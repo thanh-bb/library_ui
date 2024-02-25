@@ -172,7 +172,7 @@ function Header() {
         <header className={cx('wrapper')}>
             <div className={cx('inner')}>
                 <Link to={config.routes.home} className={cx('logo-link')}>
-                    <img src={images.logo} alt="Tiktok" />
+                    <img src={images.logo} alt="Logo" />
                 </Link>
 
                 <Search />
@@ -208,7 +208,7 @@ function Header() {
                         {currentUser ? (
                             <Image
                                 className={cx('user-avatar')}
-                                src="https://files.fullstack.edu.vn/f8-prod/user_avatars/1/623d4b2d95cec.png"
+                                src="https://cand.com.vn/Files/Image/daudung/2017/07/14/thumb_660_bfc91729-e563-4696-ba5b-71f1364d403a.png"
                                 alt="Mon"
                             />
                         ) : (
