@@ -3,7 +3,7 @@ import * as httpRequest from '~/utils/httpRequest';
 
 export const search = async (q, type = 'less') => {
     try {
-        const res = await httpRequest.get('users/search', {
+        const res = await httpRequest.get('/api/Sach', {  // Thêm '/api/Sach' vào đây để chỉ định đường dẫn đầy đủ
             params: {
                 q,
                 type
@@ -15,3 +15,4 @@ export const search = async (q, type = 'less') => {
         console.log(error);
     }
 };
+

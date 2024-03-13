@@ -1,0 +1,1 @@
+export { UserHome as default } from './UserHome';

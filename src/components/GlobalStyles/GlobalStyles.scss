@@ -9,9 +9,9 @@
     --font-family: 'ProximaNova', sans-serif;
 
     // Default layout
-    --default-layout-header-height: 60px;
-    --default-layout-width: 1150px;
-    --default-layout-horizontal-spacer: 24px;
+    --default-layout-header-height: 70px;
+    --default-layout-width: 1490px;
+    --default-layout-horizontal-spacer: 5px;
 }
 
 * {
@@ -31,6 +31,10 @@ body {
     text-rendering: optimizespeed;
     color: var(--text-color);
     overflow-y: overlay;
+    background-image: url('~/src/assets/images/background.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    overflow: hidden;
 }
 
 // Scrollbar CSS

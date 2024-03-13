@@ -1,0 +1,23 @@
+.wrapper {
+    display: flex;
+    justify-content: center; /* căn giữa theo chiều ngang */
+    align-items: center; /* căn giữa theo chiều dọc */
+    height: 100vh; /* Đảm bảo form căn giữa trên toàn bộ chiều cao của màn hình */
+    background-color: #c1bfbf5c;
+}
+
+.container {
+    width: 500px; /* hoặc bất kỳ kích thước nào bạn muốn */
+    padding: 20px;
+    font-size: large;
+}
+.form-login {
+    padding: 20px;
+}
+.card-header {
+    text-align: center;
+    font-weight: bold;
+}
+.form-group {
+    font-size: 30px;
+}

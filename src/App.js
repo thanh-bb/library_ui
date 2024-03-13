@@ -2,15 +2,22 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { publicRoutes } from '~/routes'
 import DefaultLayout from "~/layouts";
 import { Fragment } from "react";
+import { ToastContainer } from 'react-toastify';
+import Login from "./Login/Login";
 
 function App() {
   return (
     <Router>
       <div className="App">
+        <ToastContainer theme='colored' position='top-center'></ToastContainer>
+
         <Routes>
+          <Route path='/login' element={<Login />}></Route>
+
           {publicRoutes.map((route, index) => {
             const Page = route.component;
-            let Layout = DefaultLayout
+            let Layout = DefaultLayout;
+
 
             if (route.layout) {
               Layout = route.layout

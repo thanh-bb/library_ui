@@ -1,0 +1,1 @@
+export { Sach as default } from './Sach';
