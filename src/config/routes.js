@@ -10,7 +10,7 @@ const routes = {
     import: 'https://localhost:44344/Home/UploadExcel',
     nguoidung: '/nguoidung',
     userhome: '/userhome',
-    chitietsach: '/chitietsach'
-};
-
+    chitietsach: '/chitietsach/:id',
+    quanlyphieumuon: '/quanlyphieumuon'
+}
 export default routes;

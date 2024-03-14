@@ -32,8 +32,6 @@ function Search() {
         fetch(`https://localhost:44315/api/Sach?q=${encodeURIComponent(debounced)}&type=less`)
             .then((res) => res.json())
             .then((data) => {
-                console.log(data); // In ra dữ liệu trả về từ API để kiểm tra cấu trúc của nó
-                // Lọc danh sách dữ liệu dựa trên từ khóa tìm kiếm
                 const filteredData = data.filter(item => item.s_TenSach.toLowerCase().includes(debounced.toLowerCase()));
                 setSearchResult(filteredData); // Gán danh sách dữ liệu đã lọc vào setSearchResult
                 setLoading(false);
@@ -61,7 +59,7 @@ function Search() {
             render={(attrs) => (
                 <div className={cx('search-result')} tabIndex="-1" {...attrs}>
                     <PopperWrapper>
-                        <h4 className={cx('search-title')}>Accounts</h4>
+                        <h4 className={cx('search-title')}>Kết quả tìm kiếm</h4>
                         {searchResult?.map((result) => (
                             <AccountItem key={result.s_Id} data={result} />
                         ))}
@@ -74,7 +72,7 @@ function Search() {
                 <input
                     ref={inputRef}
                     value={searchValue}
-                    placeholder="Search accounts and videos"
+                    placeholder="Tìm kiếm sách"
                     spellCheck={false}
                     onChange={(e) => setSearchValue(e.target.value)}
                     onFocus={() => setShowResult(true)}

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import classNames from 'classnames/bind';
 import styles from './NguoiDung.module.scss';
+import { Link } from "react-router-dom";
 
 
 const cx = classNames.bind(styles);
@@ -193,9 +194,9 @@ export class NguoiDung extends Component {
 
         return (
             <div className={cx('wrapper')}>
-
+                <Link className={cx('btn-grad')} to={"https://localhost:44344/Home/UploadExcel"}>Import File</Link>
                 <table className="table table-hover"  >
-                    <thead className="table-primary">
+                    <thead className="table-danger">
                         <tr >
                             <th>
                                 ID

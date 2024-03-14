@@ -28,7 +28,7 @@ function Sidebar() {
                     />
                     <MenuItem title="Thể Loại" to={config.routes.theloai} icon={<LiveIcon />} activeIcon={<LiveActiveIcon />} />
                     <MenuItem title="Sách" to={config.routes.sach} icon={<LiveIcon />} activeIcon={<LiveActiveIcon />} />
-                    <MenuItem title="ImportFile" to={config.routes.import} icon={<LiveIcon />} activeIcon={<LiveActiveIcon />} />
+                    {/* <MenuItem title="ImportFile" to={config.routes.import} icon={<LiveIcon />} activeIcon={<LiveActiveIcon />} /> */}
                     <MenuItem
                         title="Người Dùng"
                         to={config.routes.nguoidung}

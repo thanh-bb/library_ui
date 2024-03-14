@@ -71,9 +71,6 @@ export class UserHome extends Component {
             .then(data => {
                 this.setState({ theloais: data });
             });
-
-
-
     }
 
     componentDidMount() {
@@ -97,31 +94,33 @@ export class UserHome extends Component {
             return tl ? tl.tl_TenTheLoai : "Không xác định";
         };
         return (
+
             <div className="wrapper">
-                <div className="row justify-content-center mt-5">
+                <div className="row justify-content-center mt-5 " style={{ width: "100%" }}>
                     {sachs.map(dep =>
                         <div className="col-md-2 m-4" key={dep.s_Id}>
-                            <div className="bg-body-tertiary card h-100 p-3 shadow p-3 bg-body-tertiary rounded rounded-4 "  >
+                            <div className="bg-body-tertiary card h-100 p-3 shadow  bg-body-tertiary rounded rounded-4">
                                 <div className="d-flex justify-content-center">
-                                    <img alt="" className="card-img-top mt-5" src={PhotoPath + dep.s_HinhAnh} style={{ width: "100px", height: "100px" }} />
+                                    <img alt="" className="card-img-top mt-5" src={PhotoPath + dep.s_HinhAnh} style={{ width: "100px", height: "150px" }} />
                                 </div>
                                 <div className="card-body ">
                                     <p className="card-title fw-bold ttext-start">{dep.s_TenSach}</p>
                                     <p className="card-text text-start fw-bolder">{getAuthorNameById(dep.tg_Id)}</p>
                                     <p className="card-text text-start fw-light text-primary">{getTheLoaiById(dep.tl_Id)}</p>
-                                    <h5 className="card-text text-start  " > Trạng thái:
-                                        <span className="text-success fst-italic fw-bold">   {dep.s_TrangThaiMuon === true ? " Sẵn sàng" : dep.s_TrangThaiMuon === false ? "Chưa sẵn sàng" : "Trạng thái không xác định"}
+                                    <h5 className="card-text text-start"> Trạng thái:
+                                        <span className="text-success fst-italic fw-bold"> {dep.s_TrangThaiMuon === true ? " Sẵn sàng" : dep.s_TrangThaiMuon === false ? "Chưa sẵn sàng" : "Trạng thái không xác định"}
                                         </span>
                                     </h5>
                                 </div>
-                                <div className="d-grid gap-2 ">
-                                    <Link to="/chitietsach" className="btn fs-3 wt-100" style={{ backgroundColor: "#fe2c55", color: "#fff" }} >Xem chi tiết</Link>
+                                <div className="d-grid gap-2">
+                                    <Link to={`/chitietsach/${dep.s_Id}`} className="btn fs-3 wt-100" style={{ backgroundColor: "#fe2c55", color: "#fff" }}>Xem chi tiết</Link>
                                 </div>
                             </div>
                         </div>
                     )}
                 </div>
-            </div >
+            </div>
+
 
 
         )

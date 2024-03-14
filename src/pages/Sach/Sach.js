@@ -178,7 +178,7 @@ export class Sach extends Component {
 
     editClick(dep) {
         this.setState({
-            modalTitle: "Edit Sach",
+            modalTitle: "Chỉnh sửa thông tin sách",
             s_Id: dep.s_Id,
             s_TenSach: dep.s_TenSach,
             s_SoLuong: dep.s_SoLuong,
@@ -258,19 +258,42 @@ export class Sach extends Component {
     changes_NhaXuatBan = (e) => {
         this.setState({ nxb_Id: e.target.value });
     }
+
+    changes_SoLuong = (e) => {
+        // Kiểm tra nếu giá trị nhập vào không phải là số hoặc nhỏ hơn 0, thì không cho phép cập nhật state
+        if (!isNaN(e.target.value) && parseInt(e.target.value) >= 0) {
+            this.setState({ s_SoLuong: e.target.value });
+        } else {
+            // Nếu giá trị nhập vào không hợp lệ, bạn có thể thông báo cho người dùng hoặc xử lý theo cách khác tùy ý
+            alert("Số lượng không hợp lệ!");
+        }
+    }
+
     changes_TheLoai = (e) => {
         this.setState({ tl_Id: e.target.value });
     }
+
     changes_LoaiSach = (e) => {
         this.setState({ ls_Id: e.target.value });
     }
 
+    changes_MoTa = (e) => {
+        this.setState({ s_MoTa: e.target.value });
+    }
     changes_KeSach = (e) => {
         this.setState({ ks_Id: e.target.value });
     }
 
     changes_OSach = (e) => {
         this.setState({ os_Id: e.target.value });
+    }
+
+    changes_TrangThaiMuon = (e) => {
+        this.setState({ s_TrangThaiMuon: e.target.value });
+    }
+
+    changes_ChiDoc = (e) => {
+        this.setState({ s_ChiDoc: e.target.value });
     }
 
     updateClick() {
@@ -307,7 +330,6 @@ export class Sach extends Component {
             })
     }
 
-
     deleteClick(id) {
         if (window.confirm("Ban co chac chan muon xoa?")) {
             fetch("https://localhost:44315/api/Sach/" + id, {
@@ -326,6 +348,7 @@ export class Sach extends Component {
                 })
         }
     }
+
     imageUpload = (e) => {
         e.preventDefault();
 
@@ -344,7 +367,6 @@ export class Sach extends Component {
 
     render() {
         const {
-
             modalTitle,
             tl_Id,
             s_Id,
@@ -363,7 +385,11 @@ export class Sach extends Component {
             kesachs,
             osachs,
             PhotoPath,
-            PhotoFileName
+            PhotoFileName,
+            s_TrangThaiMuon,
+            s_ChiDoc,
+            s_MoTa,
+            s_SoLuong
         } = this.state;
 
         const formattedDate = new Date(s_NamXuatBan).toISOString().split("T")[0];
@@ -371,14 +397,15 @@ export class Sach extends Component {
         return (
             <div className={cx('wrapper')}>
                 <button type="button"
-                    className="btn btn-primary btn-lg m-2 float-end fs-5 "
+                    className={cx('btn-grad')}
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModal"
                     onClick={() => this.addClick()}>
                     Thêm Sách
                 </button>
+
                 <table className="table table-hover"  >
-                    <thead className="table-primary">
+                    <thead className="table-danger">
                         <tr >
                             <th className="text-start w-25">
                                 <div className="d-flex flex-row">
@@ -467,28 +494,29 @@ export class Sach extends Component {
                             </tr>)}
                     </tbody>
                 </table>
-                <div className="modal fade" id="exampleModal" tabIndex="-1" aria-hidden="true">
-                    <div className="modal-dialog modal-lg modal-dialog-centered">
+
+                <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
+                    <div className="modal-dialog modal-lg modal-dialog-centered ">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">{modalTitle}</h5>
+                                <h5 className="modal-title fs-3 fw-bold">{modalTitle}</h5>
                                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                 ></button>
                             </div>
 
-                            <div className="modal-body">
+                            <div className="modal-body ">
                                 <div className="d-flex flex-row bd-hightlight mb-3">
 
-                                    <div className="p-2 w-50 bd-highlight">
+                                    <div className="p-2 w-50 bd-highlight fs-2">
 
-                                        <div className="input-group mb-3">
+                                        <div className="input-group mb-3 input-group-lg input-group-lg">
                                             <span className="input-group-text">Tên Sách</span>
                                             <input type="text" className="form-control"
                                                 value={s_TenSach}
                                                 onChange={this.changeTenSach} />
                                         </div>
 
-                                        <div className="input-group mb-3">
+                                        <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Tác giả</span>
                                             <select className="form-select"
                                                 onChange={this.changeTacGia}
@@ -501,7 +529,7 @@ export class Sach extends Component {
                                             </select>
                                         </div>
 
-                                        <div className="input-group mb-3">
+                                        <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Năm xuất bản</span>
                                             <input type="date" className="form-control"
                                                 value={formattedDate} // Sử dụng ngày tháng đã được định dạng
@@ -509,7 +537,7 @@ export class Sach extends Component {
                                         </div>
 
 
-                                        <div className="input-group mb-3">
+                                        <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Nhà Xuất Bản</span>
                                             <select className="form-select"
                                                 onChange={this.changes_NhaXuatBan}
@@ -522,7 +550,14 @@ export class Sach extends Component {
                                             </select>
                                         </div>
 
-                                        <div className="input-group mb-3">
+                                        <div className="input-group mb-3 input-group-lg input-group-lg">
+                                            <span className="input-group-text">Số lượng</span>
+                                            <input type="number" className="form-control"
+                                                value={s_SoLuong}
+                                                onChange={this.changes_SoLuong} />
+                                        </div>
+
+                                        <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Thể Loại</span>
                                             <select className="form-select"
                                                 onChange={this.changes_TheLoai}
@@ -535,7 +570,22 @@ export class Sach extends Component {
                                             </select>
                                         </div>
 
-                                        <div className="input-group mb-3">
+
+                                        <div className="input-group mb-3 input-group-lg">
+                                            <span className="input-group-text">Tóm tắt mô tả</span>
+                                            <textarea
+                                                type="text"
+                                                className="form-control"
+                                                style={{ width: "500px", height: "80px" }} // Điều chỉnh độ rộng tại đây
+                                                value={s_MoTa}
+                                                onChange={this.changes_MoTa}
+                                                maxLength={2000} // Giới hạn độ dài tại đây
+                                            />
+                                        </div>
+
+
+
+                                        <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Kệ</span>
                                             <select className="form-select"
                                                 onChange={this.changes_KeSach}
@@ -547,7 +597,7 @@ export class Sach extends Component {
                                                 </option>)}
                                             </select>
                                         </div>
-                                        <div className="input-group mb-3">
+                                        <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Ô</span>
                                             <select className="form-select"
                                                 onChange={this.changes_OSach}
@@ -560,7 +610,7 @@ export class Sach extends Component {
                                             </select>
                                         </div>
 
-                                        <div className="input-group mb-3">
+                                        <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Loại Sách</span>
                                             <select className="form-select"
                                                 onChange={this.changes_LoaiSach}
@@ -572,8 +622,28 @@ export class Sach extends Component {
                                                 </option>)}
                                             </select>
                                         </div>
+                                        <div className="input-group mb-3 input-group-lg">
+                                            <span className="input-group-text">Trạng thái trong kho</span>
+                                            <select className="form-select"
+                                                onChange={this.changes_TrangThaiMuon}
+                                                value={s_TrangThaiMuon}>
+                                                <option value="">Chọn trạng thái</option>
+                                                <option value={true}>Trong kho sẵn sàng</option>
+                                                <option value={false}>Chưa sẵn sàng</option>
 
+                                            </select>
+                                        </div>
+                                        <div className="input-group mb-3 input-group-lg">
+                                            <span className="input-group-text">Cho phép mượn về nhà</span>
+                                            <select className="form-select"
+                                                onChange={this.changes_ChiDoc}
+                                                value={s_ChiDoc}>
+                                                <option value="">Chọn </option>
+                                                <option value={true}>Chỉ được đọc tại thư viện </option>
+                                                <option value={false}>Cho phép mượn về nhà</option>
 
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div className="p-2 w-50 bd-highlight">
@@ -593,9 +663,9 @@ export class Sach extends Component {
 
                                 {s_Id !== 0 ?
                                     <button type="button"
-                                        className="btn btn-primary float-start"
+                                        className="btn btn-primary float-end fs-2"
                                         onClick={() => this.updateClick()}>
-                                        Update
+                                        Cập nhật thông tin
                                     </button> : null}
                             </div>
                         </div>

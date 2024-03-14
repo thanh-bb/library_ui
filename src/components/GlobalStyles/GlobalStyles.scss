@@ -6,7 +6,7 @@
     --white: #fff;
     --text-color: #161823;
 
-    --font-family: 'ProximaNova', sans-serif;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     // Default layout
     --default-layout-header-height: 70px;
@@ -31,7 +31,7 @@ body {
     text-rendering: optimizespeed;
     color: var(--text-color);
     overflow-y: overlay;
-    background-image: url('~/src/assets/images/background.png');
+    background-image: url('~/src/assets/images/background_gradient.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     overflow: hidden;

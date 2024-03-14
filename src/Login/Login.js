@@ -107,8 +107,8 @@ const Login = () => {
                             </div>
                         </div>
 
-                        <div className="d-grid gap-2 col-6 mx-auto mt-5">
-                            <button type="submit" className="btn btn-primary p-3 fs-3 fw-bold mb-3">SUBMIT</button>
+                        <div className='d-grid gap-2 col-6 mx-auto mt-5'>
+                            <button type="submit" className={cx('btn-grad')}>SUBMIT</button>
                         </div>
 
                     </div>

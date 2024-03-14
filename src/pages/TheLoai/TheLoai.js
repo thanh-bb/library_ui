@@ -202,14 +202,14 @@ export class TheLoai extends Component {
         return (
             <div className={cx('wrapper')}>
                 <button type="button"
-                    className="btn btn-primary btn-lg m-2 float-end fs-5 "
+                    className={cx('btn-grad')}
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModal"
                     onClick={() => this.addClick()}>
                     Thêm Thể Loại
                 </button>
                 <table className="table table-hover"  >
-                    <thead className="table-primary">
+                    <thead className="table-danger">
                         <tr >
                             <th className="text-start w-25">
                                 <div className="d-flex flex-row">

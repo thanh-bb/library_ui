@@ -7,9 +7,8 @@ import PropTypes from 'prop-types';
 const cx = classNames.bind(styles);
 
 function AccountItem({ data }) {
-    console.log(data)
     return (
-        <Link to={`/chitietsach`} className={cx('wrapper')}>
+        <Link to={`/chitietsach/${data.s_Id}`} className={cx('wrapper')}>
 
             {/* <Image className={cx('avatar')} src={data.avatar} alt={data.S_TenSach} /> */}
             <div className={cx('info')}>
