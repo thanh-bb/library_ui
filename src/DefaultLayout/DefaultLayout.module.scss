@@ -22,4 +22,5 @@
         100vh - var(--default-layout-header-height) - 20px
     ); /* Chiều dài của content là 100% chiều cao của viewport trừ chiều cao của header và khoảng cách 10px ở đáy */
     overflow-y: auto; /* Thêm thanh cuộn khi nội dung vượt quá kích thước */
+    margin-right: 6px;
 }

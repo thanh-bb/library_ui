@@ -36,35 +36,31 @@ const Login = () => {
             }).then((res) => {
                 return res.json();
             }).then((resp) => {
-                //console.log(resp)
-
-                const token = resp.JWTToken;
-
-                if (token) {
+                console.log(resp); // Log the response from the backend
+                if (resp && resp.JWTToken) {
+                    const token = resp.JWTToken;
+                    console.log(token); // Log the token received from the backend
                     try {
-                        const decodedToken = jwtDecode(token, 'this is my custom Secret key for authentication'); // Include secret key
-
-                        // Kiểm tra quyền của người dùng
+                        const decodedToken = jwtDecode(token, 'this is my custom Secret key for authentication');
+                        console.log(decodedToken); // Log the decoded token
                         if (decodedToken.role === '01') {
                             usernavigate('/home');
-                        }
-                        else {
+                        } else {
                             usernavigate('/userhome');
                         }
-
                         toast.success('Success');
                         sessionStorage.setItem('username', username);
                         sessionStorage.setItem('jwttoken', token);
-
                     } catch (error) {
+                        console.error(error); // Log any decoding errors
                         toast.error('Login Failed due to :' + error.message);
                     }
                 } else {
-                    toast.error('Login Failed due to :Invalid token specified');
+                    console.error('Invalid response from server'); // Log if the response or token is missing
+                    toast.error('Login Failed due to :Invalid response from server');
                 }
-            }).catch((err) => {
-                toast.error('Login Failed due to :' + err.message);
             });
+
         }
 
     }

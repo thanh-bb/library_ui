@@ -11,6 +11,7 @@ const routes = {
     nguoidung: '/nguoidung',
     userhome: '/userhome',
     chitietsach: '/chitietsach/:id',
-    quanlyphieumuon: '/quanlyphieumuon'
+    quanlyphieumuon: '/quanlyphieumuon',
+    phieumuon: '/chitietsach/phieumuon/:id'
 }
 export default routes;

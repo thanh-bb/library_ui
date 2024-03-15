@@ -18,6 +18,7 @@ import NguoiDung from '~/pages/NguoiDung';
 import UserHome from '~/User/pages/UserHome';
 import ChiTietSach from '~/User/pages/ChiTietSach';
 import QuanLyPhieuMuon from '~/User/pages/QuanLyPhieuMuon';
+import PhieuMuon from '~/User/pages/PhieuMuon';
 
 // Public routes
 const publicRoutes = [
@@ -36,6 +37,7 @@ const publicRoutes = [
     { path: config.routes.userhome, component: UserHome, layout: UserLayout },
     { path: config.routes.chitietsach, component: ChiTietSach, layout: UserLayout },
     { path: config.routes.quanlyphieumuon, component: QuanLyPhieuMuon, layout: UserLayout },
+    { path: config.routes.phieumuon, component: PhieuMuon, layout: UserLayout },
 
 ];
 

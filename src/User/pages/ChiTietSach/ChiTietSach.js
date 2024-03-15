@@ -6,6 +6,8 @@ import styles from './ChiTietSach.module.scss';
 const cx = classNames.bind(styles);
 
 function ChiTietSach() {
+
+
     let { id } = useParams(); // Lấy id sách từ URL
 
     const [sach, setSach] = useState(null);
@@ -181,7 +183,7 @@ function ChiTietSach() {
                                         <span className='text-primary'>{sach.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</span>
                                     </h3>
 
-                                    <Link type="button" className={`btn btn-success fs-3 mt-5 p-3 ${sach.s_TrangThaiMuon === true && sach.s_ChiDoc === false ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
+                                    <Link type="button" to={`/chitietsach/phieumuon/${sach.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach.s_TrangThaiMuon === true && sach.s_ChiDoc === false ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
                                 </>
                             )}
                         </div>
@@ -192,5 +194,6 @@ function ChiTietSach() {
         </div>
     );
 }
+
 
 export default ChiTietSach;
