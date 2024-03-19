@@ -3,29 +3,29 @@ import classNames from 'classnames/bind';
 import Header from '~/layouts/components/Header';
 import styles from './UserLayout.module.scss';
 import UserSidebar from '~/layouts/components/UserSidebar';
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 
 const cx = classNames.bind(styles);
 
 function UserLayout({ children }) {
-    const [listupdate] = useState(null);
-    useEffect(() => {
+    // const [listupdate] = useState(null);
+    // useEffect(() => {
 
-        let jwttoken = sessionStorage.getItem('jwttoken');
+    //     let jwttoken = sessionStorage.getItem('jwttoken');
 
-        fetch("https://localhost:44394/Customer", {
-            headers: {
-                'Authorization': 'bearer ' + jwttoken
-            }
-        }).then((res) => {
-            return res.json();
-        }).then((resp) => {
-            listupdate(resp);
-        }).catch((err) => {
-            console.log(err.message)
-        });
+    //     fetch("https://localhost:44394/Customer", {
+    //         headers: {
+    //             'Authorization': 'bearer ' + jwttoken
+    //         }
+    //     }).then((res) => {
+    //         return res.json();
+    //     }).then((resp) => {
+    //         listupdate(resp);
+    //     }).catch((err) => {
+    //         console.log(err.message)
+    //     });
 
-    });
+    // });
     return (
         <div className={cx('wrapper')}>
             <Header />

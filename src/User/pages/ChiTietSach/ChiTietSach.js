@@ -183,7 +183,7 @@ function ChiTietSach() {
                                         <span className='text-primary'>{sach.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</span>
                                     </h3>
 
-                                    <Link type="button" to={`/chitietsach/phieumuon/${sach.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach.s_TrangThaiMuon === true && sach.s_ChiDoc === false ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
+                                    <Link type="button" to={`/chitietsach/formphieumuon/${sach.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach.s_TrangThaiMuon === true && sach.s_ChiDoc === false ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
                                 </>
                             )}
                         </div>

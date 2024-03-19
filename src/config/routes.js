@@ -1,17 +1,23 @@
 const routes = {
     login: '/',
-    danhmuc: '/danhmuc',
-    home: '/home',
+
+    //Admin
+    danhmuc: '/admin/danhmuc',
+    home: '/admin/home',
     profile: '/:nickname',
     upload: '/upload',
     search: '/search',
-    theloai: '/theloai',
-    sach: '/sach',
+    theloai: '/admin/theloai',
+    sach: '/admin/sach',
     import: 'https://localhost:44344/Home/UploadExcel',
-    nguoidung: '/nguoidung',
+    nguoidung: '/admin/nguoidung',
+    phieumuon: '/admin/phieumuon',
+
+
+    //User
     userhome: '/userhome',
     chitietsach: '/chitietsach/:id',
     quanlyphieumuon: '/quanlyphieumuon',
-    phieumuon: '/chitietsach/phieumuon/:id'
+    formphieumuon: '/chitietsach/formphieumuon/:id'
 }
 export default routes;

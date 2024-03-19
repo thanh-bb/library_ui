@@ -44,7 +44,7 @@ const Login = () => {
                         const decodedToken = jwtDecode(token, 'this is my custom Secret key for authentication');
                         console.log(decodedToken); // Log the decoded token
                         if (decodedToken.role === '01') {
-                            usernavigate('/home');
+                            usernavigate('/admin/home');
                         } else {
                             usernavigate('/userhome');
                         }

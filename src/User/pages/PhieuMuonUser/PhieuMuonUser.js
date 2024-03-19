@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
-import styles from './PhieuMuon.module.scss';
+import styles from './PhieuMuonUser.module.scss';
 import { jwtDecode } from 'jwt-decode';
 
 const cx = classNames.bind(styles);
 
-function PhieuMuon() {
+function PhieuMuonUser() {
     let { id } = useParams(); // Lấy id sách từ URL
     let jwttoken = sessionStorage.getItem('jwttoken');
 
@@ -280,4 +280,4 @@ function PhieuMuon() {
     );
 }
 
-export default PhieuMuon;
+export default PhieuMuonUser;

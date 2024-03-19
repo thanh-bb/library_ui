@@ -15,10 +15,13 @@ import TheLoai from '~/pages/TheLoai';
 import Sach from '~/pages/Sach';
 import ImportFile from '~/pages/ImportFile';
 import NguoiDung from '~/pages/NguoiDung';
+import PhieuMuon from '~/pages/PhieuMuon';
+
+
 import UserHome from '~/User/pages/UserHome';
 import ChiTietSach from '~/User/pages/ChiTietSach';
 import QuanLyPhieuMuon from '~/User/pages/QuanLyPhieuMuon';
-import PhieuMuon from '~/User/pages/PhieuMuon';
+import PhieuMuonUser from '~/User/pages/PhieuMuonUser/PhieuMuonUser';
 
 // Public routes
 const publicRoutes = [
@@ -30,6 +33,7 @@ const publicRoutes = [
     // { path: config.routes.profile, component: Profile },
     { path: config.routes.home, component: Home },
     { path: config.routes.theloai, component: TheLoai },
+    { path: config.routes.phieumuon, component: PhieuMuon },
     { path: config.routes.upload, component: Upload, layout: HeaderOnly },
     { path: config.routes.search, component: Search, layout: null },
 
@@ -37,7 +41,7 @@ const publicRoutes = [
     { path: config.routes.userhome, component: UserHome, layout: UserLayout },
     { path: config.routes.chitietsach, component: ChiTietSach, layout: UserLayout },
     { path: config.routes.quanlyphieumuon, component: QuanLyPhieuMuon, layout: UserLayout },
-    { path: config.routes.phieumuon, component: PhieuMuon, layout: UserLayout },
+    { path: config.routes.formphieumuon, component: PhieuMuonUser, layout: UserLayout },
 
 ];
 
