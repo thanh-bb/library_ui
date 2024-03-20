@@ -150,7 +150,7 @@ function PhieuMuonUser() {
                 body: JSON.stringify({
                     pmNgayMuon: ngayMuon,
                     pmHanTra: ngayHanTra,
-                    pmTrangThai: 'string',
+                    pmTrangThai: 'Đang mượn',
                     ndId: user.nd_Id,
                     chiTietPhieuMuons: [{
                         sId: sach.s_Id,
