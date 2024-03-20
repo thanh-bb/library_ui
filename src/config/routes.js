@@ -18,6 +18,7 @@ const routes = {
     userhome: '/userhome',
     chitietsach: '/chitietsach/:id',
     quanlyphieumuon: '/quanlyphieumuon',
-    formphieumuon: '/chitietsach/formphieumuon/:id'
+    formphieumuon: '/chitietsach/formphieumuon/:id',
+    chitietphieutra: '/chitietphieutra/:id'
 }
 export default routes;

@@ -12,6 +12,7 @@ export class PhieuMuon extends Component {
         this.state = {
             phieumuons: [],
             nguoidungs: [],
+            phieutras: [],
             modalTitle: "",
             pm_NgayMuon: "",
             pm_HanTra: "",
@@ -68,7 +69,8 @@ export class PhieuMuon extends Component {
     }
 
     refreshList() {
-        fetch("https://localhost:44315/api/PhieuMuon")
+
+        fetch("https://localhost:44315/api/QuanLyPhieuMuon")
             .then(response => response.json())
             .then(data => {
                 // Sắp xếp dữ liệu theo ngày mượn giảm dần
@@ -88,6 +90,12 @@ export class PhieuMuon extends Component {
             .then(data => {
                 this.setState({ nguoidungs: data });
             });
+
+        fetch(`https://localhost:44315/api/QuanLyPhieuTra`)
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ phieutras: data });
+            });
     }
 
 
@@ -99,42 +107,17 @@ export class PhieuMuon extends Component {
         this.setState({ pm_TrangThai: e.target.value });
     }
 
-    addClick() {
-        this.setState({
-            modalTitle: "Add PhieuMuon",
-            pm_Id: 0,
-            pm_TenPhieuMuon: ""
-        });
-    }
+
 
     editClick(dep) {
         this.setState({
             modalTitle: "Chỉnh sửa trạng thái phiếu mượn",
-            pm_Id: dep.pm_Id,
-            pm_TrangThai: dep.pm_TrangThai,
-            nd_Id: dep.nd_Id
+            pm_Id: dep.Id_PhieuMuon,
+            pm_TrangThai: dep.TrangThai,
+            nd_Id: dep.Id_User
         });
     }
 
-    createClick() {
-        fetch("https://localhost:44315/api/PhieuMuon", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                pmTenPhieuMuon: this.state.pm_TenPhieuMuon // Thay pm_TenPhieuMuon thành pmTenPhieuMuon
-            })
-        })
-            .then(res => res.json())
-            .then((result) => {
-                alert(result);
-                this.refreshList();
-            }, (error) => {
-                alert('Failed');
-            })
-    }
 
     updateClick() {
         fetch("https://localhost:44315/api/PhieuMuon", {
@@ -175,7 +158,7 @@ export class PhieuMuon extends Component {
                         // Lấy thông tin cần thiết từ phản hồi
                         const s_Id = data[0].s_Id;
                         const ctpt_SoLuongSachTra = data[0].ctpm_SoLuongSachMuon;
-                        console.log(ctpt_SoLuongSachTra);
+
 
 
                         // Sau khi lấy thông tin, gửi yêu cầu POST để tạo phiếu trả
@@ -186,8 +169,9 @@ export class PhieuMuon extends Component {
                                 'Content-Type': 'application/json'
                             },
                             body: JSON.stringify({
-                                ptNgayTra: new Date(), // Lấy ngày và giờ hiện tại
-                                ndId: nd_Id, // Sử dụng nd_Id từ trạng thái đang được chọn
+                                ptNgayTra: new Date(),
+                                ndId: nd_Id,
+                                pmId: pm_Id,
                                 chiTietPhieuTras: [
                                     {
                                         sId: s_Id,
@@ -220,12 +204,6 @@ export class PhieuMuon extends Component {
     }
 
 
-
-
-
-
-
-
     deleteClick(id) {
         if (window.confirm("Ban co chac chan muon xoa?")) {
             fetch("https://localhost:44315/api/PhieuMuon/" + id, {
@@ -252,7 +230,8 @@ export class PhieuMuon extends Component {
             modalTitle,
             pm_Id,
             pm_TrangThai,
-            nguoidungs
+            nguoidungs,
+            phieutras
 
         } = this.state;
 
@@ -274,21 +253,24 @@ export class PhieuMuon extends Component {
                             <th className="text-start">
                                 Người mượn
                             </th>
-                            <th className="text-start w-25">
+                            <th className="text-start">
+                                Sách mượn
+                            </th>
+                            <th className="text-start ">
                                 <div className="d-flex flex-row">
-                                    <input className="form-control m-2 fs-4"
+                                    {/* <input className="form-control m-2 fs-4"
                                         onChange={this.changepm_NgayMuonFilter}
-                                        placeholder="Tìm theo ngày mượn" />
+                                        placeholder="Tìm theo ngày mượn" /> */}
 
                                     <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('pm_NgayMuon', true)}>
+                                        onClick={() => this.sortResult('NgayMuon', true)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
                                             <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
                                         </svg>
                                     </button>
 
                                     <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('pm_NgayMuon', false)}>
+                                        onClick={() => this.sortResult('NgayMuon', false)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
                                             <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
                                         </svg>
@@ -296,21 +278,21 @@ export class PhieuMuon extends Component {
                                 </div >
                                 Ngày Mượn
                             </th>
-                            <th className="text-start w-25">
+                            <th className="text-start ">
                                 <div className="d-flex flex-row">
-                                    <input className="form-control m-2 fs-4"
+                                    {/* <input className="form-control m-2 fs-4"
                                         onChange={this.changepm_HanTraFilter}
-                                        placeholder="Tìm theo hạn trả" />
+                                        placeholder="Tìm theo hạn trả" /> */}
 
                                     <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('pm_HanTra', true)}>
+                                        onClick={() => this.sortResult('HanTra', true)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
                                             <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
                                         </svg>
                                     </button>
 
                                     <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('pm_HanTra', false)}>
+                                        onClick={() => this.sortResult('HanTra', false)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
                                             <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
                                         </svg>
@@ -318,8 +300,12 @@ export class PhieuMuon extends Component {
                                 </div >
                                 Hạn Trả
                             </th>
+
                             <th className="text-start">
                                 Trạng Thái
+                            </th>
+                            <th className="text-start">
+                                Số ngày trễ hạn
                             </th>
                             <th className="text-start">
                                 Options
@@ -328,14 +314,44 @@ export class PhieuMuon extends Component {
                     </thead>
                     <tbody>
                         {phieumuons.map(dep =>
-                            <tr key={dep.pm_Id}>
-                                <td className="text-start">{dep.pm_Id}</td>
+                            <tr key={dep.Id_PhieuMuon}>
+                                <td className="text-start">{dep.Id_PhieuMuon}</td>
                                 <td className="text-start">
-                                    {nguoidungs.find(ng => ng.nd_Id === dep.nd_Id)?.nd_Username}
+                                    {nguoidungs.find(ng => ng.nd_Id === dep.Id_User)?.nd_Username}
                                 </td>
-                                <td className="text-start">{new Date(dep.pm_NgayMuon).toLocaleDateString('en-GB')}</td>
-                                <td className="text-start">{new Date(dep.pm_HanTra).toLocaleDateString('en-GB')}</td>
-                                <td className="text-start">{dep.pm_TrangThai}</td>
+                                <td className="text-start">{dep.TenSach}</td>
+                                <td className="text-start">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
+                                <td className="text-start">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
+                                <td className="text-start">{dep.TrangThai}</td>
+
+                                <td className="text-start">
+                                    {dep.TrangThai === "Đã trả" ?
+                                        ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
+                                            `${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày (Trễ hạn)`
+                                            :
+                                            "Đúng hạn"
+                                        :
+                                        dep.TrangThai === "Đang mượn" ?
+                                            ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
+                                                `Quá hạn trả`
+                                                :
+                                                ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
+                                                    `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
+                                                    :
+                                                    "Còn hạn"
+                                            :
+                                            dep.HanTra ?
+                                                ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
+                                                    `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
+                                                    :
+                                                    "Còn hạn"
+                                                :
+                                                "Chưa cập nhật hạn trả"
+                                    }
+                                </td>
+
+
+
                                 <td className="position-relative">
                                     <button type="button"
                                         className="btn btn-light mr-1 "
@@ -348,13 +364,7 @@ export class PhieuMuon extends Component {
                                         </svg>
                                     </button>
 
-                                    <button type="button"
-                                        className="btn btn-light mr-1"
-                                        onClick={() => this.deleteClick(dep.pm_Id)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash-fill" viewBox="0 0 16 16">
-                                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
-                                        </svg>
-                                    </button>
+
 
                                 </td>
 

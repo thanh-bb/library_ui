@@ -108,23 +108,23 @@ export class QuanLyPhieuMuon extends Component {
                                 Tên Sách
                             </th>
                             <th className="text-center">Số lượng</th>
-                            <th className="text-start ">Ngày Mượn</th>
-                            <th className="text-start ">Hạn Trả</th>
-                            <th className="text-start">Trạng Thái</th>
-                            <th className="text-start">Options</th>
+                            <th className="text-center ">Ngày Mượn</th>
+                            <th className="text-center ">Hạn Trả</th>
+                            <th className="text-center">Trạng Thái</th>
+                            <th className="text-center">Options</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredChitietpms.map(dep =>
-                            <tr key={dep.Id}>
-                                <td className="text-start">{dep.Id}</td>
+                            <tr key={dep.Id_PhieuMuon}>
+                                <td className="text-start">{dep.Id_PhieuMuon}</td>
                                 <td className="text-start">{dep.TenSach}</td>
                                 <td className="text-center">{dep.SoLuongSach}</td>
-                                <td className="text-start">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
-                                <td className="text-start">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
-                                <td className="text-start">{dep.TrangThai}</td>
-                                <td className="text-start">
-                                    <Link>Xem chi tiết</Link>
+                                <td className="text-center">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
+                                <td className="text-center">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
+                                <td className="text-center">{dep.TrangThai}</td>
+                                <td className="text-center">
+                                    <Link type="button" to={`/chitietphieutra/${dep.Id_PhieuMuon}`} className={`btn btn-link fs-4`}>Xem chi tiết</Link>
                                 </td>
                             </tr>
                         )}

@@ -22,6 +22,7 @@ import UserHome from '~/User/pages/UserHome';
 import ChiTietSach from '~/User/pages/ChiTietSach';
 import QuanLyPhieuMuon from '~/User/pages/QuanLyPhieuMuon';
 import PhieuMuonUser from '~/User/pages/PhieuMuonUser/PhieuMuonUser';
+import ChiTietPhieuTra from '~/User/pages/ChiTietPhieuTra';
 
 // Public routes
 const publicRoutes = [
@@ -42,6 +43,7 @@ const publicRoutes = [
     { path: config.routes.chitietsach, component: ChiTietSach, layout: UserLayout },
     { path: config.routes.quanlyphieumuon, component: QuanLyPhieuMuon, layout: UserLayout },
     { path: config.routes.formphieumuon, component: PhieuMuonUser, layout: UserLayout },
+    { path: config.routes.chitietphieutra, component: ChiTietPhieuTra, layout: UserLayout },
 
 ];
 
