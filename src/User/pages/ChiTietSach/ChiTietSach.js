@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import styles from './ChiTietSach.module.scss';
+import { jwtDecode } from 'jwt-decode';
 
 const cx = classNames.bind(styles);
 
 function ChiTietSach() {
-
-
     let { id } = useParams(); // Lấy id sách từ URL
+    let jwttoken = sessionStorage.getItem('jwttoken');
+
+    const [userActive, setUserActive] = useState(false);
 
     const [sach, setSach] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -19,6 +21,27 @@ function ChiTietSach() {
     const [os, setOs] = useState([]);
 
     useEffect(() => {
+        const decodedToken = jwtDecode(jwttoken);
+        const userId = decodedToken.nameid;
+
+        const fetchUser = async () => {
+
+            try {
+                // Gửi yêu cầu để lấy trạng thái của NguoiDung từ nd_Id lấy từ token
+                const response = await fetch(`https://localhost:44315/api/NguoiDung/${userId}`);
+                if (response.ok) {
+                    const userData = await response.json();
+                    setUserActive(userData[0]);
+                    setLoading(false);
+                } else {
+                    throw new Error('Failed to fetch user data');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+
+        };
+
         const fetchSach = async () => {
             try {
                 const response = await fetch(`https://localhost:44315/api/Sach/${id}`);
@@ -89,6 +112,7 @@ function ChiTietSach() {
             }
         };
 
+        fetchUser();
         fetchSach();
         fetchTacGia();
         fetchNXB();
@@ -121,15 +145,14 @@ function ChiTietSach() {
         return o ? o.os_TenO : "Unknown O";
     };
 
-
     return (
         <div className={cx('wrapper')}>
             <div className="row m-5 ">
                 <div className="col-12 d-flex justify-content-center mt-5">
                     <div className="col-4 d-flex align-items-center justify-content-center m-5">
                         <img
-                            src={`https://localhost:44315/Photos/${sach.s_HinhAnh}`}
-                            alt={sach.s_TenSach}
+                            src={`https://localhost:44315/Photos/${sach?.s_HinhAnh}`}
+                            alt={sach?.s_TenSach}
                             width="200px"
                             height="300px"
                         />
@@ -140,50 +163,53 @@ function ChiTietSach() {
                                 <>
                                     <h3>
                                         <span className='fw-bold'>Tên sách: </span>
-                                        {sach.s_TenSach}
+                                        {sach?.s_TenSach}
                                     </h3>
 
                                     <h3 className='mt-3'>
                                         <span className='fw-bold '>Tác giả: </span>
-                                        {getAuthorNameById(sach.tg_Id)}
+                                        {getAuthorNameById(sach?.tg_Id)}
                                     </h3 >
 
                                     <h3 className='mt-3'>
                                         <span className='fw-bold'>Nhà xuất bản: </span>
-                                        {getNXBNameById(sach.nxb_Id)}
+                                        {getNXBNameById(sach?.nxb_Id)}
                                     </h3>
 
                                     <h3 className='mt-3'>
                                         <span className='fw-bold'>Năm xuất bản: </span>
-                                        {new Date(sach.s_NamXuatBan).toLocaleDateString('en-GB')}
+                                        {new Date(sach?.s_NamXuatBan).toLocaleDateString('en-GB')}
                                     </h3>
 
                                     <h3 className='mt-3'>
                                         <span className='fw-bold'>Mô tả: </span>
-                                        {sach.s_MoTa}
+                                        {sach?.s_MoTa}
                                     </h3>
 
                                     <h3 className='mt-3'>
                                         <span className='fw-bold'>Số lượng sách còn lại: </span>
-                                        {sach.s_SoLuong}
+                                        {sach?.s_SoLuong}
                                     </h3>
 
                                     <h3 className='mt-3'>
                                         <span className='fw-bold'>Vị trí sách : </span>
-                                        {getKeById(sach.ks_Id)} - {getOById(sach.os_Id)}
+                                        {getKeById(sach?.ks_Id)} - {getOById(sach?.os_Id)}
                                     </h3>
 
                                     <h3 className='mt-3'>
                                         <span className='fw-bold'>Trạng thái sách: </span>
-                                        <span className='text-success'>{sach.s_TrangThaiMuon === true ? " Trong kho sẵn sàng" : sach.s_TrangThaiMuon === false ? "Chưa sẵn sàng" : "Trạng thái không xác định"}</span>
+                                        <span className='text-success'>{sach?.s_TrangThaiMuon === true ? " Trong kho sẵn sàng" : sach?.s_TrangThaiMuon === false ? "Chưa sẵn sàng" : "Trạng thái không xác định"}</span>
                                     </h3>
 
                                     <h3 className='mt-3'>
                                         <span className='fw-bold text-danger'>Lưu ý: </span>
-                                        <span className='text-primary'>{sach.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</span>
+                                        <span className='text-primary'>{sach?.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach?.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</span>
                                     </h3>
 
-                                    <Link type="button" to={`/chitietsach/formphieumuon/${sach.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach.s_TrangThaiMuon === true && sach.s_ChiDoc === false ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
+                                    {/* Hiển thị nút "Tiến hành mượn sách" nếu người dùng active */}
+                                    {userActive.nd_active && (
+                                        <Link type="button" to={`/chitietsach/formphieumuon/${sach?.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach?.s_TrangThaiMuon === true && sach?.s_ChiDoc === false ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
+                                    )}
                                 </>
                             )}
                         </div>

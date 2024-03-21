@@ -9,7 +9,7 @@ const routes = {
     search: '/search',
     theloai: '/admin/theloai',
     sach: '/admin/sach',
-    import: 'https://localhost:44344/Home/UploadExcel',
+    import: '/importfile',
     nguoidung: '/admin/nguoidung',
     phieumuon: '/admin/phieumuon',
 

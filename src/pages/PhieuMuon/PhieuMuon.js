@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import classNames from 'classnames/bind';
 import styles from './PhieuMuon.module.scss';
-
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
 
@@ -222,7 +222,18 @@ export class PhieuMuon extends Component {
                 })
         }
     }
-
+    sendEmail() {
+        axios.post('https://localhost:44315/api/Mail/SendEmail')
+            .then(response => {
+                // Xử lý khi gửi email thành công, có thể hiển thị thông báo hoặc thực hiện các hành động khác
+                alert('Email đã được gửi thành công!');
+            })
+            .catch(error => {
+                // Xử lý khi gửi email thất bại
+                console.error('Error sending email:', error);
+                alert('Có lỗi xảy ra khi gửi email.');
+            });
+    }
 
     render() {
         const {
@@ -231,17 +242,13 @@ export class PhieuMuon extends Component {
             pm_Id,
             pm_TrangThai,
             nguoidungs,
-            phieutras
-
         } = this.state;
 
         return (
             <div className={cx('wrapper')}>
                 <button type="button"
                     className={cx('btn-grad')}
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                    onClick={() => this.addClick()}>
+                    onClick={() => this.sendEmail()}>
                     Gửi mail
                 </button>
                 <table className="table table-hover"  >
@@ -327,13 +334,14 @@ export class PhieuMuon extends Component {
                                 <td className="text-start">
                                     {dep.TrangThai === "Đã trả" ?
                                         ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
-                                            `${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày (Trễ hạn)`
+                                            `Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày `
                                             :
                                             "Đúng hạn"
                                         :
                                         dep.TrangThai === "Đang mượn" ?
                                             ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
-                                                `Quá hạn trả`
+                                                ` ${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn trả) `
+
                                                 :
                                                 ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
                                                     `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
@@ -389,7 +397,6 @@ export class PhieuMuon extends Component {
                                         <option value="">Chọn trạng thái</option>
                                         <option value={"Đang mượn"}>Đang mượn</option>
                                         <option value={"Đã trả"}>Đã trả</option>
-                                        <option value={"Quá hạn trả"}>Quá hạn trả</option>
                                     </select>
                                 </div>
 
