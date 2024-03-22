@@ -41,6 +41,12 @@ function Sidebar() {
                         icon={<UserGroupIcon />}
                         activeIcon={<UserGroupActiveIcon />}
                     />
+                    <MenuItem
+                        title="Phiếu Đóng Phạt"
+                        to={config.routes.phieudongphat}
+                        icon={<UserGroupIcon />}
+                        activeIcon={<UserGroupActiveIcon />}
+                    />
                 </Menu>
                 {/* <SuggestedAccounts label="Suggested accounts" />
                 <SuggestedAccounts label="Following accounts" /> */}

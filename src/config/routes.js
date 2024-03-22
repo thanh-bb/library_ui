@@ -9,9 +9,10 @@ const routes = {
     search: '/search',
     theloai: '/admin/theloai',
     sach: '/admin/sach',
-    import: '/importfile',
+    import: '/admin/importfile',
     nguoidung: '/admin/nguoidung',
     phieumuon: '/admin/phieumuon',
+    phieudongphat: '/admin/phieudongphat',
 
 
     //User

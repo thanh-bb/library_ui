@@ -23,6 +23,7 @@ import ChiTietSach from '~/User/pages/ChiTietSach';
 import QuanLyPhieuMuon from '~/User/pages/QuanLyPhieuMuon';
 import PhieuMuonUser from '~/User/pages/PhieuMuonUser/PhieuMuonUser';
 import ChiTietPhieuTra from '~/User/pages/ChiTietPhieuTra';
+import PhieuDongPhat from '~/pages/PhieuDongPhat';
 
 // Public routes
 const publicRoutes = [
@@ -35,6 +36,7 @@ const publicRoutes = [
     { path: config.routes.home, component: Home },
     { path: config.routes.theloai, component: TheLoai },
     { path: config.routes.phieumuon, component: PhieuMuon },
+    { path: config.routes.phieudongphat, component: PhieuDongPhat },
     { path: config.routes.upload, component: Upload, layout: HeaderOnly },
     { path: config.routes.search, component: Search, layout: null },
 

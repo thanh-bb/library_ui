@@ -148,6 +148,10 @@ function ChiTietSach() {
     return (
         <div className={cx('wrapper')}>
             <div className="row m-5 ">
+                {!userActive.nd_active && (
+                    <button type="button" class="btn btn-danger fs-3 mb-4">Tài khoản của bạn đã bị khóa do vi phạm quy định của thư viện nên tạm thời bạn không thể mượn sách</button>
+                )}
+
                 <div className="col-12 d-flex justify-content-center mt-5">
                     <div className="col-4 d-flex align-items-center justify-content-center m-5">
                         <img
@@ -158,6 +162,7 @@ function ChiTietSach() {
                         />
                     </div>
                     <div className="col-6 d-flex align-items-center justify-content-center">
+
                         <div className='text-start'>
                             {sach && (
                                 <>
@@ -210,6 +215,7 @@ function ChiTietSach() {
                                     {userActive.nd_active && (
                                         <Link type="button" to={`/chitietsach/formphieumuon/${sach?.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach?.s_TrangThaiMuon === true && sach?.s_ChiDoc === false ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
                                     )}
+
                                 </>
                             )}
                         </div>
