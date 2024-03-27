@@ -24,6 +24,8 @@ import QuanLyPhieuMuon from '~/User/pages/QuanLyPhieuMuon';
 import PhieuMuonUser from '~/User/pages/PhieuMuonUser/PhieuMuonUser';
 import ChiTietPhieuTra from '~/User/pages/ChiTietPhieuTra';
 import PhieuDongPhat from '~/pages/PhieuDongPhat';
+import QuanLyPDP from '~/pages/PhieuDongPhat/QuanLyPDP';
+import PDP_User from '~/User/pages/QuanLyPDP';
 
 // Public routes
 const publicRoutes = [
@@ -37,6 +39,7 @@ const publicRoutes = [
     { path: config.routes.theloai, component: TheLoai },
     { path: config.routes.phieumuon, component: PhieuMuon },
     { path: config.routes.phieudongphat, component: PhieuDongPhat },
+    { path: config.routes.quanlypdp, component: QuanLyPDP },
     { path: config.routes.upload, component: Upload, layout: HeaderOnly },
     { path: config.routes.search, component: Search, layout: null },
 
@@ -44,6 +47,7 @@ const publicRoutes = [
     { path: config.routes.userhome, component: UserHome, layout: UserLayout },
     { path: config.routes.chitietsach, component: ChiTietSach, layout: UserLayout },
     { path: config.routes.quanlyphieumuon, component: QuanLyPhieuMuon, layout: UserLayout },
+    { path: config.routes.quanlypdp_user, component: PDP_User, layout: UserLayout },
     { path: config.routes.formphieumuon, component: PhieuMuonUser, layout: UserLayout },
     { path: config.routes.chitietphieutra, component: ChiTietPhieuTra, layout: UserLayout },
 

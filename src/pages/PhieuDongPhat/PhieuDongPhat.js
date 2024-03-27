@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import classNames from 'classnames/bind';
 import styles from './PhieuDongPhat.module.scss';
-import removeDiacritics from './removeDiacritics';
+import { Link } from 'react-router-dom';
 
 
 
@@ -100,28 +100,29 @@ function PhieuDongPhat() {
                 <h1 className='fs-1 fw-bold '>Phiếu Đóng Phạt</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="row d-flex justify-content-around mt-5">
-                        <div className="col d-flex justify-content-end mt-5 offset-2 ">
+                        <div className="col d-flex justify-content-center mt-5 offset-1 ">
                             <div className='fw-bold fs-2 row mt-4'>
                                 <div className='col d-flex justify-content-end'> Mã Phiếu Mượn:</div>
                                 <div className='col '>
                                     <input
                                         type="text"
                                         value={pmId}
-                                        className="form-control fs-2"
+                                        className="form-control fs-2 "
                                         onChange={(e) => setPmId(e.target.value)}
                                     />
                                 </div>
                             </div>
                         </div>
-                        <div className="col d-flex  mt-5 ">
+                        <div className="col d-flex mt-5 ">
                             <button type="submit" className={cx('btn-grad')}>Tạo Phiếu Đóng Phạt</button>
                             <button type="button" className={cx('btn-grad')} onClick={exportToPDF}>Xuất file PDF</button>
+                            <Link to="/admin/phieudongphat/quanly" type="button" className={cx('btn-grad')} >Xem phiếu đóng phạt</Link>
                         </div>
                     </div>
                 </form>
                 {message && (
                     <div>
-                        <p className="bg-success-subtle fs-1 text-success mt-4">{message} VND</p>
+                        <p className="bg-success-subtle fs-1 text-success mt-4">{message} </p>
                         {pdp && (
                             <div>
                                 <h2 className='mt-5 fw-bold fs-1'>Chi tiết phiếu đóng phạt</h2>
@@ -137,7 +138,7 @@ function PhieuDongPhat() {
                                             </tr>
                                             <tr className='text-start'>
                                                 <th scope="row">Tổng tiền phạt:</th>
-                                                <td >{pdp.PdpTongTienPhat}</td>
+                                                <td >{pdp.PdpTongTienPhat} VND</td>
                                             </tr>
                                             <tr className='text-start'>
                                                 <th scope="row">Ngày đóng:</th>

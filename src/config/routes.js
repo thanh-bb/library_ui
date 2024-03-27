@@ -13,6 +13,7 @@ const routes = {
     nguoidung: '/admin/nguoidung',
     phieumuon: '/admin/phieumuon',
     phieudongphat: '/admin/phieudongphat',
+    quanlypdp: '/admin/phieudongphat/quanly',
 
 
     //User
@@ -20,6 +21,7 @@ const routes = {
     chitietsach: '/chitietsach/:id',
     quanlyphieumuon: '/quanlyphieumuon',
     formphieumuon: '/chitietsach/formphieumuon/:id',
-    chitietphieutra: '/chitietphieutra/:id'
+    chitietphieutra: '/chitietphieutra/:id',
+    quanlypdp_user: '/quanlyphieudongphat'
 }
 export default routes;

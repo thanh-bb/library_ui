@@ -265,9 +265,6 @@ export class PhieuMuon extends Component {
                             </th>
                             <th className="text-start ">
                                 <div className="d-flex flex-row">
-                                    {/* <input className="form-control m-2 fs-4"
-                                        onChange={this.changepm_NgayMuonFilter}
-                                        placeholder="Tìm theo ngày mượn" /> */}
 
                                     <button type="button" className="btn btn-light"
                                         onClick={() => this.sortResult('NgayMuon', true)}>
