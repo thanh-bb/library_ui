@@ -26,6 +26,7 @@ import ChiTietPhieuTra from '~/User/pages/ChiTietPhieuTra';
 import PhieuDongPhat from '~/pages/PhieuDongPhat';
 import QuanLyPDP from '~/pages/PhieuDongPhat/QuanLyPDP';
 import PDP_User from '~/User/pages/QuanLyPDP';
+import ThongTinTaiKhoan from '~/User/pages/ThongTinTaiKhoan';
 
 // Public routes
 const publicRoutes = [
@@ -48,6 +49,7 @@ const publicRoutes = [
     { path: config.routes.chitietsach, component: ChiTietSach, layout: UserLayout },
     { path: config.routes.quanlyphieumuon, component: QuanLyPhieuMuon, layout: UserLayout },
     { path: config.routes.quanlypdp_user, component: PDP_User, layout: UserLayout },
+    { path: config.routes.thongtintaikhoan, component: ThongTinTaiKhoan, layout: UserLayout },
     { path: config.routes.formphieumuon, component: PhieuMuonUser, layout: UserLayout },
     { path: config.routes.chitietphieutra, component: ChiTietPhieuTra, layout: UserLayout },
 

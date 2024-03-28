@@ -8,7 +8,7 @@ const cx = classNames.bind(styles);
 function ChiTietPhieuTra() {
     let { id } = useParams();
 
-    const [sach, setSach] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [tacgias, setTacgias] = useState([]);
@@ -46,7 +46,7 @@ function ChiTietPhieuTra() {
                 setLoading(false);
             }
         };
-        console.log(phieutras)
+
         const fetchTacGia = async () => {
             try {
                 const response = await fetch("https://localhost:44315/api/TacGia");
@@ -77,10 +77,6 @@ function ChiTietPhieuTra() {
         return <p>Error: {error}</p>;
     }
 
-    const getAuthorNameById = (tg_Id) => {
-        const author = tacgias.find(author => author.tg_Id === tg_Id);
-        return author ? author.tg_TenTacGia : "Unknown Author";
-    };
 
 
     return (
@@ -155,7 +151,7 @@ function ChiTietPhieuTra() {
                                         </tr>
                                         <tr>
                                             <th scope="row">Số ngày trễ hạn:</th>
-                                            <td className='text-danger'>
+                                            <td className='text-danger fw-bold'>
                                                 {phieutras.SoNgayTre <= 0 ? "Đúng hạn" : `${phieutras.SoNgayTre} ngày (Trễ hạn)`}
                                             </td>
 

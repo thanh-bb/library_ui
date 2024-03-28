@@ -16,6 +16,7 @@ function UserSidebar() {
             <div className={cx('side-bar')}>
                 <Menu>
                     <MenuItem title="Trang chủ" to={config.routes.userhome} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
+                    <MenuItem title="Thông tin tài khoản" to={config.routes.thongtintaikhoan} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
                     <MenuItem title="Quản lý phiếu mượn" to={config.routes.quanlyphieumuon} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
                     <MenuItem title="Quản lý phiếu đóng phạt" to={config.routes.quanlypdp_user} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
                 </Menu>

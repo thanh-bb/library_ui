@@ -22,6 +22,7 @@ const routes = {
     quanlyphieumuon: '/quanlyphieumuon',
     formphieumuon: '/chitietsach/formphieumuon/:id',
     chitietphieutra: '/chitietphieutra/:id',
-    quanlypdp_user: '/quanlyphieudongphat'
+    quanlypdp_user: '/quanlyphieudongphat',
+    thongtintaikhoan: '/thongtintaikhoan'
 }
 export default routes;
