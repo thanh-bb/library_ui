@@ -27,6 +27,7 @@ function Sidebar() {
                         activeIcon={<UserGroupActiveIcon />}
                     />
                     <MenuItem title="Thể Loại" to={config.routes.theloai} icon={<LiveIcon />} activeIcon={<LiveActiveIcon />} />
+                    <MenuItem title="Nhà xuất bản" to={config.routes.NXB} icon={<LiveIcon />} activeIcon={<LiveActiveIcon />} />
                     <MenuItem title="Sách" to={config.routes.sach} icon={<LiveIcon />} activeIcon={<LiveActiveIcon />} />
                     <MenuItem title="ImportFile" to={config.routes.import} icon={<LiveIcon />} activeIcon={<LiveActiveIcon />} />
                     <MenuItem

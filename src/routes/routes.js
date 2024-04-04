@@ -27,6 +27,7 @@ import PhieuDongPhat from '~/pages/PhieuDongPhat';
 import QuanLyPDP from '~/pages/PhieuDongPhat/QuanLyPDP';
 import PDP_User from '~/User/pages/QuanLyPDP';
 import ThongTinTaiKhoan from '~/User/pages/ThongTinTaiKhoan';
+import NXB from '~/pages/NXB';
 
 // Public routes
 const publicRoutes = [
@@ -43,6 +44,7 @@ const publicRoutes = [
     { path: config.routes.quanlypdp, component: QuanLyPDP },
     { path: config.routes.upload, component: Upload, layout: HeaderOnly },
     { path: config.routes.search, component: Search, layout: null },
+    { path: config.routes.NXB, component: NXB },
 
     //User
     { path: config.routes.userhome, component: UserHome, layout: UserLayout },
