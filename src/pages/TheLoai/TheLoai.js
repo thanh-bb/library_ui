@@ -19,7 +19,7 @@ export class TheLoai extends Component {
             tl_TenTheLoaiFilter: "",
             theloaisWithoutFilter: [],
             danhmucs: [], // Make sure danhmucs is initialized as an empty array
-            // Initialize dm_Id in the state
+            validationError: ""
 
         };
 
@@ -114,13 +114,19 @@ export class TheLoai extends Component {
 
     editClick(dep) {
         this.setState({
-            modalTitle: "Edit TheLoai",
+            modalTitle: "Chỉnh sửa thể loại",
             tl_Id: dep.tl_Id,
-            tl_TenTheLoai: dep.tl_TenTheLoai
+            tl_TenTheLoai: dep.tl_TenTheLoai,
+            dm_Id: dep.dm_Id
         });
     }
 
     createClick() {
+        if (!this.state.tl_TenTheLoai) {
+            this.setState({ validationError: "Tên Thể Loại không được trống" });
+            return;
+        }
+
         fetch("https://localhost:44315/api/TheLoai", {
             method: "POST",
             headers: {
@@ -136,6 +142,7 @@ export class TheLoai extends Component {
             .then((result) => {
                 alert(result);
                 this.refreshList();
+                this.clearForm();
             }, (error) => {
                 alert('Failed');
             })
@@ -147,26 +154,38 @@ export class TheLoai extends Component {
 
 
     updateClick() {
-        fetch("https://localhost:44315/api/TheLoai", {
+        if (!this.state.tl_TenTheLoai) {
+            this.setState({ validationError: "Tên Thể Loại không được trống" });
+            return;
+        }
+
+
+        fetch(`https://localhost:44315/api/TheLoai`, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                tld: this.state.tl_Id,
+                tlId: this.state.tl_Id,
                 tlTenTheLoai: this.state.tl_TenTheLoai,
-                dmId: this.state.dm_Id // Include dm_Id in the request body
+                dmId: this.state.dm_Id
             })
         })
             .then(res => res.json())
             .then((result) => {
+                console.log("Update Result:", result); // Log update result
+
                 alert(result);
                 this.refreshList();
-            }, (error) => {
-                alert('Failed');
+                this.clearForm();
             })
+            .catch(error => {
+                console.error("Update Error:", error); // Log error
+                alert('Failed to update');
+            });
     }
+
 
 
     deleteClick(id) {
@@ -188,7 +207,13 @@ export class TheLoai extends Component {
         }
     }
 
-
+    clearForm() {
+        this.setState({
+            tl_Id: 0,
+            tl_TenTheLoai: "",
+            validationError: ""
+        });
+    }
     render() {
         const {
             danhmucs,
@@ -308,7 +333,7 @@ export class TheLoai extends Component {
                             </div>
 
                             <div className="modal-body">
-                                <div className="input-group mb-3">
+                                <div className="input-group mb-3 input-group-lg">
                                     <span className="input-group-text">Tên Thể Loại</span>
                                     <input type="text" className="form-control"
                                         value={tl_TenTheLoai}
@@ -318,7 +343,7 @@ export class TheLoai extends Component {
                                     <span className="input-group-text">Danh mục</span>
                                     <select className="form-select"
                                         onChange={this.changeDanhMuc}
-                                        value={dm_Id}>
+                                        value={dm_Id || (danhmucs.length > 0 ? danhmucs[0].dm_Id : '')}>
                                         {danhmucs.map(dep =>
                                             <option key={dep.dm_Id} value={dep.dm_Id}>
                                                 {dep.dm_TenDanhMuc}
@@ -326,8 +351,13 @@ export class TheLoai extends Component {
                                         )}
                                     </select>
 
-                                </div>
 
+                                </div>
+                                {this.state.validationError && (
+                                    <div className="alert alert-danger" role="alert">
+                                        {this.state.validationError}
+                                    </div>
+                                )}
 
                                 {tl_Id === 0 ?
                                     <button type="button"

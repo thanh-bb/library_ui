@@ -116,7 +116,7 @@ export class Sach extends Component {
             .then(data => {
                 this.setState({ danhmucs: data });
             });
-        fetch("https://localhost:44315/api/TacGia")
+        fetch("https://localhost:44315/api/TacGium")
             .then(response => response.json())
             .then(data => {
                 this.setState({ tacgias: data });
@@ -459,7 +459,7 @@ export class Sach extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {sachs.map(dep =>
+                        {sachs?.map(dep =>
                             <tr key={dep.s_Id}>
                                 <td className="text-start">{dep.s_Id}</td>
                                 <td className="text-start">

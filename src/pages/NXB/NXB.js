@@ -17,7 +17,9 @@ export class NXB extends Component {
 
             nxb_IdFilter: "",
             nxb_TenNXBFilter: "",
-            nxbsWithoutFilter: []
+            nxbsWithoutFilter: [],
+
+            validationError: ""
         }
     }
 
@@ -111,6 +113,11 @@ export class NXB extends Component {
     }
 
     createClick() {
+        if (!this.state.nxb_TenNhaXuatBan) {
+            this.setState({ validationError: "Tên Nhà Xuất Bản không được trống" });
+            return;
+        }
+
         fetch("https://localhost:44315/api/NhaXuatBan", {
             method: "POST",
             headers: {
@@ -125,12 +132,18 @@ export class NXB extends Component {
             .then((result) => {
                 alert(result);
                 this.refreshList();
+                this.clearForm();
             }, (error) => {
                 alert('Failed');
             })
     }
 
     updateClick() {
+        if (!this.state.nxb_TenNhaXuatBan) {
+            this.setState({ validationError: "Tên Nhà Xuất Bản không được trống" });
+            return;
+        }
+
         fetch("https://localhost:44315/api/NhaXuatBan", {
             method: "PUT",
             headers: {
@@ -146,6 +159,7 @@ export class NXB extends Component {
             .then((result) => {
                 alert(result);
                 this.refreshList();
+                this.clearForm();
             }, (error) => {
                 alert('Failed');
             })
@@ -171,6 +185,13 @@ export class NXB extends Component {
         }
     }
 
+    clearForm() {
+        this.setState({
+            nxb_Id: 0,
+            nxb_TenNhaXuatBan: "",
+            validationError: ""
+        });
+    }
 
     render() {
         const {
@@ -282,13 +303,18 @@ export class NXB extends Component {
                             </div>
 
                             <div className="modal-body">
-                                <div className="input-group mb-3">
+                                <div className="input-group mb-3 input-group-lg">
                                     <span className="input-group-text">Tên Danh Mục</span>
                                     <input type="text" className="form-control"
                                         value={nxb_TenNhaXuatBan}
                                         onChange={this.changenxb_TenNXB} />
                                 </div>
 
+                                {this.state.validationError && (
+                                    <div className="alert alert-danger" role="alert">
+                                        {this.state.validationError}
+                                    </div>
+                                )}
 
                                 {nxb_Id === 0 ?
                                     <button type="button"

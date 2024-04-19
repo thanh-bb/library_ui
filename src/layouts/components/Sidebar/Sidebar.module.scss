@@ -1,4 +1,9 @@
 /* Sidebar.module.scss */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 .wrapper {
     width: 280px;
@@ -10,5 +15,5 @@
 }
 
 .side-bar {
-    height: 100%; /* Chiều cao 100% để điền vào phần bên trong của sidebar */
+    //height: 100%; /* Chiều cao 100% để điền vào phần bên trong của sidebar */
 }

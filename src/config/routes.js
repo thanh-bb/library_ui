@@ -15,7 +15,8 @@ const routes = {
     phieudongphat: '/admin/phieudongphat',
     quanlypdp: '/admin/phieudongphat/quanly',
     NXB: '/admin/NXB',
-
+    loaisach: '/admin/loaisach',
+    tacgia: '/admin/tacgia',
 
     //User
     userhome: '/userhome',

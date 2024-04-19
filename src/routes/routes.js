@@ -16,7 +16,8 @@ import Sach from '~/pages/Sach';
 import ImportFile from '~/pages/ImportFile';
 import NguoiDung from '~/pages/NguoiDung';
 import PhieuMuon from '~/pages/PhieuMuon';
-
+import NXB from '~/pages/NXB';
+import LoaiSach from '~/pages/LoaiSach';
 
 import UserHome from '~/User/pages/UserHome';
 import ChiTietSach from '~/User/pages/ChiTietSach';
@@ -27,7 +28,8 @@ import PhieuDongPhat from '~/pages/PhieuDongPhat';
 import QuanLyPDP from '~/pages/PhieuDongPhat/QuanLyPDP';
 import PDP_User from '~/User/pages/QuanLyPDP';
 import ThongTinTaiKhoan from '~/User/pages/ThongTinTaiKhoan';
-import NXB from '~/pages/NXB';
+import TacGia from '~/pages/TacGia';
+
 
 // Public routes
 const publicRoutes = [
@@ -45,6 +47,9 @@ const publicRoutes = [
     { path: config.routes.upload, component: Upload, layout: HeaderOnly },
     { path: config.routes.search, component: Search, layout: null },
     { path: config.routes.NXB, component: NXB },
+    { path: config.routes.loaisach, component: LoaiSach },
+    { path: config.routes.tacgia, component: TacGia },
+
 
     //User
     { path: config.routes.userhome, component: UserHome, layout: UserLayout },

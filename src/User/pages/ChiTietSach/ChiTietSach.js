@@ -149,7 +149,7 @@ function ChiTietSach() {
         <div className={cx('wrapper')}>
             <div className="row m-5 ">
                 {!userActive.nd_active && (
-                    <button type="button" class="btn btn-danger fs-3 mb-4">Tài khoản của bạn đã bị khóa do vi phạm quy định của thư viện nên tạm thời bạn không thể mượn sách</button>
+                    <button type="button" className="btn btn-danger fs-3 mb-4">Tài khoản của bạn đã bị khóa do vi phạm quy định của thư viện nên tạm thời bạn không thể mượn sách</button>
                 )}
 
                 <div className="col-12 d-flex justify-content-center mt-5">

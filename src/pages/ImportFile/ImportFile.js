@@ -39,7 +39,7 @@ function ImportFile() {
                     <div className="col d-flex justify-content-end mt-5">
                         <input className="mt-4 fs-3" type="file" onChange={handleFileChange} />
                     </div>
-                    <div class="col d-flex justify-content-start mt-5">
+                    <div className="col d-flex justify-content-start mt-5">
                         <button onClick={handleUpload} className={cx('btn-grad')}>Upload</button>
                     </div>
                 </div>
