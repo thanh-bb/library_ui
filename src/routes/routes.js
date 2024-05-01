@@ -16,6 +16,7 @@ import Sach from '~/pages/Sach';
 import ImportFile from '~/pages/ImportFile';
 import NguoiDung from '~/pages/NguoiDung';
 import PhieuMuon from '~/pages/PhieuMuon';
+import PhieuTra from '~/pages/PhieuTra';
 import NXB from '~/pages/NXB';
 import LoaiSach from '~/pages/LoaiSach';
 
@@ -29,6 +30,9 @@ import QuanLyPDP from '~/pages/PhieuDongPhat/QuanLyPDP';
 import PDP_User from '~/User/pages/QuanLyPDP';
 import ThongTinTaiKhoan from '~/User/pages/ThongTinTaiKhoan';
 import TacGia from '~/pages/TacGia';
+import DaTra from '~/pages/PhieuMuon/DaTra';
+import NhapKhoSach from '~/pages/NhapKhoSach';
+import { QuanLyPhieuTra } from '~/User/pages/QuanLyPhieuMuon/QuanLyPhieuTra/QuanLyPhieuTra';
 
 
 // Public routes
@@ -42,6 +46,7 @@ const publicRoutes = [
     { path: config.routes.home, component: Home },
     { path: config.routes.theloai, component: TheLoai },
     { path: config.routes.phieumuon, component: PhieuMuon },
+    { path: config.routes.phieutra, component: PhieuTra },
     { path: config.routes.phieudongphat, component: PhieuDongPhat },
     { path: config.routes.quanlypdp, component: QuanLyPDP },
     { path: config.routes.upload, component: Upload, layout: HeaderOnly },
@@ -49,12 +54,14 @@ const publicRoutes = [
     { path: config.routes.NXB, component: NXB },
     { path: config.routes.loaisach, component: LoaiSach },
     { path: config.routes.tacgia, component: TacGia },
-
+    { path: config.routes.datra, component: DaTra },
+    { path: config.routes.nhapkhosach, component: NhapKhoSach },
 
     //User
     { path: config.routes.userhome, component: UserHome, layout: UserLayout },
     { path: config.routes.chitietsach, component: ChiTietSach, layout: UserLayout },
     { path: config.routes.quanlyphieumuon, component: QuanLyPhieuMuon, layout: UserLayout },
+    { path: config.routes.quanlyphieutra, component: QuanLyPhieuTra, layout: UserLayout },
     { path: config.routes.quanlypdp_user, component: PDP_User, layout: UserLayout },
     { path: config.routes.thongtintaikhoan, component: ThongTinTaiKhoan, layout: UserLayout },
     { path: config.routes.formphieumuon, component: PhieuMuonUser, layout: UserLayout },

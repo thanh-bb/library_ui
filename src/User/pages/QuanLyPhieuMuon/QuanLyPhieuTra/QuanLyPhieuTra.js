@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import classNames from 'classnames/bind';
-import styles from './QuanLyPhieuMuon.module.scss';
+import styles from './QuanLyPhieuTra.module.scss';
 import { Link } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
 
 const cx = classNames.bind(styles);
 
-export class QuanLyPhieuMuon extends Component {
+export class QuanLyPhieuTra extends Component {
     constructor(props) {
         super(props);
 
@@ -48,10 +48,10 @@ export class QuanLyPhieuMuon extends Component {
             fetch(`https://localhost:44315/api/QuanLyPhieuMuon/${nd_id}`)
                 .then(response => response.json())
                 .then(data => {
-                    const filteredData = data.filter(pm => pm.TrangThai === "Đang mượn");
+                    const filteredData = data.filter(pm => pm.TrangThai === "Đã trả");
                     this.setState({
                         chitietpms: filteredData,
-                        tensachWithoutFilter: filteredData// Cập nhật chitietpmsWithoutFilter với dữ liệu mới
+                        tensachWithoutFilter: filteredData // Cập nhật chitietpmsWithoutFilter với dữ liệu mới
                     });
                 })
                 .catch(error => {

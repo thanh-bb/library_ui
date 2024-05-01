@@ -32,7 +32,7 @@ function PhieuDongPhat() {
             fetchNguoiMuon(pdp.PmId);
         }
     }, [pdp]);
-    console.log(nguoiMuon)
+    // console.log(nguoiMuon)
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import classNames from 'classnames/bind';
-import styles from './PhieuMuon.module.scss';
+import styles from './DaTra.module.scss';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
-export class PhieuMuon extends Component {
+export class DaTra extends Component {
     constructor(props) {
         super(props);
 
@@ -21,8 +21,7 @@ export class PhieuMuon extends Component {
 
             pm_HanTraFilter: "",
             pm_NgayMuonFilter: "",
-            phieumuonsWithoutFilter: [],
-
+            phieumuonsWithoutFilter: []
         }
     }
 
@@ -75,7 +74,7 @@ export class PhieuMuon extends Component {
             .then(response => response.json())
             .then(data => {
                 // Lọc ra chỉ các phiếu mượn có trạng thái "Đang mượn"
-                const filteredData = data.filter(dep => dep.TrangThai === "Đang mượn");
+                const filteredData = data.filter(dep => dep.TrangThai === "Đã trả");
 
                 // Sắp xếp dữ liệu theo ngày mượn giảm dần
                 filteredData.sort((a, b) => new Date(b.pm_NgayMuon) - new Date(a.pm_NgayMuon));
@@ -118,7 +117,7 @@ export class PhieuMuon extends Component {
     editClick(dep) {
         this.setState({
             modalTitle: "Chỉnh sửa trạng thái phiếu mượn",
-            pm_Id: dep.Id_PhieuMuon,
+            pm_Id: dep.Id_DaTra,
             pm_TrangThai: dep.TrangThai,
             nd_Id: dep.Id_User
         });
@@ -149,8 +148,8 @@ export class PhieuMuon extends Component {
             const nd_Id = this.state.nd_Id;
             const pm_Id = this.state.pm_Id; // Get the pm_Id from the state
 
-            // Fetch ChiTietPhieuMuon data for the specific pm_Id
-            fetch(`https://localhost:44315/api/ChiTietPhieuMuon/${pm_Id}`, {
+            // Fetch ChiTietDaTra data for the specific pm_Id
+            fetch(`https://localhost:44315/api/ChiTietDaTra/${pm_Id}`, {
                 method: "GET",
                 headers: {
                     'Accept': 'application/json',
@@ -196,12 +195,12 @@ export class PhieuMuon extends Component {
                                 alert('Failed to create PhieuTra');
                             });
                     } else {
-                        alert("No ChiTietPhieuMuon data found for the provided pm_Id");
+                        alert("No ChiTietDaTra data found for the provided pm_Id");
                     }
                 })
                 .catch((error) => {
-                    console.error('Failed to fetch ChiTietPhieuMuon data: ', error);
-                    alert('Failed to fetch ChiTietPhieuMuon data');
+                    console.error('Failed to fetch ChiTietDaTra data: ', error);
+                    alert('Failed to fetch ChiTietDaTra data');
                 });
         } else {
             // Nếu không phải là "Đã trả", hiển thị thông báo và không thực hiện thêm phiếu trả
@@ -212,7 +211,7 @@ export class PhieuMuon extends Component {
 
     deleteClick(id) {
         if (window.confirm("Ban co chac chan muon xoa?")) {
-            fetch("https://localhost:44315/api/PhieuMuon/" + id, {
+            fetch("https://localhost:44315/api/DaTra/" + id, {
                 method: "DELETE",
                 headers: {
                     'Accept': 'application/json',
@@ -254,14 +253,9 @@ export class PhieuMuon extends Component {
             <div className={cx('wrapper')}>
                 <div class="row justify-content-around">
                     <Link type="button" to={`/admin/phieumuon`} className={"col-4 h4 pb-2 mb-4 text-danger border-bottom border-danger"}>Đang mượn</Link>
-                    <Link type="button" to={`/admin/datra`} className={"col-4 h4 pb-2 mb-4 text-success border-bottom border-success"}>Đã trả</Link>
-                </div>
-                <button type="button"
-                    className={cx('btn-grad')}
-                    onClick={() => this.sendEmail()}>
-                    Gửi mail
-                </button>
-                <table className="table table-hover"  >
+                    <Link type="button" to={`/admin/datra`} className={"col-4 h4 pb-2 mb-4 text-success border-bottom border-success"}>Đã trả</Link>                </div>
+
+                <table className="table table-hover mt-5"  >
                     <thead className="table-danger">
                         <tr >
                             <th className="text-start">
@@ -328,7 +322,7 @@ export class PhieuMuon extends Component {
                     </thead>
                     <tbody>
                         {phieumuons.map(dep =>
-                            <tr key={dep.Id_PhieuMuon}>
+                            <tr key={dep.Id_DaTra}>
                                 <td className="text-start">{dep.Id_PhieuMuon}</td>
                                 <td className="text-start">
                                     {nguoidungs.find(ng => ng.nd_Id === dep.Id_User)?.nd_Username}
@@ -434,7 +428,7 @@ export class PhieuMuon extends Component {
                         </div>
                     </div>
                 </div>
-            </div >
+            </div>
         )
     }
 }

@@ -60,7 +60,7 @@ export class UserHome extends Component {
             });
 
 
-        fetch("https://localhost:44315/api/TacGia")
+        fetch("https://localhost:44315/api/TacGium")
             .then(response => response.json())
             .then(data => {
                 this.setState({ tacgias: data });

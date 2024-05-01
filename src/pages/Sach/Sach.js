@@ -27,7 +27,7 @@ export class Sach extends Component {
             dm_Id: 0,
             s_IdFilter: "",
             s_TenSachFilter: "",
-            s_SoLuong: 0,
+            s_SoLuong: 1,
             s_MoTa: "",
             s_TrongLuong: "",
             s_NamXuatBan: 0,
@@ -41,9 +41,90 @@ export class Sach extends Component {
             os_Id: 0,
             s_HinhAnh: "",
             PhotoFileName: "hello.png",
-            PhotoPath: "https://localhost:44315/Photos/"
+            PhotoPath: "https://localhost:44315/Photos/",
+            errors: {
+                s_TenSach: '',
+                s_MoTa: '',
+                tg_Id: '',
+                s_NamXuatBan: '',
+                nxb_Id: '',
+                s_SoLuong: '',
+                tl_Id: '',
+                ks_Id: '',
+                os_Id: '',
+                ls_Id: '',
+                s_TrangThaiMuon: '',
+                s_ChiDoc: '',
+            }
         };
 
+    }
+    validateForm() {
+        let isValid = true;
+        let errors = {};
+
+        if (!this.state.s_TenSach.trim()) {
+            isValid = false;
+            errors['s_TenSach'] = 'Tên sách không được để trống';
+        }
+
+        if (!this.state.s_MoTa.trim()) {
+            isValid = false;
+            errors['s_MoTa'] = 'Tóm tắt mô tả không được để trống';
+        }
+
+        if (!this.state.tg_Id) {
+            isValid = false;
+            errors['tg_Id'] = 'Vui lòng chọn tác giả';
+        }
+
+        if (!this.state.s_NamXuatBan) {
+            isValid = false;
+            errors['s_NamXuatBan'] = 'Vui lòng chọn năm xuất bản';
+        }
+        if (!this.state.nxb_Id) {
+            isValid = false;
+            errors['nxb_Id'] = 'Vui lòng chọn nhà xuất bản';
+        }
+
+        if (!this.state.s_SoLuong || this.state.s_SoLuong <= 0) {
+            isValid = false;
+            errors['s_SoLuong'] = 'Số lượng phải là một số dương lớn hơn 0';
+        }
+
+        if (!this.state.tl_Id) {
+            isValid = false;
+            errors['tl_Id'] = 'Vui lòng chọn thể loại';
+        }
+
+        if (!this.state.ks_Id) {
+            isValid = false;
+            errors['ks_Id'] = 'Vui lòng chọn kệ sách';
+        }
+
+        if (!this.state.os_Id) {
+            isValid = false;
+            errors['os_Id'] = 'Vui lòng chọn ô sách';
+        }
+
+        if (!this.state.ls_Id) {
+            isValid = false;
+            errors['ls_Id'] = 'Vui lòng chọn loại sách';
+        }
+
+        if (this.state.s_TrangThaiMuon === null || this.state.s_TrangThaiMuon === undefined) {
+            isValid = false;
+            errors['s_TrangThaiMuon'] = 'Vui lòng chọn trạng thái';
+        }
+
+        if (this.state.s_ChiDoc === null || this.state.s_ChiDoc === undefined) {
+            isValid = false;
+            errors['s_ChiDoc'] = 'Vui lòng chọn tình trạng mượn sách';
+        }
+
+
+        this.setState({ errors: errors });
+        return isValid;
     }
 
     FilterFn() {
@@ -160,7 +241,7 @@ export class Sach extends Component {
             modalTitle: "Add Sach",
             s_Id: 0,
             s_TenSach: "",
-            s_SoLuong: 0,
+            s_SoLuong: 1,
             s_MoTa: "",
             s_TrongLuong: "",
             s_NamXuatBan: 0,
@@ -200,38 +281,43 @@ export class Sach extends Component {
     }
 
     createClick() {
-        fetch("https://localhost:44315/api/Sach", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                sTenSach: this.state.s_TenSach,
-                sSoLuong: this.state.s_SoLuong,
-                sMoTa: this.state.s_MoTa,
-                sTrongLuong: this.state.s_TrongLuong,
-                sNamXuatBan: this.state.s_NamXuatBan,
-                sTrangThaiMuon: this.state.s_TrangThaiMuon,
-                sChiDoc: this.state.s_ChiDoc,
-                tgId: this.state.tg_Id,
-                nxbId: this.state.nxb_Id,
-                tlId: this.state.tl_Id,
-                lsId: this.state.ls_Id,
-                ksId: this.state.ks_Id,
-                osId: this.state.os_Id,
-                sHinhAnh: this.state.PhotoFileName
+        if (this.validateForm()) {
+            fetch("https://localhost:44315/api/Sach", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sTenSach: this.state.s_TenSach,
+                    sSoLuong: this.state.s_SoLuong,
+                    sMoTa: this.state.s_MoTa,
+                    sTrongLuong: this.state.s_TrongLuong,
+                    sNamXuatBan: this.state.s_NamXuatBan,
+                    sTrangThaiMuon: this.state.s_TrangThaiMuon,
+                    sChiDoc: this.state.s_ChiDoc,
+                    tgId: this.state.tg_Id,
+                    nxbId: this.state.nxb_Id,
+                    tlId: this.state.tl_Id,
+                    lsId: this.state.ls_Id,
+                    ksId: this.state.ks_Id,
+                    osId: this.state.os_Id,
+                    sHinhAnh: this.state.PhotoFileName
 
+                })
             })
-        })
-            .then(res => res.json())
-            .then((result) => {
-                alert(result);
-                this.refreshList();
-            }, (error) => {
-                alert('Failed');
-            })
+                .then(res => res.json())
+                .then((result) => {
+                    alert(result);
+                    this.refreshList();
+                }, (error) => {
+                    alert('Failed');
+                })
+        } else {
+            alert('Vui lòng kiểm tra và điền đầy đủ thông tin');
+        }
     }
+
 
     changeDanhMuc = (e) => {
         // Update dm_Id in the state when danh muc changes
@@ -261,7 +347,7 @@ export class Sach extends Component {
 
     changes_SoLuong = (e) => {
         // Kiểm tra nếu giá trị nhập vào không phải là số hoặc nhỏ hơn 0, thì không cho phép cập nhật state
-        if (!isNaN(e.target.value) && parseInt(e.target.value) >= 0) {
+        if (!isNaN(e.target.value) && parseInt(e.target.value) >= 1) {
             this.setState({ s_SoLuong: e.target.value });
         } else {
             // Nếu giá trị nhập vào không hợp lệ, bạn có thể thông báo cho người dùng hoặc xử lý theo cách khác tùy ý
@@ -297,39 +383,42 @@ export class Sach extends Component {
     }
 
     updateClick() {
-        fetch("https://localhost:44315/api/Sach", {
-            method: "PUT",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                sId: this.state.s_Id,
-                sTenSach: this.state.s_TenSach,
-                sSoLuong: this.state.s_SoLuong,
-                sMoTa: this.state.s_MoTa,
-                sTrongLuong: this.state.s_TrongLuong,
-                sNamXuatBan: this.state.s_NamXuatBan,
-                sTrangThaiMuon: this.state.s_TrangThaiMuon,
-                sChiDoc: this.state.s_ChiDoc,
-                tgId: this.state.tg_Id,
-                nxbId: this.state.nxb_Id,
-                tlId: this.state.tl_Id,
-                lsId: this.state.ls_Id,
-                ksId: this.state.ks_Id,
-                osId: this.state.os_Id,
-                sHinhAnh: this.state.PhotoFileName
+        if (this.validateForm()) {
+            fetch("https://localhost:44315/api/Sach", {
+                method: "PUT",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sId: this.state.s_Id,
+                    sTenSach: this.state.s_TenSach,
+                    sSoLuong: this.state.s_SoLuong,
+                    sMoTa: this.state.s_MoTa,
+                    sTrongLuong: this.state.s_TrongLuong,
+                    sNamXuatBan: this.state.s_NamXuatBan,
+                    sTrangThaiMuon: this.state.s_TrangThaiMuon,
+                    sChiDoc: this.state.s_ChiDoc,
+                    tgId: this.state.tg_Id,
+                    nxbId: this.state.nxb_Id,
+                    tlId: this.state.tl_Id,
+                    lsId: this.state.ls_Id,
+                    ksId: this.state.ks_Id,
+                    osId: this.state.os_Id,
+                    sHinhAnh: this.state.PhotoFileName
+                })
             })
-        })
-            .then(res => res.json())
-            .then((result) => {
-                alert(result);
-                this.refreshList();
-            }, (error) => {
-                alert('Failed');
-            })
+                .then(res => res.json())
+                .then((result) => {
+                    alert(result);
+                    this.refreshList();
+                }, (error) => {
+                    alert('Failed');
+                })
+        } else {
+            alert('Vui lòng kiểm tra và điền đầy đủ thông tin');
+        }
     }
-
     deleteClick(id) {
         if (window.confirm("Ban co chac chan muon xoa?")) {
             fetch("https://localhost:44315/api/Sach/" + id, {
@@ -509,13 +598,19 @@ export class Sach extends Component {
 
                                     <div className="p-2 w-50 bd-highlight fs-2">
 
-                                        <div className="input-group mb-3 input-group-lg input-group-lg">
+                                        {this.state.errors.s_TenSach &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.s_TenSach}</div>}
+
+                                        <div className="input-group mb-3 input-group-lg">
+
                                             <span className="input-group-text">Tên Sách</span>
                                             <input type="text" className="form-control"
                                                 value={s_TenSach}
                                                 onChange={this.changeTenSach} />
                                         </div>
 
+                                        {this.state.errors.tg_Id &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.tg_Id}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Tác giả</span>
                                             <select className="form-select"
@@ -529,6 +624,8 @@ export class Sach extends Component {
                                             </select>
                                         </div>
 
+                                        {this.state.errors.s_NamXuatBan &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.s_NamXuatBan}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Năm xuất bản</span>
                                             <input type="date" className="form-control"
@@ -536,7 +633,8 @@ export class Sach extends Component {
                                                 onChange={this.changeNamXuatBan} />
                                         </div>
 
-
+                                        {this.state.errors.nxb_Id &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.nxb_Id}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Nhà Xuất Bản</span>
                                             <select className="form-select"
@@ -550,13 +648,13 @@ export class Sach extends Component {
                                             </select>
                                         </div>
 
-                                        <div className="input-group mb-3 input-group-lg input-group-lg">
-                                            <span className="input-group-text">Số lượng</span>
-                                            <input type="number" className="form-control"
-                                                value={s_SoLuong}
-                                                onChange={this.changes_SoLuong} />
-                                        </div>
 
+
+
+
+
+                                        {this.state.errors.tl_Id &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.tl_Id}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Thể Loại</span>
                                             <select className="form-select"
@@ -572,7 +670,9 @@ export class Sach extends Component {
 
 
                                         <div className="input-group mb-3 input-group-lg">
-                                            <span className="input-group-text">Tóm tắt mô tả</span>
+                                            <span className="input-group-text">  Tóm tắt mô tả</span>
+                                            {this.state.errors.s_MoTa &&
+                                                <div className="text-danger fs-5 text-start">{this.state.errors.s_MoTa}</div>}
                                             <textarea
                                                 type="text"
                                                 className="form-control"
@@ -585,6 +685,8 @@ export class Sach extends Component {
 
 
 
+                                        {this.state.errors.ks_Id &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.ks_Id}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Kệ</span>
                                             <select className="form-select"
@@ -597,6 +699,9 @@ export class Sach extends Component {
                                                 </option>)}
                                             </select>
                                         </div>
+
+                                        {this.state.errors.os_Id &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.os_Id}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Ô</span>
                                             <select className="form-select"
@@ -610,6 +715,9 @@ export class Sach extends Component {
                                             </select>
                                         </div>
 
+
+                                        {this.state.errors.ls_Id &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.ls_Id}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Loại Sách</span>
                                             <select className="form-select"
@@ -622,6 +730,9 @@ export class Sach extends Component {
                                                 </option>)}
                                             </select>
                                         </div>
+
+                                        {this.state.errors.s_TrangThaiMuon &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.s_TrangThaiMuon}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Trạng thái trong kho</span>
                                             <select className="form-select"
@@ -633,6 +744,9 @@ export class Sach extends Component {
 
                                             </select>
                                         </div>
+
+                                        {this.state.errors.s_ChiDoc &&
+                                            <div className="text-danger fs-5 text-start">{this.state.errors.s_ChiDoc}</div>}
                                         <div className="input-group mb-3 input-group-lg">
                                             <span className="input-group-text">Cho phép mượn về nhà</span>
                                             <select className="form-select"

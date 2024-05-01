@@ -49,7 +49,7 @@ function ChiTietPhieuTra() {
 
         const fetchTacGia = async () => {
             try {
-                const response = await fetch("https://localhost:44315/api/TacGia");
+                const response = await fetch("https://localhost:44315/api/TacGium");
                 if (response.ok) {
                     const data = await response.json();
                     setTacgias(data);

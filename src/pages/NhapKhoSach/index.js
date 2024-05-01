@@ -1,0 +1,1 @@
+export { NhapKhoSach as default } from './NhapKhoSach';

@@ -256,7 +256,7 @@ export class NXB extends Component {
                                         </svg>
                                     </button>
                                 </div >
-                                Tên Danh Mục
+                                Tên Nhà Xuất Bản
                             </th>
                             <th>
                                 Options

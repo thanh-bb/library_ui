@@ -28,6 +28,7 @@ function PhieuMuonUser() {
     });
     const [soLuongNhap, setSoLuongNhap] = useState(1); // Số lượng nhập vào, mặc định là 1
     const [soLuongTrongKho, setSoLuongTrongKho] = useState(0); // Số lượng sách trong kho
+    const [isBookBorrowed, setIsBookBorrowed] = useState(false);
 
     useEffect(() => {
         const decodedToken = jwtDecode(jwttoken);
@@ -61,6 +62,15 @@ function PhieuMuonUser() {
                     setSach(data[0]);
                     setSoLuongTrongKho(data[0].s_SoLuong);
                     setLoading(false);
+                    // Kiểm tra xem sách đã được mượn hay chưa
+                    const checkMuonResponse = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckMuon/${userId}/${id}`);
+                    console.log(checkMuonResponse);
+                    if (checkMuonResponse.ok) {
+                        const result = await checkMuonResponse.json();
+                        if (result === 'Đang mượn') {
+                            setIsBookBorrowed(true);
+                        }
+                    }
                 } else {
                     throw new Error('Failed to fetch data');
                 }
@@ -72,7 +82,7 @@ function PhieuMuonUser() {
 
         const fetchTacGia = async () => {
             try {
-                const response = await fetch("https://localhost:44315/api/TacGia");
+                const response = await fetch("https://localhost:44315/api/TacGium");
                 if (response.ok) {
                     const data = await response.json();
                     setTacgias(data);
@@ -213,14 +223,16 @@ function PhieuMuonUser() {
                             </div>
                             <div className="mb-3 text-start">
                                 <label htmlFor="exampleInputEmail2" className="form-label">Hạn trả</label>
-                                <input type="date" className="form-control fs-2" id="exampleInputEmail2" value={ngayHanTra} onChange={(e) => setNgayHanTra(e.target.value)} />
+                                <input type="date" className="form-control fs-2" id="exampleInputEmail2" value={ngayHanTra} readOnly onChange={(e) => setNgayHanTra(e.target.value)} />
                             </div>
                             <div className="mb-3 text-start">
                                 <label id="exampleInputEmail3" className="form-label">Số lượng</label>
-                                <input type="number" className="form-control fs-2" id="exampleInputEmail3" value={soLuongNhap} onChange={(e) => setSoLuongNhap(parseInt(e.target.value))} />
-                                {!isValidSoLuong() && <span style={{ color: 'red' }}>Số lượng không hợp lệ</span>}
+                                <input className="form-control fs-2" id="exampleInputEmail3" value={1} disabled onChange={(e) => setSoLuongNhap(parseInt(e.target.value))} />
+                                {/* {!isValidSoLuong() && <span style={{ color: 'red' }}>Số lượng không hợp lệ</span>} */}
                             </div>
-                            <button type="submit" className="btn btn-primary fs-2 p-3" disabled={!isValidSoLuong()}>SUBMIT</button>
+                            <button type="submit" className="btn btn-primary fs-2 p-3" disabled={!isValidSoLuong() || isBookBorrowed}>SUBMIT</button>
+                            {isBookBorrowed && <p className='text-danger mt-3'>Bạn đã mượn sách này</p>}
+                            <p className='fst-italic text-success mt-3'>Lưu ý: Thời gian mượn sách của bạn là 14 ngày</p>
                         </form>
                     </div>
                     <div className="col-6 d-flex align-items-center justify-content-center">

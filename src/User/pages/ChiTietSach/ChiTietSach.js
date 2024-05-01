@@ -11,6 +11,8 @@ function ChiTietSach() {
     let jwttoken = sessionStorage.getItem('jwttoken');
 
     const [userActive, setUserActive] = useState(false);
+    const [numberOfBorrowReceipts, setNumberOfBorrowReceipts] = useState(0);
+    const [maxBorrowingsPerMonth, setMaxBorrowingsPerMonth] = useState(5);
 
     const [sach, setSach] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -41,7 +43,19 @@ function ChiTietSach() {
             }
 
         };
-
+        const fetchNumberOfBorrowReceipts = async () => {
+            try {
+                const response = await fetch(`https://localhost:44315/api/PhieuMuon/Count/${userId}`);
+                if (response.ok) {
+                    const count = await response.json();
+                    setNumberOfBorrowReceipts(count);
+                } else {
+                    throw new Error('Failed to fetch number of borrow receipts');
+                }
+            } catch (error) {
+                console.error('Error fetching number of borrow receipts:', error);
+            }
+        };
         const fetchSach = async () => {
             try {
                 const response = await fetch(`https://localhost:44315/api/Sach/${id}`);
@@ -60,7 +74,7 @@ function ChiTietSach() {
 
         const fetchTacGia = async () => {
             try {
-                const response = await fetch("https://localhost:44315/api/TacGia");
+                const response = await fetch("https://localhost:44315/api/TacGium");
                 if (response.ok) {
                     const data = await response.json();
                     setTacgias(data);
@@ -118,7 +132,9 @@ function ChiTietSach() {
         fetchNXB();
         fetchKe();
         fetchO();
-    }, [id]);
+        fetchNumberOfBorrowReceipts();
+        setMaxBorrowingsPerMonth(5);
+    }, [jwttoken, id]);
 
     if (loading) {
         return <p>Loading...</p>;
@@ -150,6 +166,15 @@ function ChiTietSach() {
             <div className="row m-5 ">
                 {!userActive.nd_active && (
                     <button type="button" className="btn btn-danger fs-3 mb-4">Tài khoản của bạn đã bị khóa do vi phạm quy định của thư viện nên tạm thời bạn không thể mượn sách</button>
+                )}
+                {userActive.nd_active && (
+                    numberOfBorrowReceipts >= maxBorrowingsPerMonth ? (
+                        <button type="button" className="btn btn-danger fs-3 mb-4">Bạn đã mượn sách đủ số lần cho phép trong tháng này.</button>
+                    ) : (
+                        <>
+                            <button type="button" className="btn btn-primary fs-3 mb-4">Bạn còn {maxBorrowingsPerMonth - numberOfBorrowReceipts} lần mượn sách trong tháng này.</button>
+                        </>
+                    )
                 )}
 
                 <div className="col-12 d-flex justify-content-center mt-5">
@@ -187,13 +212,13 @@ function ChiTietSach() {
                                     </h3>
 
                                     <h3 className='mt-3'>
-                                        <span className='fw-bold'>Mô tả: </span>
-                                        {sach?.s_MoTa}
+                                        <span className='fw-bold'>Số lượng sách có trong kho: </span>
+                                        {sach?.s_SoLuong}
                                     </h3>
 
                                     <h3 className='mt-3'>
-                                        <span className='fw-bold'>Số lượng sách còn lại: </span>
-                                        {sach?.s_SoLuong}
+                                        <span className='fw-bold'>Số lượng sách còn lại có thể mượn: </span>
+                                        {sach?.s_SoLuong - 1}
                                     </h3>
 
                                     <h3 className='mt-3'>
@@ -212,9 +237,17 @@ function ChiTietSach() {
                                     </h3>
 
                                     {/* Hiển thị nút "Tiến hành mượn sách" nếu người dùng active */}
+
                                     {userActive.nd_active && (
-                                        <Link type="button" to={`/chitietsach/formphieumuon/${sach?.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach?.s_TrangThaiMuon === true && sach?.s_ChiDoc === false ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
+                                        numberOfBorrowReceipts >= maxBorrowingsPerMonth ? (
+                                            <p className="text-danger fs-5"></p>
+                                        ) : (
+                                            <>
+                                                <Link type="button" to={`/chitietsach/formphieumuon/${sach?.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach?.s_TrangThaiMuon === true && sach?.s_ChiDoc === false && sach?.s_SoLuong > 1 ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
+                                            </>
+                                        )
                                     )}
+
 
                                 </>
                             )}
@@ -222,6 +255,12 @@ function ChiTietSach() {
                     </div>
 
                 </div>
+            </div>
+            <div className='p-5'>
+                <h3 className='mt-3 text-start' >
+                    <span className='fw-bold'>Mô tả: </span>
+                    {sach?.s_MoTa}
+                </h3>
             </div>
         </div>
     );
