@@ -12,8 +12,66 @@
     margin-right: 15px;
     height: calc(100vh - 40px); /* 100% chiều cao của viewport trừ padding top và bottom */
     overflow-y: auto; /* Bật thanh cuộn khi cần thiết */
+    background-color: #fff;
+    border-radius: 20px;
 }
 
 .side-bar {
     //height: 100%; /* Chiều cao 100% để điền vào phần bên trong của sidebar */
+}
+.dropdown-content {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px; // Thụt vào để rõ ràng hơn
+}
+
+.fs-5 {
+    font-size: 1.25rem;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 0.5rem 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    border-radius: 4px;
+    color: var(--text-color);
+    transition: background-color ease-in-out 200ms;
+
+    &.active {
+        color: var(--primary);
+
+        .icon {
+            display: none;
+        }
+
+        .active-icon {
+            display: flex;
+        }
+    }
+
+    &:hover {
+        background-color: #435ebe;
+        color: #fff;
+    }
+}
+
+.title {
+    margin-left: 10px;
+}
+
+.icon,
+.active-icon {
+    display: flex;
+}
+
+.active-icon {
+    display: none;
 }

@@ -1,7 +1,7 @@
 @import 'normalize.css';
 
 :root {
-    --primary: #fe2c55;
+    --primary: #2e319e;
     --black: #000;
     --white: #fff;
     --text-color: #161823;
@@ -9,7 +9,7 @@
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 
     // Default layout
-    --default-layout-header-height: 70px;
+    --default-layout-header-height: 100px;
     --default-layout-width: 1490px;
     --default-layout-horizontal-spacer: 5px;
 }
@@ -31,7 +31,9 @@ body {
     text-rendering: optimizespeed;
     color: var(--text-color);
     overflow-y: overlay;
-    background-image: url('~/src/assets/images/background_gradient.png');
+    //background-image: url('~/src/assets/images/background_gradient.png');
+    background: #ffffffd1;
+
     background-size: 100% 100%;
     background-repeat: no-repeat;
     overflow: hidden;
@@ -97,7 +99,7 @@ body {
         font-weight: 600;
         font-size: 1.6rem;
         line-height: 2.2rem;
-        background-color: rgba(84, 84, 84, 0.92);
+        background-color: rgba(211, 209, 209, 0.92);
     }
 
     .tippy-arrow {

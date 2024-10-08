@@ -12,8 +12,8 @@
     justify-content: center;
     width: 100%;
     height: var(--default-layout-header-height);
-    box-shadow: 0px 1px 1px rgb(0 0 0 / 12%);
-    background-color: #fff;
+    //box-shadow: 0px 1px 1px rgb(0 0 0 / 12%);
+    // background-color: #fff;
 }
 
 .inner {
@@ -23,6 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-top: 10px;
 }
 
 .logo-link {
@@ -33,6 +34,7 @@
 .actions {
     display: flex;
     align-items: center;
+    margin-top: 10px;
 }
 
 .more-btn {

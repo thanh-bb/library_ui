@@ -1,0 +1,145 @@
+.wrapper {
+    background-color: rgba(252, 252, 252, 1);
+    // display: flex;
+    // justify-content: center; /* căn giữa theo chiều ngang */
+    // align-items: center; /* căn giữa theo chiều dọc */
+    height: 90vh; /* Đảm bảo form căn giữa trên toàn bộ chiều cao của màn hình */
+    // background-color: #b7b6b65c;
+    //padding-block: 0;
+}
+
+.container {
+    //  width: 1100px; /* hoặc bất kỳ kích thước nào bạn muốn */
+    padding: 20px;
+    font-size: large;
+}
+.content-body {
+    padding: 30px;
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+.board-item,
+.ranking-item,
+.prominent,
+.categories {
+    background-color: #ffffff;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    height: 350px;
+    border-radius: 20px;
+}
+
+.prominent {
+    height: 320px;
+}
+
+.book-item {
+    text-align: center;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    height: 245px;
+    width: 165px;
+    border-radius: 10px 10px 20px 20px;
+    margin: auto;
+}
+
+.prominent,
+.categories {
+    height: fit-content;
+    padding-bottom: 20px;
+}
+
+.book-cover {
+    width: 165px;
+    height: 190px;
+    border-radius: 10px 10px 10px 10px;
+    object-fit: cover;
+}
+
+.prominent .d-flex,
+.categories .d-flex {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); /* Mỗi item có độ rộng tối thiểu 150px và dàn đều */
+    gap: 50px; /* Khoảng cách giữa các item */
+    justify-content: center; /* Căn giữa các item */
+    padding: 30px;
+}
+
+.categories-label {
+    background-color: rgba(43, 109, 255, 1);
+    border-radius: 20px;
+
+    color: #fff;
+    width: fit-content;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.book-item {
+    position: relative;
+    text-align: center;
+
+    .book-image-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+
+        .book-cover {
+            width: 165px;
+            height: 190px;
+            transition: transform 0.3s ease;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Lớp phủ mờ */
+            opacity: 0; /* Ẩn lớp phủ ban đầu */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .view-detail-text {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            opacity: 0; /* Ẩn chữ ban đầu */
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+    }
+
+    &:hover {
+        .book-cover {
+            transform: scale(1.1); /* Phóng to hình khi hover */
+        }
+
+        .overlay {
+            opacity: 1; /* Hiển thị lớp phủ */
+        }
+
+        .view-detail-text {
+            opacity: 1; /* Hiển thị chữ "Xem chi tiết" */
+        }
+    }
+}
+
+.btn-continue {
+    background-color: #2e319e;
+    margin-top: 20px;
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: rgb(255, 255, 255);
+    box-shadow: 0 0 20px #eee;
+    border-radius: 20px;
+    display: block;
+    font-weight: bold;
+    height: 40px;
+    width: 100%;
+}

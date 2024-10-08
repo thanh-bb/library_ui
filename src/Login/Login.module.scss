@@ -3,7 +3,7 @@
     justify-content: center; /* căn giữa theo chiều ngang */
     align-items: center; /* căn giữa theo chiều dọc */
     height: 100vh; /* Đảm bảo form căn giữa trên toàn bộ chiều cao của màn hình */
-    background-color: #c1bfbf5c;
+    background-color: #b7b6b65c;
 }
 
 .container {
@@ -23,22 +23,74 @@
 }
 
 .btn-grad {
-    background-image: linear-gradient(to right, #cabafb 0%, #fba49f 51%, #d5c8ff 100%);
-    margin: 10px;
-    padding: 15px 45px;
+    //background-image: linear-gradient(to right, #cabafb 0%, #fba49f 51%, #d5c8ff 100%);
+    //background: linear-gradient(90deg, #32faf3, #46ff7d);
+    background-color: #2e319e;
+    margin-top: 20px;
+    //padding: 15px 45px;
     text-align: center;
-    text-transform: uppercase;
+    //  text-transform: uppercase;
     transition: 0.5s;
     background-size: 200% auto;
-    color: white;
+    color: rgb(255, 255, 255);
     box-shadow: 0 0 20px #eee;
-    border-radius: 10px;
+    border-radius: 20px;
     display: block;
     font-weight: bold;
+    height: 40px;
+    width: 100%;
 }
 
 .btn-grad:hover {
     background-position: right center; /* change the direction of the change here */
     color: #fff;
     text-decoration: none;
+}
+
+.miss-pass {
+    text-decoration: none;
+    font-size: small;
+    color: dodgerblue;
+}
+
+.miss-pass:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: darkblue;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70%; /* Tùy chỉnh theo kích thước mong muốn */
+    margin: auto;
+    margin-top: 20px;
+}
+
+.line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: black;
+}
+
+.text {
+    margin: 0 10px; /* Tạo khoảng cách giữa text và đường kẻ */
+    font-weight: bold;
+}
+
+.btn-register {
+    background-color: #00a2ff;
+    margin-top: 20px;
+    text-align: center;
+    //text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: black;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 20px;
+    display: block;
+    font-weight: bold;
+    height: 40px;
+    width: 100%;
 }

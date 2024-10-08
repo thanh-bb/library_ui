@@ -4,6 +4,7 @@ import DefaultLayout from "~/layouts";
 import { Fragment } from "react";
 import { ToastContainer } from 'react-toastify';
 import Login from "./Login/Login";
+import Signup from "./Signup";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
 
         <Routes>
           <Route path='/login' element={<Login />}></Route>
+          <Route path='/signup' element={<Signup />}></Route>
 
           {publicRoutes.map((route, index) => {
             const Page = route.component;

@@ -10,17 +10,18 @@
     margin-top: var(--default-layout-header-height);
     display: flex;
     padding-top: 10px;
-    background-color: #bdbdbd4d;
+    //background-color: #bdbdbd4d;
 }
 
 .content {
-    margin-right: 6px;
+    //margin-right: 6px;
     flex: 1;
-    border-radius: 26px;
-    background-color: #ffffffe6;
-    margin-bottom: 10px;
+    border-radius: 26px 0 0 0;
+    //  background-color: rgba(204, 204, 204, 0.315);
+    //margin-bottom: 10px;
     height: calc(
-        100vh - var(--default-layout-header-height) - 20px
+        100vh - var(--default-layout-header-height) - 10px
     ); /* Chiều dài của content là 100% chiều cao của viewport trừ chiều cao của header và khoảng cách 10px ở đáy */
     overflow-y: auto; /* Thêm thanh cuộn khi nội dung vượt quá kích thước */
+    //padding-bottom: 80px;
 }

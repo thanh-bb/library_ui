@@ -4,6 +4,7 @@
     margin-right: 15px;
     // font-size: large;
     text-align: center;
+    padding-bottom: 120px;
 }
 
 .head-table {
@@ -12,22 +13,46 @@
 }
 
 .btn-grad {
-    background-image: linear-gradient(to right, #f4608a 0%, #e45796 51%, #f1468d 100%);
-    margin: 10px;
-    padding: 15px 45px;
+    background-color: #435ebe;
+    padding: 10px 30px;
     text-align: center;
     text-transform: uppercase;
     transition: 0.5s;
     background-size: 200% auto;
     color: white;
     box-shadow: 0 0 20px #eee;
-    border-radius: 10px;
-    display: block;
-    float: right;
+    border-radius: 20%;
+    font-size: 50px;
+
+    /* New properties to position the button */
+    position: fixed; /* or 'absolute' */
+    bottom: 30px; /* Adjust as needed */
+    right: 40px; /* Adjust as needed */
+    z-index: 9999; /* Ensures it appears on top */
 }
 
 .btn-grad:hover {
     background-position: right center; /* change the direction of the change here */
     color: #fff;
     text-decoration: none;
+}
+
+.btn-create {
+    background-color: #435ebe;
+    padding: 10px 30px;
+    text-align: center;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    font-size: 15px;
+    border: 2px solid #435ebe;
+    float: right;
+}
+
+.btn-create:hover {
+    color: #435ebe;
+    background-color: #c1c1ff30;
+    font-weight: bold;
+    border: 2px solid #435ebe;
 }

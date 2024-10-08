@@ -212,7 +212,7 @@ function PhieuMuonUser() {
 
     return (
         <div className={cx('wrapper')}>
-            <h1 className='text-align-center'>Thông Tin Phiếu Mượn</h1>
+            <h1 className='text-align-center'>Thông Tin Phiếu Mượn Tại Thư Viện</h1>
             <div className="row m-5 ">
                 <div className="col-12 d-flex justify-content-center mt-5">
                     <div className="col-4 d-flex align-items-center justify-content-center m-5">
@@ -230,7 +230,7 @@ function PhieuMuonUser() {
                                 <input className="form-control fs-2" id="exampleInputEmail3" value={1} disabled onChange={(e) => setSoLuongNhap(parseInt(e.target.value))} />
                                 {/* {!isValidSoLuong() && <span style={{ color: 'red' }}>Số lượng không hợp lệ</span>} */}
                             </div>
-                            <button type="submit" className="btn btn-primary fs-2 p-3" disabled={!isValidSoLuong() || isBookBorrowed}>SUBMIT</button>
+                            <button type="submit" className="btn btn-primary fs-3" disabled={!isValidSoLuong() || isBookBorrowed}>Gửi yêu cầu xét duyệt mượn</button>
                             {isBookBorrowed && <p className='text-danger mt-3'>Bạn đã mượn sách này</p>}
                             <p className='fst-italic text-success mt-3'>Lưu ý: Thời gian mượn sách của bạn là 14 ngày</p>
                         </form>

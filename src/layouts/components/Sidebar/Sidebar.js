@@ -1,88 +1,169 @@
+import { useState } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Sidebar.module.scss';
 import Menu, { MenuItem } from './Menu';
+
+
 import {
-    HomeIcon,
-    HomeActiveIcon,
     UserGroupIcon,
     UserGroupActiveIcon,
-    LiveActiveIcon,
-    LiveIcon,
+    BookIcon,
+    BookActiveIcon,
+    WarningIcon,
+    WarningActiveIcon,
+    CardIcon,
+    CardActiveIcon
 } from '~/components/Icons';
 // import SuggestedAccounts from '~/components/SuggestedAccounts';
 import config from '~/config';
+import TitleMenu from './Menu/TitleMenu';
 
 const cx = classNames.bind(styles);
 
 function Sidebar() {
+    // Trạng thái quản lý dropdown của các menu
+    const [isBookInfoOpen, setIsBookInfoOpen] = useState(false);
+    const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
+    const [isBorrowReturnOpen, setIsBorrowReturnOpen] = useState(false);
+    const [isViolationManagementOpen, setIsViolationManagementOpen] = useState(false);
+
+    // Hàm toggle để mở hoặc đóng dropdown
+    const toggleBookInfo = () => setIsBookInfoOpen(!isBookInfoOpen);
+    const toggleUserManagement = () => setIsUserManagementOpen(!isUserManagementOpen);
+    const toggleBorrowReturn = () => setIsBorrowReturnOpen(!isBorrowReturnOpen);
+    const toggleViolationManagement = () => setIsViolationManagementOpen(!isViolationManagementOpen);
+
     return (
         <aside className={cx('wrapper')}>
-            <div className={cx('side-bar mb-lg-5 ')}>
+            <div className={cx('side-bar mb-lg-5')}>
                 <Menu>
-                    {/* <MenuItem title="For You" to={config.routes.home} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} /> */}
-                    <div className="d-flex flex-column ">
-                        <div className='fs-5 '>Quản lý thông tin sách</div>
+                    {/* Quản lý thông tin sách */}
+                    <div className="d-flex flex-column" onClick={toggleBookInfo} style={{ cursor: 'pointer' }}>
+                        <TitleMenu
+                            title="Quản lý thông tin sách"
+                            icon={<BookIcon />}
+                            activeIcon={<BookActiveIcon />}
+                            to={config.routes.danhmuc}
+                        />
                         <hr style={{ margin: '0' }}></hr>
                     </div>
-                    <MenuItem
-                        title="Danh Mục"
-                        to={config.routes.danhmuc}
-                        icon={< HomeIcon />}
-                        activeIcon={<UserGroupActiveIcon />}
-                    />
-                    <MenuItem title="Loại sách" to={config.routes.loaisach} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem title="Thể Loại" to={config.routes.theloai} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem title="Nhà xuất bản" to={config.routes.NXB} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem title="Tác Giả" to={config.routes.tacgia} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem title="Sách" to={config.routes.sach} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem title="Nhập Kho Sách" to={config.routes.nhapkhosach} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <br></br>
-                    <div className="d-flex flex-column ">
-                        <div className='fs-5 '>Quản lý người dùng</div>
+                    {isBookInfoOpen && (
+                        <div className={cx('dropdown-content')}>
+                            <MenuItem
+                                title="Danh Mục"
+                                to={config.routes.danhmuc}
+                            />
+                            <MenuItem
+                                title="Loại sách"
+                                to={config.routes.loaisach}
+
+                            />
+                            <MenuItem
+                                title="Thể Loại"
+                                to={config.routes.theloai}
+
+                            />
+                            <MenuItem
+                                title="Nhà xuất bản"
+                                to={config.routes.NXB}
+
+                            />
+                            <MenuItem
+                                title="Tác Giả"
+                                to={config.routes.tacgia}
+
+                            />
+                            <MenuItem
+                                title="Sách"
+                                to={config.routes.sach}
+
+                            />
+                            <MenuItem
+                                title="Nhập Kho Sách"
+                                to={config.routes.nhapkhosach}
+
+                            />
+                        </div>
+                    )}
+
+                    {/* Quản lý người dùng */}
+                    <div className="d-flex flex-column" onClick={toggleUserManagement} style={{ cursor: 'pointer' }}>
+                        <TitleMenu
+                            title="Quản lý người dùng"
+                            icon={<UserGroupIcon />}
+                            activeIcon={<UserGroupActiveIcon />}
+                            to={config.routes.nguoidung}
+                        />
                         <hr style={{ margin: '0' }}></hr>
                     </div>
-                    <MenuItem title="ImportFile" to={config.routes.import} icon={<UserGroupIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem
-                        title="Người Dùng"
-                        to={config.routes.nguoidung}
-                        icon={<UserGroupIcon />}
-                        activeIcon={<UserGroupActiveIcon />}
-                    />
-                    <br></br>
-                    <div className="d-flex flex-column ">
-                        <div className='fs-5 '>Quản lý mượn trả </div>
+                    {isUserManagementOpen && (
+                        <div className={cx('dropdown-content')}>
+
+                            <MenuItem
+                                title="Người Dùng"
+                                to={config.routes.nguoidung}
+
+                            />
+                            <MenuItem
+                                title="ImportFile"
+                                to={config.routes.import}
+
+                            />
+                            <MenuItem
+                                title="Quản lý đăng ký mới"
+                                to={config.routes.nguoidungdangky}
+
+                            />
+                        </div>
+                    )}
+
+                    {/* Quản lý mượn trả */}
+                    <div className="d-flex flex-column" onClick={toggleBorrowReturn} style={{ cursor: 'pointer' }}>
+                        <TitleMenu
+                            title="Quản lý mượn trả"
+                            icon={<CardIcon />}
+                            activeIcon={<CardActiveIcon />}
+                            to={config.routes.phieumuon}
+
+                        />
                         <hr style={{ margin: '0' }}></hr>
                     </div>
-                    <MenuItem
-                        title="Phiếu Mượn"
-                        to={config.routes.phieumuon}
-                        icon={<LiveIcon />}
-                        activeIcon={<LiveActiveIcon />}
-                    />
-                    <MenuItem
-                        title="Phiếu Trả"
-                        to={config.routes.phieutra}
-                        icon={<LiveIcon />}
-                        activeIcon={<LiveActiveIcon />}
-                    />
-                    <br></br>
-                    <div className="d-flex flex-column ">
-                        <div className='fs-5 '>Quản lý vi phạm </div>
+                    {isBorrowReturnOpen && (
+                        <div className={cx('dropdown-content')}>
+                            <MenuItem
+                                title="Phiếu Mượn"
+                                to={config.routes.phieumuon}
+
+                            />
+                            <MenuItem
+                                title="Phiếu Trả"
+                                to={config.routes.phieutra}
+
+                            />
+                        </div>
+                    )}
+
+                    {/* Quản lý vi phạm */}
+                    <div className="d-flex flex-column" onClick={toggleViolationManagement} style={{ cursor: 'pointer' }}>
+                        <TitleMenu
+                            title="Quản lý vi phạm"
+                            icon={<WarningIcon />}
+                            activeIcon={<WarningActiveIcon />}
+                            to={config.routes.phieudongphat}
+                        />
                         <hr style={{ margin: '0' }}></hr>
                     </div>
-                    <MenuItem
-                        title="Phiếu Đóng Phạt"
-                        to={config.routes.phieudongphat}
-                        icon={<LiveIcon />}
-                        activeIcon={<LiveActiveIcon />}
-                    />
+                    {isViolationManagementOpen && (
+                        <div className={cx('dropdown-content')}>
+                            <MenuItem
+                                title="Phiếu Đóng Phạt"
+                                to={config.routes.phieudongphat}
+
+                            />
+                        </div>
+                    )}
                 </Menu>
-                <br></br>
-                {/* <SuggestedAccounts label="Suggested accounts" />
-                <SuggestedAccounts label="Following accounts" /> */}
             </div>
-
-
         </aside>
     );
 }

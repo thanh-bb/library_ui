@@ -12,7 +12,7 @@ function UserLayout({ children }) {
         <div className={cx('wrapper')}>
             <Header />
             <div className={cx('container')}>
-                <UserSidebar />
+                {/* <UserSidebar /> */}
                 <div className={cx('content')}>{children}</div>
             </div>
         </div>

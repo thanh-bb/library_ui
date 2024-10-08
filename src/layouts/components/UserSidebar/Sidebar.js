@@ -4,6 +4,12 @@ import Menu, { MenuItem } from './Menu';
 import {
     HomeIcon,
     HomeActiveIcon,
+    UserInforIcon,
+    UserInforActiveIcon,
+    MemberCardIcon,
+    MemberCardActiveIcon,
+    BillIcon,
+    BillActiveIcon,
 } from '~/components/Icons';
 // import SuggestedAccounts from '~/components/SuggestedAccounts';
 import config from '~/config';
@@ -16,9 +22,9 @@ function UserSidebar() {
             <div className={cx('side-bar')}>
                 <Menu>
                     <MenuItem title="Trang chủ" to={config.routes.userhome} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem title="Thông tin tài khoản" to={config.routes.thongtintaikhoan} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem title="Quản lý phiếu mượn" to={config.routes.quanlyphieumuon} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
-                    <MenuItem title="Quản lý phiếu đóng phạt" to={config.routes.quanlypdp_user} icon={<HomeIcon />} activeIcon={<HomeActiveIcon />} />
+                    <MenuItem title="Thông tin tài khoản" to={config.routes.thongtintaikhoan} icon={<UserInforIcon />} activeIcon={<UserInforActiveIcon />} />
+                    <MenuItem title="Quản lý phiếu mượn" to={config.routes.quanlyphieumuon} icon={<MemberCardIcon />} activeIcon={<MemberCardActiveIcon />} />
+                    <MenuItem title="Quản lý phiếu đóng phạt" to={config.routes.quanlypdp_user} icon={<BillIcon />} activeIcon={<BillActiveIcon />} />
                 </Menu>
             </div>
 

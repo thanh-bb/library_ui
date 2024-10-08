@@ -11,6 +11,7 @@ import DanhMuc from '~/pages/DanhMuc';
 import Upload from '~/pages/Upload';
 import Search from '~/pages/Search';
 import Login from '~/Login';
+import Signup from '~/Signup';
 import TheLoai from '~/pages/TheLoai';
 import Sach from '~/pages/Sach';
 import ImportFile from '~/pages/ImportFile';
@@ -33,6 +34,10 @@ import TacGia from '~/pages/TacGia';
 import DaTra from '~/pages/PhieuMuon/DaTra';
 import NhapKhoSach from '~/pages/NhapKhoSach';
 import { QuanLyPhieuTra } from '~/User/pages/QuanLyPhieuMuon/QuanLyPhieuTra/QuanLyPhieuTra';
+import NguoiDungDangKy from '~/pages/NguoiDungDangKy';
+import ChiTietNDDK from '~/pages/ChiTietNDDK';
+import Cart from '~/User/pages/Cart';
+import { CTPMOnline } from '~/User/pages/CTPMOnline/CTPMOnline';
 
 
 // Public routes
@@ -41,7 +46,11 @@ const publicRoutes = [
     { path: config.routes.sach, component: Sach },
     { path: config.routes.import, component: ImportFile },
     { path: config.routes.nguoidung, component: NguoiDung },
+    { path: config.routes.nguoidungdangky, component: NguoiDungDangKy },
+    { path: config.routes.chitietNDDK, component: ChiTietNDDK },
+
     { path: config.routes.login, component: Login, layout: HeaderOnly },
+    { path: config.routes.signup, component: Signup, layout: HeaderOnly },
     // { path: config.routes.profile, component: Profile },
     { path: config.routes.home, component: Home },
     { path: config.routes.theloai, component: TheLoai },
@@ -66,7 +75,8 @@ const publicRoutes = [
     { path: config.routes.thongtintaikhoan, component: ThongTinTaiKhoan, layout: UserLayout },
     { path: config.routes.formphieumuon, component: PhieuMuonUser, layout: UserLayout },
     { path: config.routes.chitietphieutra, component: ChiTietPhieuTra, layout: UserLayout },
-
+    { path: config.routes.giosach, component: Cart, layout: UserLayout },
+    { path: config.routes.chitietphieumuonOnline, component: CTPMOnline, layout: UserLayout },
 ];
 
 const privateRoutes = [];

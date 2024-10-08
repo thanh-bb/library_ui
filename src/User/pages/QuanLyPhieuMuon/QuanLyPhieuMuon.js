@@ -13,7 +13,11 @@ export class QuanLyPhieuMuon extends Component {
         this.state = {
             chitietpms: [],
             tenSachFilter: '',
-            tensachWithoutFilter: [] // Khởi tạo mảng chitietpmsWithoutFilter
+            tensachWithoutFilter: [],// Khởi tạo mảng chitietpmsWithoutFilter
+            selectedTag: "Đang mượn",
+            phieumuonWithoutFilter: [],
+            phieumuons: [],
+            TrangThai: "",
         }
     }
 
@@ -35,30 +39,26 @@ export class QuanLyPhieuMuon extends Component {
     }
 
     refreshList() {
-        // Lấy token từ sessionStorage
         const token = sessionStorage.getItem('jwttoken');
-
-        // Kiểm tra nếu token tồn tại
         if (token) {
-            // Giải mã token để lấy nd_id
             const decodedToken = jwtDecode(token);
             const nd_id = decodedToken.nameid;
 
-            // Gọi API để lấy danh sách phiếu mượn của người dùng với nd_id này
             fetch(`https://localhost:44315/api/QuanLyPhieuMuon/${nd_id}`)
                 .then(response => response.json())
                 .then(data => {
-                    const filteredData = data.filter(pm => pm.TrangThai === "Đang mượn");
                     this.setState({
-                        chitietpms: filteredData,
-                        tensachWithoutFilter: filteredData// Cập nhật chitietpmsWithoutFilter với dữ liệu mới
+                        chitietpms: data.filter(pm => pm.TrangThai === this.state.selectedTag),
+                        tensachWithoutFilter: data // Lưu toàn bộ dữ liệu phiếu mượn
+                    }, () => {
+                        // Lọc danh sách dựa trên trạng thái đã chọn
+                        this.FilterFn();
                     });
                 })
                 .catch(error => {
                     console.error('Error fetching data: ', error);
                 });
         } else {
-            // Xử lý khi không có token
             console.error('Access token not found');
         }
     }
@@ -68,48 +68,94 @@ export class QuanLyPhieuMuon extends Component {
         this.refreshList();
     }
 
+    FilterFn() {
+        const { selectedTag, tensachWithoutFilter } = this.state;
+
+        const filteredData = tensachWithoutFilter.filter(el => {
+            // Kiểm tra pm_TrangThai dựa trên tag đã chọn
+            return (
+                el.TrangThai === selectedTag
+            );
+        });
+
+        this.setState({ phieumuons: filteredData });
+    }
+
+
+    // Phân loại trạng thái
+    handleTagSelection = (tag) => {
+        this.setState({ selectedTag: tag }, () => {
+            this.FilterFn();
+        });
+    }
+
+
     render() {
 
-        const { chitietpms, tenSachFilter } = this.state;
+        const { phieumuons, tenSachFilter } = this.state;
 
-        const filteredChitietpms = chitietpms.filter(pm =>
-            pm.TenSach.toLowerCase().includes(tenSachFilter.toLowerCase())
-        );
+        // const filteredChitietpms = chitietpms.filter(pm =>
+        //     pm.TenSach.toLowerCase().includes(tenSachFilter.toLowerCase())
+        // );
+
+        const { selectedTag } = this.state;
+
+
         return (
             <div className={cx('wrapper')}>
-                <div class="row justify-content-around">
-                    <Link type="button" to={`/quanlyphieumuon`} className={"col-4 h4 pb-2 mb-4 text-danger border-bottom border-danger"}>Đang mượn</Link>
-                    <Link type="button" to={`/quanlyphieutra`} className={"col-4 h4 pb-2 mb-4 text-success border-bottom border-success"}>Đã trả</Link>
+                <div className="row d-flex justify-content-end mb-3">
+                    <h1 className="fw-bold mt-5 mb-5 ">Phiếu Mượn Tại Thư Viện</h1>
+                    <hr></hr>
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đang mượn" })}
+                            onClick={() => this.handleTagSelection("Đang mượn")}
+
+                        >
+                            Đang mượn
+                        </button>
+                    </div>
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đã trả" })}
+                            onClick={() => this.handleTagSelection("Đã trả")}
+                        >
+                            Đã trả
+                        </button>
+                    </div>
                 </div>
 
-                <table className="table table-hover">
-                    <thead className="table-danger">
+                <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+                    <div className="d-flex flex-row w-100 mb-2">
+                        <input className="form-control m-2 fs-3 p-2 w-100"
+                            type="text"
+                            placeholder="Tìm kiếm theo tên sách"
+                            value={tenSachFilter}
+                            onChange={this.handleTenSachFilterChange}
+                        />
+                        <button type="button" className="btn btn-light"
+                            onClick={() => this.sortResult('TenSach', true)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
+                            </svg>
+                        </button>
 
+                        <button type="button" className="btn btn-light"
+                            onClick={() => this.sortResult('TenSach', false)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
+                    <thead >
                         <tr>
-
                             <th className="text-start">ID Phiếu</th>
                             <th className="text-start w-25">
-                                <div className="d-flex flex-row w-100 mb-2">
-                                    <input className="form-control m-2 fs-3 p-2 w-100"
-                                        type="text"
-                                        placeholder="Tìm kiếm theo tên sách"
-                                        value={tenSachFilter}
-                                        onChange={this.handleTenSachFilterChange}
-                                    />
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('TenSach', true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
-                                        </svg>
-                                    </button>
 
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('TenSach', false)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
-                                        </svg>
-                                    </button>
-                                </div>
                                 Tên Sách
                             </th>
                             <th className="text-center">Số lượng</th>
@@ -120,7 +166,7 @@ export class QuanLyPhieuMuon extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredChitietpms.map(dep =>
+                        {phieumuons.map(dep =>
                             <tr key={dep.Id_PhieuMuon}>
                                 <td className="text-start">{dep.Id_PhieuMuon}</td>
                                 <td className="text-start">{dep.TenSach}</td>

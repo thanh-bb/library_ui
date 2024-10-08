@@ -10,14 +10,14 @@
     margin-top: var(--default-layout-header-height);
     display: flex;
     padding-top: 10px;
-    background-color: #bdbdbd4d;
+    //  background-color: #bdbdbd4d;
 }
 
 .content {
     margin-right: 6px;
     flex: 1;
     border-radius: 26px;
-    background-color: #ffffffe6;
+    //   background-color: #ffffffe6;
     margin-bottom: 10px;
     height: calc(
         100vh - var(--default-layout-header-height) - 20px

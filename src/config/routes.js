@@ -1,5 +1,6 @@
 const routes = {
     login: '/',
+    signup: '/signup',
 
     //Admin
     danhmuc: '/admin/danhmuc',
@@ -11,6 +12,8 @@ const routes = {
     sach: '/admin/sach',
     import: '/admin/importfile',
     nguoidung: '/admin/nguoidung',
+    nguoidungdangky: '/admin/nguoidungdangky',
+    chitietNDDK: '/admin/chitietNDDK/:id',
     phieumuon: '/admin/phieumuon',
     phieutra: '/admin/phieutra',
     phieudongphat: '/admin/phieudongphat',
@@ -28,6 +31,8 @@ const routes = {
     formphieumuon: '/chitietsach/formphieumuon/:id',
     chitietphieutra: '/chitietphieutra/:id',
     quanlypdp_user: '/quanlyphieudongphat',
-    thongtintaikhoan: '/thongtintaikhoan'
+    thongtintaikhoan: '/thongtintaikhoan',
+    giosach: '/giosach',
+    chitietphieumuonOnline: "/chi_tiet_phieu_muon_online",
 }
 export default routes;

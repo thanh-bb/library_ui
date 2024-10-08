@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import classNames from 'classnames/bind';
 import styles from './ThongTinTaiKhoan.module.scss';
 import { jwtDecode } from 'jwt-decode';
+import { Link } from 'react-router-dom';
+
 
 const cx = classNames.bind(styles);
 
@@ -53,62 +55,119 @@ export class ThongTinTaiKhoan extends Component {
         console.log(thongtins)
         return (
             <div className={cx('wrapper')}>
-                <div className="d-flex justify-content-center mt-5">
-                    <div className="col-md-6">
-                        <div className='text-start'>
-                            {thongtins && (
-                                <> <h1 className='text-center fw-bold'>Thông tin tài khoản</h1>
-                                    <table className="table table-bordered fs-3 mt-5">
-                                        <tbody>
-                                            <tr >
-                                                <th scope="row">ID</th>
-                                                <td > {thongtins.nd_Id}</td>
+                <div className={cx("container")}>
+                    <div className={cx('content-body')} >
+                        <div className="card border border-0">
+                            <div >
+                                <h2 className={cx('card-header')}>Thông tin tài khoản người dùng</h2>
+                            </div>
+                            <hr />
 
-                                            </tr >
-                                            <tr >
-                                                <th scope="row">Username: </th>
-                                                <td>{thongtins.nd_Username}</td>
+                            <div className="row d-flex justify-content-between mt-5">
 
-                                            </tr>
-                                            <tr >
-                                                <th scope="row">Họ tên: </th>
-                                                <td>{thongtins.nd_HoTen}</td>
+                                {thongtins && (
+                                    <>
+                                        <div className='col-1'>
+                                            <img
+                                                width="120px"
+                                                height="180px"
+                                                style={{ borderRadius: "10px" }}
+                                                alt=""
+                                                src={
+                                                    thongtins?.nd_HinhThe
+                                                        ? `https://localhost:44315/Photos/${thongtins?.nd_HinhThe}`
+                                                        : "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+                                                }
+                                            />
+                                        </div>
+                                        <div className="col-4 ">
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Usename</label>
+                                                : {thongtins?.nd_Username}
+                                            </div>
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Họ tên</label>
+                                                : {thongtins?.nd_HoTen}
+                                            </div>
 
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Giới tính:</th>
-                                                <td>{thongtins.nd_GioiTinh}</td>
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Ngày sinh</label>
+                                                : {new Date(thongtins?.nd_NgaySinh).toLocaleDateString('en-GB')}
+                                            </div>
 
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Ngày sinh:</th>
-                                                <td > {new Date(thongtins.nd_NgaySinh).toLocaleDateString('en-GB')}</td>
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Giới tính</label>
+                                                : {thongtins?.nd_GioiTinh}
+                                            </div>
 
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Địa chỉ:</th>
-                                                <td>{thongtins.nd_DiaChi}</td>
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Số CCCD</label>
+                                                : {thongtins?.nd_CCCD}
+                                            </div>
 
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Ngày đăng ký:</th>
-                                                <td > {new Date(thongtins.nd_NgayDangKy).toLocaleDateString('en-GB')}</td>
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Số điện thoại</label>
+                                                : {thongtins?.nd_SoDienThoai}
+                                            </div>
 
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">Email:</th>
-                                                <td >{thongtins.nd_Email}</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" >Trạng thái tài khoản:</th>
-                                                <td className="text-success fw-bold"> {thongtins.nd_active === true ? "Đang hoạt động" : thongtins.nd_active === false ? "Đã bị khóa" : "Trạng thái không xác định"}
-                                                </td>
-                                            </tr>
 
-                                        </tbody>
-                                    </table>
-                                </>
-                            )}
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Email</label>
+                                                : {thongtins?.nd_Email}
+                                            </div>
+
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Địa chỉ</label>
+                                                : {thongtins?.nd_DiaChi}
+                                            </div>
+                                        </div>
+                                        <div className="col-5">
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Ngày đăng ký hội viên</label>
+                                                : {new Date(thongtins?.nd_NgayDangKy).toLocaleDateString('en-GB')}
+                                            </div>
+
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Thời gian sử dụng</label>
+                                                : {thongtins?.nd_ThoiGianSuDung}
+                                            </div>
+
+                                            <div className="form-group mb-3">
+                                                <label className="fw-medium">Thuộc đối tượng người dùng</label>
+                                                : {thongtins?.lnd_LoaiNguoiDung}
+                                            </div>
+
+                                            <div className="form-group mb-3 text-success fw-bold">
+                                                <label className="fw-medium text-black">Trạng thái hoạt động tài khoản</label>
+                                                : {thongtins.nd_active === true ? "Đang hoạt động" : thongtins.nd_active === false ? "Đã bị khóa" : "Trạng thái không xác định"}
+                                            </div>
+
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className="row d-flex justify-content-end mt-3">
+                                <div className='col-4 '>
+                                    <div className="row flex">
+                                        <div className="col-5">
+                                            <Link to="/userhome" type="submit" className={cx('btn-return')}>
+                                                <p className="pt-2">Quay lại</p>
+                                            </Link>
+                                        </div>
+                                        <div className="col-7 ">
+                                            <button
+                                                type="button"
+                                                className={cx('btn-continue')}
+                                                onClick={""}
+                                            >   Đổi mật khẩu
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

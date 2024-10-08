@@ -77,16 +77,17 @@ function Search() {
                     onChange={(e) => setSearchValue(e.target.value)}
                     onFocus={() => setShowResult(true)}
                 />
+
+
+                {/* <button className={cx('search-btn')}>
+                    <SearchIcon />
+                </button> */}
                 {!!searchValue && !loading && (
                     <button className={cx('clear')} onClick={handleClear}>
                         <FontAwesomeIcon icon={faCircleXmark} />
                     </button>
                 )}
                 {loading && <FontAwesomeIcon className={cx('loading')} icon={faSpinner} />}
-
-                <button className={cx('search-btn')}>
-                    <SearchIcon />
-                </button>
             </div>
         </HeadlessTippy>
     );

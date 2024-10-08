@@ -1,15 +1,17 @@
 .search,
 .search-result {
-    width: 361px;
+    width: 400px;
+    margin-top: 10px;
 }
 
 .search {
     position: relative;
-    height: var(--search-height);
+    height: 40px;
     padding-left: 16px;
     display: flex;
-    background-color: rgba(211, 213, 227, 0.681);
-    border-radius: var(--search-border-radius);
+    background-color: rgb(237, 237, 255);
+    // border-radius: var(--search-border-radius);
+    border-radius: 50px;
     border: 1.5px solid transparent;
 
     input {
@@ -27,15 +29,15 @@
         color: rgba(22, 24, 35, 0.75);
     }
 
-    &::after {
-        content: '';
-        position: absolute;
-        top: var(--search-top-spacer);
-        right: var(--search-button-width);
-        width: 1px;
-        height: calc(var(--search-height) - var(--search-top-spacer) * 2);
-        background-color: rgba(22, 24, 35, 0.12);
-    }
+    // &::after {
+    //     content: '';
+    //     position: absolute;
+    //     top: var(--search-top-spacer);
+    //     right: var(--search-button-width);
+    //     width: 1px;
+    //     height: calc(var(--search-height) - var(--search-top-spacer) * 2);
+    //     background-color: rgba(22, 24, 35, 0.12);
+    // }
 
     &:focus-within {
         border-color: rgba(22, 24, 35, 0.2);
@@ -52,10 +54,10 @@
 .clear,
 .loading {
     position: absolute;
-    right: calc(var(--search-button-width) + 16px);
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(22, 24, 35, 0.34);
+    color: rgb(14, 14, 17);
 }
 
 .loading {
@@ -77,10 +79,12 @@
     justify-content: center;
     width: var(--search-button-width);
     height: 100%;
-    border-top-right-radius: var(--search-border-radius);
-    border-bottom-right-radius: var(--search-border-radius);
-    font-size: 1.8rem;
-    color: rgba(22, 24, 35, 0.34);
+    // border-top-right-radius: var(--search-border-radius);
+    // border-bottom-right-radius: var(--search-border-radius);
+    border-radius: 10px;
+    font-size: 2rem;
+    color: rgba(3, 3, 3, 0.937);
+    font-weight: bold;
 
     &:hover {
         cursor: pointer;

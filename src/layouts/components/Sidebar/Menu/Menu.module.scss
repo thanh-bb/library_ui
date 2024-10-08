@@ -1,4 +1,4 @@
-.menu-item {
+.title-menu {
     display: flex;
     align-items: center;
     padding: 8px;
@@ -21,7 +21,36 @@
     }
 
     &:hover {
-        background-color: #fff;
+        background-color: #435ebe;
+        color: #fff;
+    }
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    font-size: 1.6rem;
+    border-radius: 4px;
+    color: var(--text-color);
+    transition: background-color ease-in-out 200ms;
+
+    &.active {
+        color: var(--primary);
+        font-weight: 700;
+
+        .icon {
+            display: none;
+        }
+
+        .active-icon {
+            display: flex;
+        }
+    }
+
+    &:hover {
+        background-color: #435ebe;
+        color: #fff;
     }
 }
 

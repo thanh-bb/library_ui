@@ -5,6 +5,7 @@ import styles from './ChiTietSach.module.scss';
 import { jwtDecode } from 'jwt-decode';
 
 const cx = classNames.bind(styles);
+const PhotoPath = "https://localhost:44315/Photos/";
 
 function ChiTietSach() {
     let { id } = useParams(); // Lấy id sách từ URL
@@ -18,9 +19,93 @@ function ChiTietSach() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [tacgias, setTacgias] = useState([]);
+    const [theloais, setTheLoais] = useState([]);
     const [nxbs, setNxbs] = useState([]);
     const [kes, setKes] = useState([]);
     const [os, setOs] = useState([]);
+    const [cartId, setCartId] = useState(null);
+    const [hmhList, setHmhList] = useState([]);
+
+    const [isBookAvailable, setIsBookAvailable] = useState(false);
+
+    const decodedToken = jwtDecode(jwttoken);
+    const userId = decodedToken.nameid;
+
+    const [selectedImage, setSelectedImage] = useState(hmhList.length > 0 ? hmhList[0].hmh_HinhAnhMaHoa : null);
+
+    // Fetch dữ liệu sách và người dùng
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Kiểm tra hoặc tạo giỏ hàng
+                const checkOrCreateCartResponse = await fetch(`https://localhost:44315/api/Cart/CheckOrCreateUserCart?userId=${userId}`);
+                const cartId = await checkOrCreateCartResponse.json();
+                setCartId(cartId);  // Lưu lại cartId
+
+                // Lấy dữ liệu sách
+                const response = await fetch(`https://localhost:44315/api/Sach/${id}`);
+                const bookData = await response.json();
+                setSach(bookData[0]);
+
+                // Lấy danh sách hình minh họa
+                const hmhResponse = await fetch(`https://localhost:44315/api/HinhMinhHoa/${id}`);
+                const hmhData = await hmhResponse.json();
+                setHmhList(hmhData); // Save list of images
+
+                // Hiển thị mặc định hình đầu tiên
+                if (hmhData.length > 0) {
+                    setSelectedImage(hmhData[0].hmh_HinhAnhMaHoa);
+                }
+
+                setLoading(false);
+            } catch (error) {
+                setError(error.message);
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id, userId]);
+
+    // Kiểm tra sách có trong giỏ hàng không
+    useEffect(() => {
+        const checkBookAvailability = async () => {
+            try {
+                const response = await fetch(`https://localhost:44315/api/Cart/CheckBookAvailability?sId=${id}&userId=${userId}`);
+                const isAvailable = await response.json();
+                setIsBookAvailable(isAvailable);
+            } catch (error) {
+                console.error('Error checking book availability:', error);
+            }
+        };
+
+        checkBookAvailability();
+    }, [id, userId]);
+
+    const handleAddToCart = async () => {
+        try {
+            const response = await fetch('https://localhost:44315/api/Cart/AddToCart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ghId: cartId,  // Sử dụng cartId vừa lấy
+                    sId: id
+                })
+            });
+
+            if (response.ok) {
+                alert('Sách đã được thêm vào giỏ hàng.');
+                window.location.reload();
+            } else {
+                throw new Error('Failed to add book to cart');
+            }
+        } catch (error) {
+            alert('Lỗi khi thêm sách vào giỏ hàng.');
+        }
+    };
+
+
+
 
     useEffect(() => {
         const decodedToken = jwtDecode(jwttoken);
@@ -85,6 +170,21 @@ function ChiTietSach() {
                 console.error('Error fetching authors:', error);
             }
         };
+
+        const fetchTheLoai = async () => {
+            try {
+                const response = await fetch("https://localhost:44315/api/TheLoai");
+                if (response.ok) {
+                    const data = await response.json();
+                    setTheLoais(data);
+                } else {
+                    throw new Error('Failed to fetch the loai');
+                }
+            } catch (error) {
+                console.error('Error fetching theloais:', error);
+            }
+        };
+
         const fetchNXB = async () => {
             try {
                 const response = await fetch("https://localhost:44315/api/NhaXuatBan");
@@ -128,6 +228,7 @@ function ChiTietSach() {
 
         fetchUser();
         fetchSach();
+        fetchTheLoai();
         fetchTacGia();
         fetchNXB();
         fetchKe();
@@ -135,6 +236,35 @@ function ChiTietSach() {
         fetchNumberOfBorrowReceipts();
         setMaxBorrowingsPerMonth(5);
     }, [jwttoken, id]);
+
+    // Fetch dữ liệu sách và người dùng
+    // useEffect(() => {
+    //     const decodedToken = jwtDecode(jwttoken);
+    //     const userId = decodedToken.nameid;
+
+    //     const fetchData = async () => {
+    //         try {
+    //             // Kiểm tra hoặc tạo giỏ hàng
+    //             const checkOrCreateCartResponse = await fetch(`https://localhost:44315/api/Cart/CheckOrCreateUserCart?userId=${userId}`);
+    //             const cartId = await checkOrCreateCartResponse.json();
+    //             setCartId(cartId);  // Lưu lại cartId
+
+    //             // Lấy dữ liệu sách
+    //             const response = await fetch(`https://localhost:44315/api/Sach/${id}`);
+    //             const bookData = await response.json();
+    //             setSach(bookData[0]);              
+
+    //             setLoading(false);
+    //         } catch (error) {
+    //             setError(error.message);
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     fetchData();
+    // }, [jwttoken, id]);
+
+
 
     if (loading) {
         return <p>Loading...</p>;
@@ -161,108 +291,247 @@ function ChiTietSach() {
         return o ? o.os_TenO : "Unknown O";
     };
 
+    const getTheLoaiById = (tl_Id) => {
+        const tl = theloais.find(tl => tl.tl_Id === tl_Id);
+        return tl ? tl.tl_TenTheLoai : "Không xác định";
+    };
+
     return (
         <div className={cx('wrapper')}>
-            <div className="row m-5 ">
-                {!userActive.nd_active && (
-                    <button type="button" className="btn btn-danger fs-3 mb-4">Tài khoản của bạn đã bị khóa do vi phạm quy định của thư viện nên tạm thời bạn không thể mượn sách</button>
-                )}
-                {userActive.nd_active && (
-                    numberOfBorrowReceipts >= maxBorrowingsPerMonth ? (
-                        <button type="button" className="btn btn-danger fs-3 mb-4">Bạn đã mượn sách đủ số lần cho phép trong tháng này.</button>
-                    ) : (
-                        <>
-                            <button type="button" className="btn btn-primary fs-3 mb-4">Bạn còn {maxBorrowingsPerMonth - numberOfBorrowReceipts} lần mượn sách trong tháng này.</button>
-                        </>
-                    )
-                )}
+            <div className={cx("container")}>
+                <div className="row justify-content-center mt-5 ">
+                    <div className={cx("row d-flex justify-content-center")}>
+                        <div className="col-10">
+                            <div className={cx("row d-flex justify-content-around", "board-item",)}>
+                                <div className='col-1'>
+                                    {hmhList && hmhList.length > 0 && hmhList.map((image, index) => (
+                                        <img
+                                            key={index}
+                                            src={`${PhotoPath}${image.hmh_HinhAnhMaHoa}`}
+                                            alt={`${index + 1}`}
+                                            className={cx("list-book-cover")}
+                                            width="20px"
+                                            height="30px"
+                                            onClick={() => setSelectedImage(image.hmh_HinhAnhMaHoa)}  // Khi click sẽ chọn hình ảnh này
+                                        />
+                                    ))}
+                                </div>
 
-                <div className="col-12 d-flex justify-content-center mt-5">
-                    <div className="col-4 d-flex align-items-center justify-content-center m-5">
-                        <img
-                            src={`https://localhost:44315/Photos/${sach?.s_HinhAnh}`}
-                            alt={sach?.s_TenSach}
-                            width="200px"
-                            height="300px"
-                        />
-                    </div>
-                    <div className="col-6 d-flex align-items-center justify-content-center">
 
-                        <div className='text-start'>
-                            {sach && (
-                                <>
-                                    <h3>
-                                        <span className='fw-bold'>Tên sách: </span>
-                                        {sach?.s_TenSach}
-                                    </h3>
-
-                                    <h3 className='mt-3'>
-                                        <span className='fw-bold '>Tác giả: </span>
-                                        {getAuthorNameById(sach?.tg_Id)}
-                                    </h3 >
-
-                                    <h3 className='mt-3'>
-                                        <span className='fw-bold'>Nhà xuất bản: </span>
-                                        {getNXBNameById(sach?.nxb_Id)}
-                                    </h3>
-
-                                    <h3 className='mt-3'>
-                                        <span className='fw-bold'>Năm xuất bản: </span>
-                                        {new Date(sach?.s_NamXuatBan).toLocaleDateString('en-GB')}
-                                    </h3>
-
-                                    <h3 className='mt-3'>
-                                        <span className='fw-bold'>Số lượng sách có trong kho: </span>
-                                        {sach?.s_SoLuong}
-                                    </h3>
-
-                                    <h3 className='mt-3'>
-                                        <span className='fw-bold'>Số lượng sách còn lại có thể mượn: </span>
-                                        {sach?.s_SoLuong - 1}
-                                    </h3>
-
-                                    <h3 className='mt-3'>
-                                        <span className='fw-bold'>Vị trí sách : </span>
-                                        {getKeById(sach?.ks_Id)} - {getOById(sach?.os_Id)}
-                                    </h3>
-
-                                    <h3 className='mt-3'>
-                                        <span className='fw-bold'>Trạng thái sách: </span>
-                                        <span className='text-success'>{sach?.s_TrangThaiMuon === true ? " Trong kho sẵn sàng" : sach?.s_TrangThaiMuon === false ? "Chưa sẵn sàng" : "Trạng thái không xác định"}</span>
-                                    </h3>
-
-                                    <h3 className='mt-3'>
-                                        <span className='fw-bold text-danger'>Lưu ý: </span>
-                                        <span className='text-primary'>{sach?.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach?.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</span>
-                                    </h3>
-
-                                    {/* Hiển thị nút "Tiến hành mượn sách" nếu người dùng active */}
-
-                                    {userActive.nd_active && (
-                                        numberOfBorrowReceipts >= maxBorrowingsPerMonth ? (
-                                            <p className="text-danger fs-5"></p>
-                                        ) : (
-                                            <>
-                                                <Link type="button" to={`/chitietsach/formphieumuon/${sach?.s_Id}`} className={`btn btn-success fs-3 mt-5 p-3 ${sach?.s_TrangThaiMuon === true && sach?.s_ChiDoc === false && sach?.s_SoLuong > 1 ? '' : 'disabled'}`}>Tiến hành mượn sách</Link>
-                                            </>
-                                        )
+                                <div className='col-5'>
+                                    {selectedImage && (
+                                        <img
+                                            src={`${PhotoPath}${selectedImage}`}
+                                            alt="Selected"
+                                            className={cx("book-cover")}
+                                            width="150px"
+                                            height="200px"
+                                        />
                                     )}
+                                </div>
 
 
-                                </>
-                            )}
+                                <div className='col-5'>
+                                    <div className='text-start '>
+                                        {sach && (
+                                            <>
+                                                <h1>
+                                                    <span className={cx('title-book')}> {sach?.s_TenSach} </span>
+
+                                                </h1>
+
+                                                <h2 className={cx('name-author')}>
+                                                    <span className=''> {getAuthorNameById(sach?.tg_Id)}</span>
+                                                </h2 >
+
+
+                                                <div className={cx("btn  rounded-pill bg-success-subtle text-success fw-bold")}>
+                                                    <p className="mb-0 fs-4">{getTheLoaiById(sach?.tl_Id)}</p>
+                                                </div>
+
+                                                <br />
+
+                                                <div className={cx("btn rounded-pill bg-primary-subtle text-primary fw-bold mt-5 me-3")}>
+                                                    <p className='mb-0 fw-bold fs-4'>
+                                                        {sach?.s_TrangThaiMuon
+                                                            ? (sach?.s_SoLuong > 1
+                                                                ? "Trong kho sẵn sàng"
+                                                                : "Chưa sẵn sàng")
+                                                            : sach?.s_TrangThaiMuon === false
+                                                                ? "Chưa sẵn sàng"
+                                                                : "Trạng thái không xác định"}
+                                                    </p>
+                                                </div>
+
+                                                <span className={cx("btn rounded-pill bg-primary-subtle text-primary fw-bold mt-5")}>
+                                                    <p className='mb-0 fw-bold fs-4'>{sach?.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach?.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</p>
+                                                </span>
+
+                                                <div className={cx("btn rounded-pill bg-primary-subtle text-primary-emphasis fw-bold mt-4 mb-3")}>
+                                                    <p className='mb-0 fw-bold fs-4'>Số lượng sách hiện có trong thư viện: {sach?.s_SoLuong - 1}</p>
+                                                </div>
+
+                                                <br />
+
+                                                <div className="d-flex align-items-center mt-5">
+                                                    <p className="text-danger fw-bold mb-0 me-2">Lưu ý:</p>
+                                                    <span className={cx("btn rounded-pill bg-danger-subtle text-danger fw-bold")}>
+                                                        {!userActive.nd_active && (
+                                                            <p className="mb-0 fw-bold fs-3">
+                                                                Tài khoản của bạn đã bị khóa do vi phạm quy định của thư viện nên tạm thời bạn không thể mượn sách
+                                                            </p>
+                                                        )}
+                                                        {userActive.nd_active && (
+                                                            numberOfBorrowReceipts >= maxBorrowingsPerMonth ? (
+                                                                <p className="mb-0 fw-bold fs-3 pe-auto">Bạn đã mượn đủ số lần cho phép của tháng này</p>
+                                                            ) : (
+                                                                <p className="mb-0 fw-bold fs-3">Bạn còn {maxBorrowingsPerMonth - numberOfBorrowReceipts} lần mượn sách trong tháng này</p>
+                                                            )
+                                                        )}
+                                                    </span>
+                                                </div>
+
+                                                {/* Hiển thị nút "Tiến hành mượn sách" nếu sách có sẵn để mượn */}
+                                                {userActive.nd_active && (
+                                                    <>
+                                                        {(sach?.s_TrangThaiMuon && sach?.s_ChiDoc === false && sach?.s_SoLuong > 1) ? (
+                                                            <div className='row d-flex justify-content-between mt-5'>
+                                                                {isBookAvailable ? (
+                                                                    <>
+                                                                        <button
+                                                                            type="button"
+                                                                            className={cx('col', 'btn-continue', 'me-5')}
+                                                                            onClick={handleAddToCart}
+                                                                        >
+                                                                            Thêm vào giỏ sách
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <button
+                                                                            type="button"
+                                                                            className={cx('col', 'btn-existed', 'me-5')}
+                                                                        >
+                                                                            Sách đã có trong giỏ sách
+                                                                        </button>
+                                                                    </>
+                                                                )}
+
+                                                                {numberOfBorrowReceipts <= maxBorrowingsPerMonth ? (
+                                                                    <>
+                                                                        <Link to={`/chitietsach/formphieumuon/${sach?.s_Id}`}
+                                                                            className={cx('col', 'btn-return')}>
+                                                                            Mượn sách ngay
+                                                                        </Link>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <button
+                                                                            type="button"
+                                                                            className={cx('col', 'btn-disable')}>
+                                                                            Bạn không thể mượn sách về nhà
+                                                                        </button>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <div className='row d-flex justify-content-between mt-5'>
+                                                                <button
+                                                                    type="button"
+                                                                    className={cx('col', 'btn-disable')}>
+                                                                    Bạn không thể mượn sách về nhà
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                )}
+
+
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
+                    <div className={cx("row d-flex justify-content-center")}>
+                        <div className="col-10">
+                            <div className={cx("row d-flex justify-content-center", "board-item",)}>
+                                {sach && (
+                                    <>
+                                        <table class="table">
+                                            <h2 className='fw-bold mb-5'> Thông tin chi tiết</h2>
+                                            <tbody>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Tên sách</th>
+                                                    <td>{sach?.s_TenSach}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Tác giả</th>
+                                                    <td>{getAuthorNameById(sach?.tg_Id)}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Thể loại</th>
+                                                    <td>{getNXBNameById(sach?.nxb_Id)}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Ngày xuất bản</th>
+                                                    <td>  {new Date(sach?.s_NamXuatBan).toLocaleDateString('en-GB')}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Nhà xuất bản</th>
+                                                    <td>  {new Date(sach?.s_NamXuatBan).toLocaleDateString('en-GB')}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Ngày xuất bản</th>
+                                                    <td>{getNXBNameById(sach?.nxb_Id)}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Số lượng sách thực có tại thư viện</th>
+                                                    <td>{sach?.s_SoLuong}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Số lượng sách có thể sử dụng</th>
+                                                    <td>{sach?.s_SoLuong - 1}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Vị trí sách tại thư viện</th>
+                                                    <td>  {getKeById(sach?.ks_Id)} - {getOById(sach?.os_Id)}</td>
+                                                </tr>    <tr>
+                                                    <th className='fw-medium w-50'>Trạng thái mượn</th>
+                                                    <td>{sach?.s_TrangThaiMuon === true ? " Trong kho sẵn sàng" : sach?.s_TrangThaiMuon === false ? "Chưa sẵn sàng" : "Trạng thái không xác định"}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th className='fw-medium w-50'>Cho phép mượn về</th>
+                                                    <td>{sach?.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach?.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={cx("row d-flex justify-content-center")}>
+                        <div className="col-10">
+                            <div className={cx("row d-flex justify-content-center", "board-item",)}>
+                                {sach && (
+                                    <>
+                                        <h2 className='fw-bold mb-2'>Mô tả</h2>
+                                        <h3 className='fw-normal mb-3'>Tóm tắt nội dung</h3>
+                                        <p>{sach?.s_MoTa}</p>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div className='p-5'>
-                <h3 className='mt-3 text-start' >
-                    <span className='fw-bold'>Mô tả: </span>
-                    {sach?.s_MoTa}
-                </h3>
-            </div>
-        </div>
+        </div >
     );
 }
 

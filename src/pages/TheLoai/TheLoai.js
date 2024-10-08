@@ -106,7 +106,7 @@ export class TheLoai extends Component {
 
     addClick() {
         this.setState({
-            modalTitle: "Add TheLoai",
+            modalTitle: "Thêm mới Thể loại",
             tl_Id: 0,
             tl_TenTheLoai: ""
         });
@@ -124,6 +124,11 @@ export class TheLoai extends Component {
     createClick() {
         if (!this.state.tl_TenTheLoai) {
             this.setState({ validationError: "Tên Thể Loại không được trống" });
+            return;
+        }
+
+        if (!this.state.dm_Id) {
+            this.setState({ validationError: "Vui lòng chọn Thể loại" });
             return;
         }
 
@@ -189,7 +194,7 @@ export class TheLoai extends Component {
 
 
     deleteClick(id) {
-        if (window.confirm("Ban co chac chan muon xoa?")) {
+        if (window.confirm("Bạn có chắc chắn muốn xóa?")) {
             fetch("https://localhost:44315/api/TheLoai/" + id, {
                 method: "DELETE",
                 headers: {
@@ -231,54 +236,61 @@ export class TheLoai extends Component {
                     data-bs-toggle="modal"
                     data-bs-target="#exampleModal"
                     onClick={() => this.addClick()}>
-                    Thêm Thể Loại
+                    +
                 </button>
-                <table className="table table-hover"  >
-                    <thead className="table-danger">
+                <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+                    <div className="col-6">
+                        <div className="d-flex flex-row">
+                            <input className="form-control m-2 fs-4"
+                                onChange={this.changetl_IdFilter}
+                                placeholder="Tìm theo ID" />
+
+                            <button type="button" className="btn btn-light"
+                                onClick={() => this.sortResult('tl_Id', true)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
+                                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
+                                </svg>
+                            </button>
+
+                            <button type="button" className="btn btn-light"
+                                onClick={() => this.sortResult('tl_Id', false)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                                    <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="col-6">
+                        <div className="d-flex flex-row">
+                            <input className="form-control m-2 fs-4"
+                                onChange={this.changetl_TenTheLoaiFilter}
+                                placeholder="Tìm theo ký tự" />
+
+                            <button type="button" className="btn btn-light"
+                                onClick={() => this.sortResult('tl_TenTheLoai', true)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
+                                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
+                                </svg>
+                            </button>
+
+                            <button type="button" className="btn btn-light"
+                                onClick={() => this.sortResult('tl_TenTheLoai', false)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                                    <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
+                    <thead >
                         <tr >
                             <th className="text-start w-25">
-                                <div className="d-flex flex-row">
-                                    <input className="form-control m-2 fs-4"
-                                        onChange={this.changetl_IdFilter}
-                                        placeholder="Tìm theo ID" />
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('tl_Id', true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
-                                        </svg>
-                                    </button>
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('tl_Id', false)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
-                                        </svg>
-                                    </button>
-
-                                </div>
                                 ID Thể Loại
                             </th>
                             <th className="text-start">
-                                <div className="d-flex flex-row">
-                                    <input className="form-control m-2 fs-4"
-                                        onChange={this.changetl_TenTheLoaiFilter}
-                                        placeholder="Tìm theo ký tự" />
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('tl_TenTheLoai', true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
-                                        </svg>
-                                    </button>
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('tl_TenTheLoai', false)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
-                                        </svg>
-                                    </button>
-                                </div>
                                 Tên Thể Loại
                             </th>
                             <th className="text-start">
@@ -323,60 +335,60 @@ export class TheLoai extends Component {
                             </tr>)}
                     </tbody>
                 </table>
-                <div className="modal fade" id="exampleModal" tabIndex="-1" aria-hidden="true">
-                    <div className="modal-dialog modal-lg modal-dialog-centered">
-                        <div className="modal-content">
+                <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
+                    <div className="modal-dialog modal-lg modal-dialog-centered ">
+                        <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">
                             <div className="modal-header">
-                                <h5 className="modal-title">{modalTitle}</h5>
+                                <h5 className="modal-title fs-2">{modalTitle}</h5>
                                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                 ></button>
                             </div>
 
                             <div className="modal-body">
                                 <div className="input-group mb-3 input-group-lg">
-                                    <span className="input-group-text">Tên Thể Loại</span>
-                                    <input type="text" className="form-control"
+                                    <span className="input-group-text fw-bold">Tên Thể Loại</span>
+                                    <input type="text" className="form-control fs-2"
                                         value={tl_TenTheLoai}
                                         onChange={this.changetl_TenTheLoai} />
                                 </div>
-                                <div className="input-group mb-3">
-                                    <span className="input-group-text">Danh mục</span>
-                                    <select className="form-select"
+
+                                <div className="input-group mb-3 input-group-lg fs-2">
+                                    <span className="input-group-text fw-bold">Danh mục</span>
+                                    <select className="form-select fs-3"
                                         onChange={this.changeDanhMuc}
-                                        value={dm_Id || (danhmucs.length > 0 ? danhmucs[0].dm_Id : '')}>
+                                        value={dm_Id}>
+                                        <option value="">Chọn thể loại</option>
                                         {danhmucs.map(dep =>
                                             <option key={dep.dm_Id} value={dep.dm_Id}>
                                                 {dep.dm_TenDanhMuc}
                                             </option>
                                         )}
                                     </select>
-
-
                                 </div>
                                 {this.state.validationError && (
-                                    <div className="alert alert-danger" role="alert">
-                                        {this.state.validationError}
-                                    </div>
+                                    <p className="fw-bold text-danger float-start fs-4" role="alert">
+                                        Lưu ý: {this.state.validationError}
+                                    </p>
                                 )}
 
                                 {tl_Id === 0 ?
                                     <button type="button"
-                                        className="btn btn-primary float-start"
+                                        className={cx('btn-create')}
                                         onClick={() => this.createClick()}>
-                                        Create
+                                        Thêm
                                     </button> : null}
 
                                 {tl_Id !== 0 ?
                                     <button type="button"
-                                        className="btn btn-primary float-start"
+                                        className={cx('btn-create')}
                                         onClick={() => this.updateClick()}>
-                                        Update
+                                        Cập nhật
                                     </button> : null}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         )
     }
 }
