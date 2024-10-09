@@ -460,7 +460,7 @@ function ChiTietSach() {
                             <div className={cx("row d-flex justify-content-center", "board-item",)}>
                                 {sach && (
                                     <>
-                                        <table class="table">
+                                        <table className="table">
                                             <h2 className='fw-bold mb-5'> Thông tin chi tiết</h2>
                                             <tbody>
                                                 <tr>

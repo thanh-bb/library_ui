@@ -160,8 +160,9 @@ function PhieuMuonUser() {
                 body: JSON.stringify({
                     pmNgayMuon: ngayMuon,
                     pmHanTra: ngayHanTra,
-                    pmTrangThai: 'Đang mượn',
+                    pmTrangThaiMuon: 'Không xác định',
                     ndId: user.nd_Id,
+                    pmTrangThaiXetDuyet: "Chờ xét duyệt",
                     chiTietPhieuMuons: [{
                         sId: sach.s_Id,
                         ctpmSoLuongSachMuon: soLuongNhap,
