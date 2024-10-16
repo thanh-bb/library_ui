@@ -248,8 +248,10 @@ export class UserHome extends Component {
                                                     <span className={cx("view-detail-text")}>Xem chi tiết</span>
                                                 </Link>
                                             </div>
-                                            <div className="p-5">
-                                                <h3 className="mt-2">{dep.STenSach}</h3>
+                                            <div>
+                                                <h4 className="mt-2">
+                                                    {dep.STenSach.length > 20 ? dep.STenSach.substring(0, 50) + "..." : dep.STenSach}
+                                                </h4>
                                                 <h5>{getAuthorNameById(dep.TgId)}</h5>
                                             </div>
                                         </div>

@@ -17,7 +17,8 @@ export class QuanLyPhieuMuon extends Component {
             selectedTag: "Đang mượn",
             phieumuonWithoutFilter: [],
             phieumuons: [],
-            TrangThai: "",
+            TrangThaiMuon: "",
+            TrangThaiXetDuyet: ""
         }
     }
 
@@ -48,7 +49,7 @@ export class QuanLyPhieuMuon extends Component {
                 .then(response => response.json())
                 .then(data => {
                     this.setState({
-                        chitietpms: data.filter(pm => pm.TrangThai === this.state.selectedTag),
+                        chitietpms: data.filter(pm => pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag),
                         tensachWithoutFilter: data // Lưu toàn bộ dữ liệu phiếu mượn
                     }, () => {
                         // Lọc danh sách dựa trên trạng thái đã chọn
@@ -74,12 +75,13 @@ export class QuanLyPhieuMuon extends Component {
         const filteredData = tensachWithoutFilter.filter(el => {
             // Kiểm tra pm_TrangThai dựa trên tag đã chọn
             return (
-                el.TrangThai === selectedTag
+                el.TrangThaiMuon === selectedTag || el.TrangThaiXetDuyet === selectedTag
             );
         });
 
         this.setState({ phieumuons: filteredData });
     }
+
 
 
     // Phân loại trạng thái
@@ -106,6 +108,16 @@ export class QuanLyPhieuMuon extends Component {
                 <div className="row d-flex justify-content-end mb-3">
                     <h1 className="fw-bold mt-5 mb-5 ">Phiếu Mượn Tại Thư Viện</h1>
                     <hr></hr>
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ xét duyệt" })}
+                            onClick={() => this.handleTagSelection("Chờ xét duyệt")}
+
+                        >
+                            Chờ xét duyệt
+                        </button>
+                    </div>
                     <div className="col-2">
                         <button
                             type="button"
@@ -174,19 +186,22 @@ export class QuanLyPhieuMuon extends Component {
                                 <td className="text-center">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
                                 <td className="text-center">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
                                 <td className="text-center">
-                                    {dep.TrangThai === "Đã trả" ?
-                                        ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
-                                            ` Đã trả - Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày `
-                                            : "Đã trả - Đúng hạn"
-                                        : dep.TrangThai === "Đang mượn" ?
-                                            ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
-                                                `${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn)`
-                                                : ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
-                                                    `Đang mượn - Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày đến hạn`
-                                                    : "Đang mượn - Còn hạn trong hạn trả"
-                                            : null // handle other cases or provide a default value
-                                    }
+                                    {dep.TrangThaiMuon === "Đã trả" ? (
+                                        (new Date(dep.HanTra) - new Date()) < 0 ?
+                                            `Đã trả - Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày` :
+                                            "Đã trả - Đúng hạn"
+                                    ) : dep.TrangThaiMuon === "Đang mượn" ? (
+                                        (new Date(dep.HanTra) - new Date()) < 0 ?
+                                            `${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn)` :
+                                            `Đang mượn - Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày đến hạn`
+                                    ) : dep.TrangThaiXetDuyet === "Chờ xét duyệt" ? (
+                                        "Chờ xét duyệt"
+                                    ) : (
+                                        "Trạng thái không xác định"
+
+                                    )}
                                 </td>
+
 
                                 <td className="text-center">
                                     <Link type="button" to={`/chitietphieutra/${dep.Id_PhieuMuon}`} className={`btn btn-link fs-4`}>Xem chi tiết</Link>

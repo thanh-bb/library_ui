@@ -23,25 +23,21 @@ export class PhieuMuon extends Component {
             pm_NgayMuonFilter: "",
             phieumuonsWithoutFilter: [],
 
+
+            selectedTag: "Đang mượn",
+            phieumuonWithoutFilter: [],
+            TrangThaiMuon: "",
+            TrangThaiXetDuyet: ""
         }
     }
 
     FilterFn() {
-        var pm_HanTraFilter = this.state.pm_HanTraFilter;
-        var pm_NgayMuonFilter = this.state.pm_NgayMuonFilter;
+        const { selectedTag, phieumuonsWithoutFilter } = this.state;
+        var filteredData = phieumuonsWithoutFilter.filter(function (el) {
+            return el.TrangThaiMuon === selectedTag || el.TrangThaiXetDuyet === selectedTag;
+        });
 
-        var filteredData = this.state.phieumuonsWithoutFilter.filter(
-            function (el) {
-                return (
-                    el.pm_HanTra?.toString().toLowerCase().includes(
-                        pm_HanTraFilter.toString().trim().toLowerCase()
-                    ) &&
-                    el.pm_NgayMuon?.toString().toLowerCase().includes(
-                        pm_NgayMuonFilter.toString().trim().toLowerCase()
-                    )
-                );
-            }
-        );
+        console.log("Filtered data (only status): ", filteredData);  // Kiểm tra kết quả lọc chỉ theo trạng thái
         this.setState({ phieumuons: filteredData });
     }
 
@@ -64,6 +60,7 @@ export class PhieuMuon extends Component {
             this.FilterFn();
         });
     }
+
     changepm_HanTraFilter = (e) => {
         this.setState({ pm_HanTraFilter: e.target.value }, () => {
             this.FilterFn();
@@ -75,7 +72,7 @@ export class PhieuMuon extends Component {
             .then(response => response.json())
             .then(data => {
                 // Lọc ra chỉ các phiếu mượn có trạng thái "Đang mượn"
-                const filteredData = data.filter(dep => dep.TrangThai === "Đang mượn");
+                const filteredData = data.filter(pm => pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag);
 
                 // Sắp xếp dữ liệu theo ngày mượn giảm dần
                 filteredData.sort((a, b) => new Date(b.pm_NgayMuon) - new Date(a.pm_NgayMuon));
@@ -103,27 +100,27 @@ export class PhieuMuon extends Component {
             });
     }
 
-
-
     componentDidMount() {
         this.refreshList();
     }
 
     changepm_TrangThai = (e) => {
-        this.setState({ pm_TrangThai: e.target.value });
+        this.setState({ pm_TrangThaiMuon: e.target.value });
     }
 
+    changepm_TrangThaiXetDuyet = (e) => {
+        this.setState({ pm_TrangThaiXetDuyet: e.target.value });
+    }
 
 
     editClick(dep) {
         this.setState({
             modalTitle: "Chỉnh sửa trạng thái phiếu mượn",
             pm_Id: dep.Id_PhieuMuon,
-            pm_TrangThai: dep.TrangThai,
+            pm_TrangThaiMuon: dep.TrangThaiMuon,
             nd_Id: dep.Id_User
         });
     }
-
 
     updateClick() {
         fetch("https://localhost:44315/api/PhieuMuon", {
@@ -134,7 +131,7 @@ export class PhieuMuon extends Component {
             },
             body: JSON.stringify({
                 pmId: this.state.pm_Id,
-                pmTrangThai: this.state.pm_TrangThai // Thay dm_TenDanhMuc thành dmTenDanhMuc
+                pmTrangThaiMuon: this.state.pm_TrangThaiMuon
             })
         })
             .then(res => res.json())
@@ -145,7 +142,7 @@ export class PhieuMuon extends Component {
                 alert('Failed');
             });
 
-        if (this.state.pm_TrangThai === "Đã trả") {
+        if (this.state.pm_TrangThaiMuon === "Đã trả") {
             const nd_Id = this.state.nd_Id;
             const pm_Id = this.state.pm_Id; // Get the pm_Id from the state
 
@@ -209,6 +206,28 @@ export class PhieuMuon extends Component {
         }
     }
 
+    updateXetDuyetClick() {
+        fetch("https://localhost:44315/api/PhieuMuon/XetDuyet", {
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                pmId: this.state.pm_Id,
+                pmTrangThaiXetDuyet: this.state.pm_TrangThaiXetDuyet
+            })
+        })
+            .then(res => res.json())
+            .then((result) => {
+                alert(result);
+                this.refreshList();
+            }, (error) => {
+                alert('Failed');
+            });
+
+    }
+
 
     deleteClick(id) {
         if (window.confirm("Ban co chac chan muon xoa?")) {
@@ -228,6 +247,7 @@ export class PhieuMuon extends Component {
                 })
         }
     }
+
     sendEmail() {
         axios.post('https://localhost:44315/api/Mail/SendEmail')
             .then(response => {
@@ -241,28 +261,115 @@ export class PhieuMuon extends Component {
             });
     }
 
+
+    // Phân loại trạng thái
+    handleTagSelection = (tag) => {
+        this.setState({ selectedTag: tag }, () => {
+            this.FilterFn();
+        });
+    }
+
+
     render() {
         const {
             phieumuons,
             modalTitle,
             pm_Id,
-            pm_TrangThai,
+            pm_TrangThaiMuon,
+            pm_TrangThaiXetDuyet,
             nguoidungs,
+            selectedTag
         } = this.state;
 
         return (
             <div className={cx('wrapper')}>
-                <div className="row justify-content-around">
-                    <Link type="button" to={`/admin/phieumuon`} className={"col-4 h4 pb-2 mb-4 text-danger border-bottom border-danger"}>Đang mượn</Link>
-                    <Link type="button" to={`/admin/datra`} className={"col-4 h4 pb-2 mb-4 text-success border-bottom border-success"}>Đã trả</Link>
+                <div className="row d-flex justify-content-end mb-3">
+                    <h1 className="fw-bold mt-5 mb-5 ">Quản Lý Phiếu Mượn Tại Thư Viện</h1>
+                    <hr></hr>
+
+                    {selectedTag === "Đang mượn" && (
+                        <div className="col-auto">
+                            <button type="button"
+                                className={cx('btn-grad')}
+                                onClick={() => this.sendEmail()}>
+                                Gửi mail
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ xét duyệt" })}
+                            onClick={() => this.handleTagSelection("Chờ xét duyệt")}
+
+                        >
+                            Chờ xét duyệt
+                        </button>
+                    </div>
+
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đang mượn" })}
+                            onClick={() => this.handleTagSelection("Đang mượn")}
+
+                        >
+                            Đang mượn
+                        </button>
+                    </div>
+
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đã trả" })}
+                            onClick={() => this.handleTagSelection("Đã trả")}
+                        >
+                            Đã trả
+                        </button>
+                    </div>
                 </div>
-                <button type="button"
-                    className={cx('btn-grad')}
-                    onClick={() => this.sendEmail()}>
-                    Gửi mail
-                </button>
-                <table className="table table-hover"  >
-                    <thead className="table-danger">
+
+
+
+                <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+                    <div className="d-flex flex-row w-100 mb-2">
+                        Sắp xếp theo ngày mượn
+                        <button type="button" className="btn btn-light"
+                            onClick={() => this.sortResult('NgayMuon', true)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
+                            </svg>
+                        </button>
+
+                        <button type="button" className="btn btn-light"
+                            onClick={() => this.sortResult('NgayMuon', false)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div className="d-flex flex-row w-100 mb-2">
+                        Sắp xếp theo hạn trả
+                        <button type="button" className="btn btn-light"
+                            onClick={() => this.sortResult('HanTra', true)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
+                            </svg>
+                        </button>
+
+                        <button type="button" className="btn btn-light"
+                            onClick={() => this.sortResult('HanTra', false)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                                <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                </div>
+
+                <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
+                    <thead >
                         <tr >
                             <th className="text-start">
                                 ID Phiếu
@@ -274,47 +381,11 @@ export class PhieuMuon extends Component {
                                 Sách mượn
                             </th>
                             <th className="text-start ">
-                                <div className="d-flex flex-row">
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('NgayMuon', true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
-                                        </svg>
-                                    </button>
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('NgayMuon', false)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
-                                        </svg>
-                                    </button>
-                                </div >
                                 Ngày Mượn
                             </th>
                             <th className="text-start ">
-                                <div className="d-flex flex-row">
-                                    {/* <input className="form-control m-2 fs-4"
-                                        onChange={this.changepm_HanTraFilter}
-                                        placeholder="Tìm theo hạn trả" /> */}
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('HanTra', true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
-                                        </svg>
-                                    </button>
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('HanTra', false)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
-                                        </svg>
-                                    </button>
-                                </div >
                                 Hạn Trả
                             </th>
-
                             <th className="text-start">
                                 Trạng Thái
                             </th>
@@ -336,16 +407,16 @@ export class PhieuMuon extends Component {
                                 <td className="text-start">{dep.TenSach}</td>
                                 <td className="text-start">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
                                 <td className="text-start">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
-                                <td className="text-start">{dep.TrangThai}</td>
+                                <td className="text-start">{dep.TrangThaiMuon}</td>
 
                                 <td className="text-start">
-                                    {dep.TrangThai === "Đã trả" ?
+                                    {dep.TrangThaiMuon === "Đã trả" ?
                                         ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
                                             `Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày `
                                             :
                                             "Đúng hạn"
                                         :
-                                        dep.TrangThai === "Đang mượn" ?
+                                        dep.TrangThaiMuon === "Đang mượn" ?
                                             ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
                                                 ` ${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn trả) `
 
@@ -368,7 +439,7 @@ export class PhieuMuon extends Component {
 
 
                                 <td className="position-relative">
-                                    {dep.TrangThai !== "Đã trả" ? ( // Add condition to enable/disable button
+                                    {dep.TrangThaiMuon !== "Đã trả" ? ( // Add condition to enable/disable button
                                         <button type="button"
                                             className="btn btn-light mr-1 "
                                             data-bs-toggle="modal"
@@ -405,16 +476,31 @@ export class PhieuMuon extends Component {
                             </div>
 
                             <div className="modal-body">
-                                <div className="input-group mb-3">
-                                    <span className="input-group-text">Trạng thái</span>
-                                    <select className="form-select"
-                                        onChange={this.changepm_TrangThai}
-                                        value={pm_TrangThai}>
-                                        <option value="">Chọn trạng thái</option>
-                                        <option value={"Đang mượn"}>Đang mượn</option>
-                                        <option value={"Đã trả"}>Đã trả</option>
-                                    </select>
-                                </div>
+
+                                {selectedTag === "Đang mượn" && (
+                                    <div className="input-group mb-3">
+                                        <span className="input-group-text">Trạng thái</span>
+                                        <select className="form-select"
+                                            onChange={this.changepm_TrangThai}
+                                            value={pm_TrangThaiMuon}>
+                                            <option value="">Chọn trạng thái</option>
+                                            <option value={"Đang mượn"}>Đang mượn</option>
+                                            <option value={"Đã trả"}>Đã trả</option>
+                                        </select>
+                                    </div>)}
+
+                                {selectedTag === "Chờ xét duyệt" && (
+                                    <div className="input-group mb-3">
+                                        <span className="input-group-text">Trạng thái</span>
+                                        <select className="form-select"
+                                            onChange={this.changepm_TrangThaiXetDuyet}
+                                            value={pm_TrangThaiXetDuyet}>
+                                            <option value="">Chọn trạng thái</option>
+                                            <option value={"Từ chối xét duyệt"}>Từ chối xét duyệt</option>
+                                            <option value={"Đã xét duyệt"}>Xét duyệt</option>
+                                        </select>
+                                    </div>
+                                )}
 
 
                                 {pm_Id === 0 ?
@@ -424,12 +510,25 @@ export class PhieuMuon extends Component {
                                         Create
                                     </button> : null}
 
-                                {pm_Id !== 0 ?
-                                    <button type="button"
-                                        className="btn btn-primary float-start"
-                                        onClick={() => this.updateClick()}>
-                                        Update
-                                    </button> : null}
+                                {pm_Id !== 0 && (
+                                    <>
+                                        {selectedTag === "Đang mượn" && (
+                                            <button type="button"
+                                                className="btn btn-primary float-start"
+                                                onClick={() => this.updateClick()}>
+                                                Update
+                                            </button>
+                                        )}
+                                        {selectedTag === "Chờ xét duyệt" && (
+                                            <button type="button"
+                                                className="btn btn-secondary float-start"
+                                                onClick={() => this.updateXetDuyetClick()}>
+                                                Xét Duyệt
+                                            </button>
+                                        )}
+                                    </>
+                                )}
+
                             </div>
                         </div>
                     </div>

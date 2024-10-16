@@ -6,11 +6,6 @@
     text-align: center;
 }
 
-.head-table {
-    font-size: 16px;
-    background-color: cornflowerblue;
-}
-
 .btn-grad {
     background-image: linear-gradient(to right, #f4608a 0%, #e45796 51%, #f1468d 100%);
     margin: 10px;
@@ -30,4 +25,39 @@
     background-position: right center; /* change the direction of the change here */
     color: #fff;
     text-decoration: none;
+}
+
+.btn-status {
+    background-color: #1253e094;
+    margin-top: 20px;
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: rgba(0, 0, 0, 0.321);
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+    font-weight: bold;
+    height: 40px;
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.321);
+}
+
+/* Khi nút được chọn */
+.btn-selected {
+    background-color: #11009e;
+    margin-top: 20px;
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: rgb(255, 255, 255);
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+    font-weight: bold;
+    height: 40px;
+    width: 100%;
+    border: none;
+    box-shadow: 0 0 10px #dedbdb;
+    transform: scale(1.05);
 }

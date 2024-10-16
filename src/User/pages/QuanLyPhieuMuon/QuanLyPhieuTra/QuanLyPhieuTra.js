@@ -77,7 +77,7 @@ export class QuanLyPhieuTra extends Component {
         );
         return (
             <div className={cx('wrapper')}>
-                <div class="row justify-content-around">
+                <div className="row justify-content-around">
                     <Link type="button" to={`/quanlyphieumuon`} className={"col-4 h4 pb-2 mb-4 text-danger border-bottom border-danger"}>Đang mượn</Link>
                     <Link type="button" to={`/quanlyphieutra`} className={"col-4 h4 pb-2 mb-4 text-success border-bottom border-success"}>Đã trả</Link>
                 </div>
