@@ -377,42 +377,54 @@ export class CTPMOnline extends Component {
     }
 
     handleOrderSubmit = () => {
-        if (token) {
-            const decodedToken = jwtDecode(token);
-            const userId = decodedToken.nameid;
+        if (this.state.paymentMethod === "VNPAY") {
+            // Lấy thông tin cần gửi
+            const customerName = this.state.selectedAddress.dcgh_TenNguoiNhan;
+            const amount = this.state.amount || 30000;
+            const orderDescription = "Thanh toán cho đơn hàng";
 
-            // Tạo đối tượng phiếu mượn online từ thông tin state
-            const orderData = {
-                ndId: userId,
-                pmoNgayDat: new Date().toISOString(),  // Lấy ngày hiện tại
-                pmoLoaiGiaoHang: this.state.deliveryMethod,
-                pmoPhuongThucThanhToan: this.state.paymentMethod,
-                dcghId: this.state.selectedAddress ? this.state.selectedAddress.dcgh_Id : null,  // ID của địa chỉ giao hàng
-                pmoTrangThai: "Chờ xử lý",  // Trạng thái mặc định
-                ChiTietPhieuMuonOnlines: selectedBooks.map(book => ({
-                    SId: book.s_Id,
-                    CtpmoSoLuongSachMuon: 1  // Số lượng sách mượn (giả định mỗi sách mượn 1)
-                }))
-            };
+            // Tạo URL với query parameters
+            const paymentUrl = `https://localhost:44393/?customerName=${encodeURIComponent(customerName)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}`;
 
-            // Gửi yêu cầu POST đến API backend
-            fetch("https://localhost:44315/api/CTPMOnline", {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderData)
-            })
-                .then(response => response.json())
-                .then(result => {
-                    alert("Đặt sách thành công!");  // Hiển thị thông báo thành công
-                    window.location.href = '/quanlyphieumuon';
+            // Chuyển hướng đến URL thanh toán VNPAY kèm dữ liệu
+            window.location.href = paymentUrl;
+        } else {
+            // Xử lý các phương thức thanh toán khác (COD)
+            if (token) {
+                const decodedToken = jwtDecode(token);
+                const userId = decodedToken.nameid;
+
+                const orderData = {
+                    ndId: userId,
+                    pmoNgayDat: new Date().toISOString(),
+                    pmoLoaiGiaoHang: this.state.deliveryMethod,
+                    pmoPhuongThucThanhToan: this.state.paymentMethod,
+                    dcghId: this.state.selectedAddress ? this.state.selectedAddress.dcgh_Id : null,
+                    pmoTrangThai: "Chờ xử lý",
+                    ChiTietPhieuMuonOnlines: selectedBooks.map(book => ({
+                        SId: book.s_Id,
+                        CtpmoSoLuongSachMuon: 1
+                    }))
+                };
+
+                fetch("https://localhost:44315/api/CTPMOnline", {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("Đặt sách thất bại, vui lòng thử lại.");
-                });
+                    .then(response => response.json())
+                    .then(result => {
+                        alert("Đặt sách thành công!");
+                        window.location.href = '/quanlyphieumuon';  // Điều hướng đến trang quản lý phiếu mượn
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert("Đặt sách thất bại, vui lòng thử lại.");
+                    });
+            }
         }
     }
 

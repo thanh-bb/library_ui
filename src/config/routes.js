@@ -34,5 +34,6 @@ const routes = {
     thongtintaikhoan: '/thongtintaikhoan',
     giosach: '/giosach',
     chitietphieumuonOnline: "/chi_tiet_phieu_muon_online",
+    vnpay: "/vnpay"
 }
 export default routes;

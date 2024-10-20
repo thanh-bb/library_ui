@@ -38,6 +38,7 @@ import NguoiDungDangKy from '~/pages/NguoiDungDangKy';
 import ChiTietNDDK from '~/pages/ChiTietNDDK';
 import Cart from '~/User/pages/Cart';
 import { CTPMOnline } from '~/User/pages/CTPMOnline/CTPMOnline';
+import VNPay from '~/User/pages/VNPay';
 
 
 // Public routes
@@ -77,6 +78,8 @@ const publicRoutes = [
     { path: config.routes.chitietphieutra, component: ChiTietPhieuTra, layout: UserLayout },
     { path: config.routes.giosach, component: Cart, layout: UserLayout },
     { path: config.routes.chitietphieumuonOnline, component: CTPMOnline, layout: UserLayout },
+    { path: config.routes.vnpay, component: VNPay, layout: UserLayout },
+
 ];
 
 const privateRoutes = [];
