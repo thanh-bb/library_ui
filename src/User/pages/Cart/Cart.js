@@ -52,6 +52,10 @@ export class Cart extends Component {
             bookImages: {},
             nd_Id: 0,
             selectedBooks: [],
+            numberOfBorrowReceipts: 0,
+            maxBorrowingsPerMonth: 5,
+            numberOfBorrowReceipts_Off: 0,
+            numberOfBorrowReceipts_Onl: 0
 
         };
     }
@@ -164,11 +168,54 @@ export class Cart extends Component {
             });
     }
 
+    // Hàm lấy số lượng mượn offline
+    fetchOfflineBorrowCount = async () => {
+        const token = sessionStorage.getItem('jwttoken');
+        if (token) {
+            const userId = jwtDecode(token).nameid;
+
+            try {
+                const response = await fetch(`https://localhost:44315/api/PhieuMuon/Count/${userId}`);
+                const offlineCount = await response.json();
+                this.setState({ numberOfBorrowReceipts_Off: offlineCount }); // Cập nhật vào state
+            } catch (error) {
+                console.error('Error fetching offline borrow count:', error);
+                this.setState({ numberOfBorrowReceipts_Off: 0 });
+            }
+        }
+    };
+
+    // Hàm lấy số lượng mượn online
+    fetchOnlineBorrowCount = async () => {
+        const token = sessionStorage.getItem('jwttoken');
+        if (token) {
+            const userId = jwtDecode(token).nameid;
+
+            try {
+                const response = await fetch(`https://localhost:44315/api/PhieuMuonOnline/Count/${userId}`);
+                const onlineCount = await response.json();
+                this.setState({ numberOfBorrowReceipts_Onl: onlineCount }); // Cập nhật vào state
+            } catch (error) {
+                console.error('Error fetching online borrow count:', error);
+                this.setState({ numberOfBorrowReceipts_Onl: 0 });
+            }
+        }
+    };
+
+    // Hàm gọi cả hai hàm trên và tính tổng
+    fetchBorrowCount = async () => {
+        await this.fetchOfflineBorrowCount();
+        await this.fetchOnlineBorrowCount();
+
+        const totalBorrowReceipts = this.state.numberOfBorrowReceipts_Off + this.state.numberOfBorrowReceipts_Onl;
+        this.setState({ numberOfBorrowReceipts: totalBorrowReceipts }); // Cập nhật tổng vào state
+    };
 
 
     componentDidMount() {
         this.refreshList();
         this.fetchRankingData();
+        this.fetchBorrowCount(); // Gọi hàm để cập nhật số lần mượn
     }
 
     // Function to set the selected category
@@ -214,19 +261,26 @@ export class Cart extends Component {
         });
     };
 
+
     handleContinue = () => {
         const selectedBooks = this.state.listcarts.filter(book =>
             this.state.selectedBooks.includes(book.s_Id)
         );
 
         if (selectedBooks.length === 0) {
-            alert("Vui Lòng chọn ít nhất 1 cuốn sách để có thể tiếp tục!");
+            alert("Vui lòng chọn ít nhất 1 cuốn sách để có thể tiếp tục!");
             return;
         }
-        sessionStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
-        window.location.href = "/chi_tiet_phieu_muon_online";  // Chuyển trang
-    }
 
+        const { numberOfBorrowReceipts, maxBorrowingsPerMonth } = this.state;
+        // Check if user has reached the borrow limit
+        if (numberOfBorrowReceipts >= maxBorrowingsPerMonth) {
+            alert("Bạn đã mượn đủ số lần cho phép của tháng này!");
+        } else {
+            sessionStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
+            window.location.href = "/chi_tiet_phieu_muon_online";
+        }
+    };
 
 
     render() {

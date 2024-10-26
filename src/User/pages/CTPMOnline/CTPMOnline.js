@@ -377,19 +377,19 @@ export class CTPMOnline extends Component {
     }
 
     handleOrderSubmit = () => {
+        if (this.state.deliveryMethod === "Giao sách tận nơi" && !this.state.selectedAddress) {
+            alert("Vui lòng cung cấp địa chỉ giao sách.");
+            return;
+        }
+
         if (this.state.paymentMethod === "VNPAY") {
-            // Lấy thông tin cần gửi
             const customerName = this.state.selectedAddress.dcgh_TenNguoiNhan;
             const amount = this.state.amount || 30000;
             const orderDescription = "Thanh toán cho đơn hàng";
 
-            // Tạo URL với query parameters
             const paymentUrl = `https://localhost:44393/?customerName=${encodeURIComponent(customerName)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}`;
-
-            // Chuyển hướng đến URL thanh toán VNPAY kèm dữ liệu
             window.location.href = paymentUrl;
         } else {
-            // Xử lý các phương thức thanh toán khác (COD)
             if (token) {
                 const decodedToken = jwtDecode(token);
                 const userId = decodedToken.nameid;
@@ -418,7 +418,7 @@ export class CTPMOnline extends Component {
                     .then(response => response.json())
                     .then(result => {
                         alert("Đặt sách thành công!");
-                        window.location.href = '/quanlyphieumuon';  // Điều hướng đến trang quản lý phiếu mượn
+                        window.location.href = '/quanlyphieumuon';
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -427,6 +427,7 @@ export class CTPMOnline extends Component {
             }
         }
     }
+
 
 
 

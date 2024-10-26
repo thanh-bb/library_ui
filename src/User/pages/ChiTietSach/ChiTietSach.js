@@ -12,7 +12,9 @@ function ChiTietSach() {
     let jwttoken = sessionStorage.getItem('jwttoken');
 
     const [userActive, setUserActive] = useState(false);
-    const [numberOfBorrowReceipts, setNumberOfBorrowReceipts] = useState(0);
+    const [numberOfBorrowReceipts_Off, setNumberOfBorrowReceipts_Off] = useState(0);
+    const [numberOfBorrowReceipts_Onl, setNumberOfBorrowReceipts_Onl] = useState(0);
+
     const [maxBorrowingsPerMonth, setMaxBorrowingsPerMonth] = useState(5);
 
     const [sach, setSach] = useState(null);
@@ -128,12 +130,13 @@ function ChiTietSach() {
             }
 
         };
-        const fetchNumberOfBorrowReceipts = async () => {
+
+        const fetchNumberOfBorrowReceipts_Off = async () => {
             try {
                 const response = await fetch(`https://localhost:44315/api/PhieuMuon/Count/${userId}`);
                 if (response.ok) {
                     const count = await response.json();
-                    setNumberOfBorrowReceipts(count);
+                    setNumberOfBorrowReceipts_Off(count);
                 } else {
                     throw new Error('Failed to fetch number of borrow receipts');
                 }
@@ -141,6 +144,22 @@ function ChiTietSach() {
                 console.error('Error fetching number of borrow receipts:', error);
             }
         };
+
+
+        const fetchNumberOfBorrowReceipts_Onl = async () => {
+            try {
+                const response = await fetch(`https://localhost:44315/api/PhieuMuonOnline/Count/${userId}`);
+                if (response.ok) {
+                    const count = await response.json();
+                    setNumberOfBorrowReceipts_Onl(count);
+                } else {
+                    throw new Error('Failed to fetch number of borrow receipts');
+                }
+            } catch (error) {
+                console.error('Error fetching number of borrow receipts:', error);
+            }
+        };
+
         const fetchSach = async () => {
             try {
                 const response = await fetch(`https://localhost:44315/api/Sach/${id}`);
@@ -233,7 +252,8 @@ function ChiTietSach() {
         fetchNXB();
         fetchKe();
         fetchO();
-        fetchNumberOfBorrowReceipts();
+        fetchNumberOfBorrowReceipts_Off();
+        fetchNumberOfBorrowReceipts_Onl();
         setMaxBorrowingsPerMonth(5);
     }, [jwttoken, id]);
 
@@ -353,14 +373,11 @@ function ChiTietSach() {
 
                                                 <div className={cx("btn rounded-pill bg-primary-subtle text-primary fw-bold mt-5 me-3")}>
                                                     <p className='mb-0 fw-bold fs-4'>
-                                                        {sach?.s_TrangThaiMuon
-                                                            ? (sach?.s_SoLuong > 1
-                                                                ? "Trong kho sẵn sàng"
-                                                                : "Chưa sẵn sàng")
-                                                            : sach?.s_TrangThaiMuon === false
-                                                                ? "Chưa sẵn sàng"
-                                                                : "Trạng thái không xác định"}
+                                                        {sach?.s_SoLuong > 1
+                                                            ? "Trong kho sẵn sàng"
+                                                            : "Chưa sẵn sàng"}
                                                     </p>
+
                                                 </div>
 
                                                 <span className={cx("btn rounded-pill bg-primary-subtle text-primary fw-bold mt-5")}>
@@ -368,7 +385,7 @@ function ChiTietSach() {
                                                 </span>
 
                                                 <div className={cx("btn rounded-pill bg-primary-subtle text-primary-emphasis fw-bold mt-4 mb-3")}>
-                                                    <p className='mb-0 fw-bold fs-4'>Số lượng sách hiện có trong thư viện: {sach?.s_SoLuong - 1}</p>
+                                                    <p className='mb-0 fw-bold fs-4'>Số lượng thực tế sách có thể mượn: {sach?.s_SoLuong - 1}</p>
                                                 </div>
 
                                                 <br />
@@ -382,10 +399,10 @@ function ChiTietSach() {
                                                             </p>
                                                         )}
                                                         {userActive.nd_active && (
-                                                            numberOfBorrowReceipts >= maxBorrowingsPerMonth ? (
+                                                            (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) >= maxBorrowingsPerMonth ? (
                                                                 <p className="mb-0 fw-bold fs-3 pe-auto">Bạn đã mượn đủ số lần cho phép của tháng này</p>
                                                             ) : (
-                                                                <p className="mb-0 fw-bold fs-3">Bạn còn {maxBorrowingsPerMonth - numberOfBorrowReceipts} lần mượn sách trong tháng này</p>
+                                                                <p className="mb-0 fw-bold fs-3">Bạn còn {maxBorrowingsPerMonth - (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl)} lần mượn sách trong tháng này</p>
                                                             )
                                                         )}
                                                     </span>
@@ -394,10 +411,29 @@ function ChiTietSach() {
                                                 {/* Hiển thị nút "Tiến hành mượn sách" nếu sách có sẵn để mượn */}
                                                 {userActive.nd_active && (
                                                     <>
-                                                        {(sach?.s_TrangThaiMuon && sach?.s_ChiDoc === false && sach?.s_SoLuong > 1) ? (
-                                                            <div className='row d-flex justify-content-between mt-5'>
-                                                                {isBookAvailable ? (
-                                                                    <>
+                                                        {(sach?.s_ChiDoc === false && sach?.s_SoLuong > 1) ? (
+                                                            <div className="row d-flex justify-content-between mt-5">
+                                                                {!isBookAvailable ? (
+                                                                    // Nếu sách đã có trong giỏ hàng, hiển thị nút "Sách đã có trong giỏ sách" và disable
+                                                                    <button
+                                                                        type="button"
+                                                                        className={cx('col', 'btn-existed', 'me-5')}
+                                                                        disabled
+                                                                    >
+                                                                        Sách đã có trong giỏ sách
+                                                                    </button>
+                                                                ) : (
+                                                                    (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) > maxBorrowingsPerMonth ? (
+                                                                        // Nếu vượt quá số lượng mượn cho phép, hiển thị nút "Không thể thêm vào giỏ sách" và disable
+                                                                        <button
+                                                                            type="button"
+                                                                            className={cx('col', 'btn-disable', 'me-5')}
+                                                                            disabled
+                                                                        >
+                                                                            Không thể thêm vào giỏ sách
+                                                                        </button>
+                                                                    ) : (
+                                                                        // Nếu sách chưa có trong giỏ hàng và chưa vượt quá giới hạn mượn, hiển thị nút "Thêm vào giỏ sách"
                                                                         <button
                                                                             type="button"
                                                                             className={cx('col', 'btn-continue', 'me-5')}
@@ -405,46 +441,39 @@ function ChiTietSach() {
                                                                         >
                                                                             Thêm vào giỏ sách
                                                                         </button>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <button
-                                                                            type="button"
-                                                                            className={cx('col', 'btn-existed', 'me-5')}
-                                                                        >
-                                                                            Sách đã có trong giỏ sách
-                                                                        </button>
-                                                                    </>
+                                                                    )
                                                                 )}
 
-                                                                {numberOfBorrowReceipts <= maxBorrowingsPerMonth ? (
-                                                                    <>
-                                                                        <Link to={`/chitietsach/formphieumuon/${sach?.s_Id}`}
-                                                                            className={cx('col', 'btn-return')}>
-                                                                            Mượn sách ngay
-                                                                        </Link>
-                                                                    </>
+                                                                {/* Nút "Mượn sách ngay" */}
+                                                                {(numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) <= maxBorrowingsPerMonth ? (
+                                                                    <Link to={`/chitietsach/formphieumuon/${sach?.s_Id}`}
+                                                                        className={cx('col', 'btn-return')}
+                                                                    >
+                                                                        Mượn sách ngay
+                                                                    </Link>
                                                                 ) : (
-                                                                    <>
-                                                                        <button
-                                                                            type="button"
-                                                                            className={cx('col', 'btn-disable')}>
-                                                                            Bạn không thể mượn sách về nhà
-                                                                        </button>
-                                                                    </>
+                                                                    <button
+                                                                        type="button"
+                                                                        className={cx('col', 'btn-disable')}
+                                                                        disabled
+                                                                    >
+                                                                        Bạn không thể mượn sách về nhà
+                                                                    </button>
                                                                 )}
                                                             </div>
                                                         ) : (
                                                             <div className='row d-flex justify-content-between mt-5'>
                                                                 <button
                                                                     type="button"
-                                                                    className={cx('col', 'btn-disable')}>
+                                                                    className={cx('col', 'btn-disable')}
+                                                                >
                                                                     Bạn không thể mượn sách về nhà
                                                                 </button>
                                                             </div>
                                                         )}
                                                     </>
                                                 )}
+
 
 
                                             </>

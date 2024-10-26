@@ -67,7 +67,7 @@ function PhieuMuonUser() {
                     console.log(checkMuonResponse);
                     if (checkMuonResponse.ok) {
                         const result = await checkMuonResponse.json();
-                        if (result === 'Đang mượn') {
+                        if (result === 'Chờ xét duyệt') {
                             setIsBookBorrowed(true);
                         }
                     }

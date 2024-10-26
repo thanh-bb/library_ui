@@ -72,15 +72,17 @@ export class QuanLyPhieuMuon extends Component {
     FilterFn() {
         const { selectedTag, tensachWithoutFilter } = this.state;
 
+        // Lọc dựa trên selectedTag
         const filteredData = tensachWithoutFilter.filter(el => {
-            // Kiểm tra pm_TrangThai dựa trên tag đã chọn
             return (
                 el.TrangThaiMuon === selectedTag || el.TrangThaiXetDuyet === selectedTag
             );
         });
 
+        console.log("Dữ liệu sau khi lọc:", filteredData); // Kiểm tra dữ liệu sau khi lọc
         this.setState({ phieumuons: filteredData });
     }
+
 
 
 
