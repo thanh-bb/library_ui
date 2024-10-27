@@ -56,3 +56,74 @@
     font-weight: bold;
     border: 2px solid #435ebe;
 }
+
+// phân trang
+
+.pagination button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background-color: #435ebe;
+    color: white;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-item {
+    position: fixed;
+    left: 350px;
+    bottom: 110px; /* Adjust this value as needed */
+    // z-index: 9999;
+}
+
+.pagination {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.page-item {
+    margin: 0 0.2rem;
+    padding: 5px;
+}
+
+.page-link {
+    display: block;
+    padding: 0.5rem 0.8rem;
+    color: #030d34;
+    text-decoration: none;
+    //    font-size: 1.25rem;
+    border-radius: 0.3rem;
+    transition: background-color 0.2s, color 0.2s;
+
+    width: 30px;
+}
+
+.page-link:hover {
+    background-color: #435ebe;
+    color: white;
+}
+
+.page-item.active .page-link {
+    background-color: #435ebe;
+    color: white;
+    font-weight: bold;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: default;
+}

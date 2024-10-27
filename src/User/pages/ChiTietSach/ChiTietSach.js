@@ -348,7 +348,9 @@ function ChiTietSach() {
                                             height="200px"
                                         />
                                     )}
+
                                 </div>
+
 
 
                                 <div className='col-5'>
@@ -356,7 +358,13 @@ function ChiTietSach() {
                                         {sach && (
                                             <>
                                                 <h1>
-                                                    <span className={cx('title-book')}> {sach?.s_TenSach} </span>
+                                                    <span className={cx('title-book')}> {sach?.s_TenSach}
+                                                        {!sach?.s_TrangThaiMuon && (
+                                                            <div className={cx("btn rounded-pill bg-danger-subtle text-danger fw-bold mx-2")}>
+                                                                <p className='mb-0 fw-bold fs-4'>Đã ẩn</p>
+                                                            </div>
+                                                        )}
+                                                    </span>
 
                                                 </h1>
 
@@ -409,7 +417,7 @@ function ChiTietSach() {
                                                 </div>
 
                                                 {/* Hiển thị nút "Tiến hành mượn sách" nếu sách có sẵn để mượn */}
-                                                {userActive.nd_active && (
+                                                {userActive.nd_active && sach?.s_TrangThaiMuon && (
                                                     <>
                                                         {(sach?.s_ChiDoc === false && sach?.s_SoLuong > 1) ? (
                                                             <div className="row d-flex justify-content-between mt-5">

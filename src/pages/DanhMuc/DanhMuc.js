@@ -17,7 +17,11 @@ export class DanhMuc extends Component {
             dm_IdFilter: "",
             dm_TenDanhMucFilter: "",
             danhmucsWithoutFilter: [],
-            validationError: ""
+            validationError: "",
+
+            currentPage: 1,
+            itemsPerPage: 7,
+            totalPages: 0
         }
     }
 
@@ -73,9 +77,11 @@ export class DanhMuc extends Component {
         fetch("https://localhost:44315/api/DanhMuc")
             .then(response => response.json())
             .then(data => {
+                const totalPages = Math.ceil(data.length / this.state.itemsPerPage);
                 this.setState({
                     danhmucs: data,
-                    danhmucsWithoutFilter: data  // Update danhmucsWithoutFilter with fetched data
+                    danhmucsWithoutFilter: data, // Update danhmucsWithoutFilter with fetched data
+                    totalPages: totalPages
                 });
             })
             .catch(error => {
@@ -187,13 +193,43 @@ export class DanhMuc extends Component {
         });
     }
 
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage } = this.state;
+        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
+
     render() {
         const {
             danhmucs,
             modalTitle,
             dm_Id,
-            dm_TenDanhMuc
+            dm_TenDanhMuc,
         } = this.state;
+
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(danhmucs.length / itemsPerPage);
+
+        // Lọc dữ liệu theo trang hiện tại
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = danhmucs.slice(indexOfFirstItem, indexOfLastItem);
 
         return (
             <div className={cx('wrapper')}>
@@ -259,7 +295,7 @@ export class DanhMuc extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {danhmucs.map(dep =>
+                            {currentItems.map((dep) =>
                                 <tr key={dep.dm_Id}>
                                     <td className="text-start">{dep.dm_Id}</td>
                                     <td className="text-start">{dep.dm_TenDanhMuc}</td>
@@ -288,7 +324,44 @@ export class DanhMuc extends Component {
                                 </tr>)}
                         </tbody>
                     </table>
+
                 </div>
+
+
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
 
                 <button type="button"
                     className={cx('btn-grad')}

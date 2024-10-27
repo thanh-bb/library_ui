@@ -27,7 +27,11 @@ export class PhieuMuon extends Component {
             selectedTag: "Đang mượn",
             phieumuonWithoutFilter: [],
             TrangThaiMuon: "",
-            TrangThaiXetDuyet: ""
+            TrangThaiXetDuyet: "",
+
+            currentPage: 1,
+            itemsPerPage: 5,
+            totalPages: 0
         }
     }
 
@@ -71,6 +75,8 @@ export class PhieuMuon extends Component {
         fetch("https://localhost:44315/api/QuanLyPhieuMuon")
             .then(response => response.json())
             .then(data => {
+                const totalPages = Math.ceil(data.length / this.state.itemsPerPage);
+
                 // Lọc ra chỉ các phiếu mượn có trạng thái "Đang mượn"
                 const filteredData = data.filter(pm => pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag);
 
@@ -79,7 +85,8 @@ export class PhieuMuon extends Component {
 
                 this.setState({
                     phieumuons: filteredData,
-                    phieumuonsWithoutFilter: data  // Update phieumuonsWithoutFilter with fetched data
+                    phieumuonsWithoutFilter: data, // Update phieumuonsWithoutFilter with fetched data
+                    totalPages: totalPages
                 });
             })
             .catch(error => {
@@ -269,6 +276,27 @@ export class PhieuMuon extends Component {
         });
     }
 
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage } = this.state;
+        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
 
     render() {
         const {
@@ -281,60 +309,68 @@ export class PhieuMuon extends Component {
             selectedTag
         } = this.state;
 
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(phieumuons.length / itemsPerPage);
+
+        // Lọc dữ liệu theo trang hiện tại
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = phieumuons.slice(indexOfFirstItem, indexOfLastItem);
+
+
         return (
             <div className={cx('wrapper')}>
-                <div className="row d-flex justify-content-end mb-3">
-                    <h1 className="fw-bold mt-5 mb-5 ">Quản Lý Phiếu Mượn Tại Thư Viện</h1>
-                    <hr></hr>
 
-                    {selectedTag === "Đang mượn" && (
-                        <div className="col-auto">
-                            <button type="button"
-                                className={cx('btn-grad')}
-                                onClick={() => this.sendEmail()}>
-                                Gửi mail
+                <div className="row d-flex justify-content-between mb-3">
+                    {/* Tiêu đề bên trái */}
+                    <div className="col-4 mt-1">
+                        <h3 className="fw-bold text-start mt fs-2 text-decoration-underline">Quản Lý Phiếu Mượn Tại Thư Viện</h3>
+
+                    </div>
+
+                    <div className=" col-8 row d-flex justify-content-end ">
+
+                        <div className="col-2">
+                            <button
+                                type="button"
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ xét duyệt" })}
+                                onClick={() => this.handleTagSelection("Chờ xét duyệt")}
+
+                            >
+                                Chờ xét duyệt
                             </button>
                         </div>
-                    )}
 
-                    <div className="col-2">
-                        <button
-                            type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ xét duyệt" })}
-                            onClick={() => this.handleTagSelection("Chờ xét duyệt")}
+                        <div className="col-2">
+                            <button
+                                type="button"
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Đang mượn" })}
+                                onClick={() => this.handleTagSelection("Đang mượn")}
 
-                        >
-                            Chờ xét duyệt
-                        </button>
-                    </div>
+                            >
+                                Đang mượn
+                            </button>
+                        </div>
 
-                    <div className="col-2">
-                        <button
-                            type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đang mượn" })}
-                            onClick={() => this.handleTagSelection("Đang mượn")}
-
-                        >
-                            Đang mượn
-                        </button>
-                    </div>
-
-                    <div className="col-2">
-                        <button
-                            type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đã trả" })}
-                            onClick={() => this.handleTagSelection("Đã trả")}
-                        >
-                            Đã trả
-                        </button>
+                        <div className="col-2">
+                            <button
+                                type="button"
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Đã trả" })}
+                                onClick={() => this.handleTagSelection("Đã trả")}
+                            >
+                                Đã trả
+                            </button>
+                        </div>
                     </div>
                 </div>
 
 
 
-                <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
-                    <div className="d-flex flex-row w-100 mb-2">
-                        Sắp xếp theo ngày mượn
+                <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded align-items-center d-flex justify-content-between">
+                    {/* Phần bên trái: Sắp xếp theo ngày mượn và hạn trả */}
+                    <div className="col-8 d-flex align-items-center">
+                        {/* Sắp xếp theo ngày mượn */}
+                        <span className="me-2">Sắp xếp theo ngày mượn</span>
                         <button type="button" className="btn btn-light"
                             onClick={() => this.sortResult('NgayMuon', true)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
@@ -348,9 +384,9 @@ export class PhieuMuon extends Component {
                                 <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
                             </svg>
                         </button>
-                    </div>
-                    <div className="d-flex flex-row w-100 mb-2">
-                        Sắp xếp theo hạn trả
+
+                        {/* Sắp xếp theo hạn trả */}
+                        <span className="me-2 mx-5">Sắp xếp theo hạn trả</span>
                         <button type="button" className="btn btn-light"
                             onClick={() => this.sortResult('HanTra', true)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
@@ -366,6 +402,16 @@ export class PhieuMuon extends Component {
                         </button>
                     </div>
 
+                    <div className="col-2 ">
+                        {/* Phần bên phải: Nút Gửi mail */}
+                        {selectedTag === "Đang mượn" && (
+                            <div className="col-auto">
+                                <button type="button" className={cx('btn-mail')} onClick={() => this.sendEmail()}>
+                                    Gửi mail
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
@@ -398,7 +444,7 @@ export class PhieuMuon extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {phieumuons.map(dep =>
+                        {currentItems.map(dep =>
                             <tr key={dep.Id_PhieuMuon}>
                                 <td className="text-start">{dep.Id_PhieuMuon}</td>
                                 <td className="text-start">
@@ -466,6 +512,43 @@ export class PhieuMuon extends Component {
                             </tr>)}
                     </tbody>
                 </table>
+
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+
+
                 <div className="modal fade" id="exampleModal" tabIndex="-1" aria-hidden="true">
                     <div className="modal-dialog modal-lg modal-dialog-centered">
                         <div className="modal-content">
@@ -533,6 +616,8 @@ export class PhieuMuon extends Component {
                         </div>
                     </div>
                 </div>
+
+
             </div >
         )
     }

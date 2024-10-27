@@ -24,7 +24,12 @@ export class NguoiDungDangKy extends Component {
             nddk_CCCDFilter: "",
             nddk_HoTenFilter: "",
             nguoidungdangkysWithoutFilter: [],
-            selectedTag: "Chưa xét duyệt"
+            selectedTag: "Chưa xét duyệt",
+
+
+            currentPage: 1,
+            itemsPerPage: 5,
+            totalPages: 0
         }
     }
     handleTagSelection = (tag) => {
@@ -75,9 +80,11 @@ export class NguoiDungDangKy extends Component {
         fetch("https://localhost:44315/api/NguoiDungDangKy/GetSomeInfor")
             .then(response => response.json())
             .then(data => {
+                const totalPages = Math.ceil(data.length / this.state.itemsPerPage);
                 this.setState({
                     nguoidungdangkys: data.filter(user => user.nddk_TrangThaiDuyet === this.state.selectedTag),
-                    nguoidungdangkysWithoutFilter: data
+                    nguoidungdangkysWithoutFilter: data,
+                    totalPages: totalPages
                 });
             })
             .catch(error => {
@@ -90,8 +97,39 @@ export class NguoiDungDangKy extends Component {
     }
 
 
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage } = this.state;
+        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
     render() {
         const { nguoidungdangkys, selectedTag } = this.state;
+
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(nguoidungdangkys.length / itemsPerPage);
+
+        // Lọc dữ liệu theo trang hiện tại
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = nguoidungdangkys.slice(indexOfFirstItem, indexOfLastItem);
+
+
 
         return (
             <div className={cx('wrapper')}>
@@ -192,7 +230,7 @@ export class NguoiDungDangKy extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {nguoidungdangkys.map(dep =>
+                        {currentItems.map(dep =>
 
                             <tr key={dep.nddk_Id}>
                                 <td className="text-start">{dep.nddk_HoTen}</td>
@@ -220,6 +258,40 @@ export class NguoiDungDangKy extends Component {
                             </tr>)}
                     </tbody>
                 </table>
+
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
 
             </div >
         )

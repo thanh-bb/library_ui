@@ -19,8 +19,12 @@ export class TheLoai extends Component {
             tl_TenTheLoaiFilter: "",
             theloaisWithoutFilter: [],
             danhmucs: [], // Make sure danhmucs is initialized as an empty array
-            validationError: ""
+            validationError: "",
 
+
+            currentPage: 1,
+            itemsPerPage: 7,
+            totalPages: 0
         };
 
     }
@@ -59,7 +63,6 @@ export class TheLoai extends Component {
         this.setState({ theloais: sortedData });
     }
 
-
     changetl_IdFilter = (e) => {
         this.setState({ tl_IdFilter: e.target.value }, () => {
             this.FilterFn();
@@ -72,15 +75,15 @@ export class TheLoai extends Component {
         });
     }
 
-
-
     refreshList() {
         fetch("https://localhost:44315/api/TheLoai")
             .then(response => response.json())
             .then(data => {
+                const totalPages = Math.ceil(this.state.theloais.length / this.state.itemsPerPage);
                 this.setState({
                     theloais: data,
-                    theloaisWithoutFilter: data
+                    theloaisWithoutFilter: data,
+                    totalPages: totalPages
                 });
             })
             .catch(error => {
@@ -152,11 +155,11 @@ export class TheLoai extends Component {
                 alert('Failed');
             })
     }
+
     changeDanhMuc = (e) => {
         // Update dm_Id in the state when danh muc changes
         this.setState({ dm_Id: e.target.value });
     }
-
 
     updateClick() {
         if (!this.state.tl_TenTheLoai) {
@@ -191,8 +194,6 @@ export class TheLoai extends Component {
             });
     }
 
-
-
     deleteClick(id) {
         if (window.confirm("Bạn có chắc chắn muốn xóa?")) {
             fetch("https://localhost:44315/api/TheLoai/" + id, {
@@ -219,6 +220,29 @@ export class TheLoai extends Component {
             validationError: ""
         });
     }
+
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage } = this.state;
+        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
+
     render() {
         const {
             danhmucs,
@@ -228,6 +252,15 @@ export class TheLoai extends Component {
             tl_TenTheLoai,
             dm_Id,
         } = this.state;
+
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(danhmucs.length / itemsPerPage);
+
+        // Lọc dữ liệu theo trang hiện tại
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = theloais.slice(indexOfFirstItem, indexOfLastItem);
+
 
         return (
             <div className={cx('wrapper')}>
@@ -302,7 +335,7 @@ export class TheLoai extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {theloais.map(dep =>
+                        {currentItems.map(dep =>
                             <tr key={dep.tl_Id}>
                                 <td className="text-start">{dep.tl_Id}</td>
                                 <td className="text-start">{dep.tl_TenTheLoai}</td>
@@ -335,6 +368,41 @@ export class TheLoai extends Component {
                             </tr>)}
                     </tbody>
                 </table>
+
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
                 <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
                     <div className="modal-dialog modal-lg modal-dialog-centered ">
                         <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">

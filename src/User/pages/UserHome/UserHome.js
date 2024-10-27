@@ -59,19 +59,23 @@ export class UserHome extends Component {
         fetch("https://localhost:44315/api/Sach")
             .then(response => response.json())
             .then(data => {
+                // Lọc chỉ những sách có s_TrangThaiMuon là true
+                const availableBooks = data.filter(book => book.s_TrangThaiMuon === true);
+
                 this.setState({
-                    sachs: data,
-                    sachsWithoutFilter: data
+                    sachs: availableBooks,
+                    sachsWithoutFilter: availableBooks
                 });
 
-                // Fetch images for each book after the book list is loaded
-                data.forEach(book => {
-                    this.fetchBookImages(book.s_Id); // Call fetchBookImages with s_Id
+                // Fetch images for each book after the filtered book list is loaded
+                availableBooks.forEach(book => {
+                    this.fetchBookImages(book.s_Id);
                 });
             })
             .catch(error => {
                 console.error('Error fetching books:', error);
             });
+
 
 
         fetch("https://localhost:44315/api/TacGium")
@@ -89,7 +93,12 @@ export class UserHome extends Component {
         fetch("https://localhost:44315/api/ThongKe/SachNoiBat")
             .then(response => response.json())
             .then(data => {
-                this.setState({ listsachnoibats: data });
+                const availableProminentBooks = data.filter(book => book.STrangThaiMuon === true);
+
+                this.setState({
+                    listsachnoibats: availableProminentBooks
+                });
+
             });
     }
 
@@ -116,12 +125,15 @@ export class UserHome extends Component {
         fetch("https://localhost:44315/api/ThongKe/SachNoiBat")
             .then(response => response.json())
             .then(data => {
+                // Lọc chỉ những sách nổi bật có s_TrangThaiMuon là true
+                const availableProminentBooks = data.filter(book => book.STrangThaiMuon === true);
+
                 this.setState({
-                    listsachnoibats: data
+                    listsachnoibats: availableProminentBooks
                 });
 
                 // Fetch images for each prominent book
-                data.forEach(book => {
+                availableProminentBooks.forEach(book => {
                     this.fetchBookImages(book.s_Id); // Lấy ảnh cho sách nổi bật
                 });
             })
@@ -129,6 +141,7 @@ export class UserHome extends Component {
                 console.error('Error fetching prominent books:', error);
             });
     }
+
 
     fetchRankingData() {
         fetch("https://localhost:44315/api/ThongKe/TopReaders")  // Adjust the endpoint as needed
@@ -172,10 +185,11 @@ export class UserHome extends Component {
             return tl ? tl.tl_TenTheLoai : "Không xác định";
         };
 
-        // Filter books based on the selected category
+        // Filter books based on selected category and TrangThaiMuon
         const filteredBooks = selectedCategory
-            ? sachs.filter(book => book.tl_Id === selectedCategory)
-            : sachs;
+            ? sachs.filter(book => book.tl_Id === selectedCategory && book.s_TrangThaiMuon === true)
+            : sachs.filter(book => book.s_TrangThaiMuon === true);
+
 
         return (
             <div className={cx('wrapper')}>

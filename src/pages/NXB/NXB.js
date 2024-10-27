@@ -19,7 +19,12 @@ export class NXB extends Component {
             nxb_TenNXBFilter: "",
             nxbsWithoutFilter: [],
 
-            validationError: ""
+            validationError: "",
+
+            currentPage: 1,
+            itemsPerPage: 7,
+            totalPages: 0
+
         }
     }
 
@@ -59,7 +64,6 @@ export class NXB extends Component {
         this.setState({ nxbs: sortedData });
     }
 
-
     changenxb_IdFilter = (e) => {
         this.setState({ nxb_IdFilter: e.target.value }, () => {
             this.FilterFn();
@@ -72,14 +76,15 @@ export class NXB extends Component {
         });
     }
 
-
     refreshList() {
         fetch("https://localhost:44315/api/NhaXuatBan")
             .then(response => response.json())
             .then(data => {
+                const totalPages = Math.ceil(data.length / this.state.itemsPerPage);
                 this.setState({
                     nxbs: data,
-                    nxbsWithoutFilter: data  // Update nxbsWithoutFilter with fetched data
+                    nxbsWithoutFilter: data,  // Update nxbsWithoutFilter with fetched data
+                    totalPages: totalPages
                 });
             })
             .catch(error => {
@@ -193,6 +198,27 @@ export class NXB extends Component {
         });
     }
 
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage } = this.state;
+        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
     render() {
         const {
             nxbs,
@@ -200,6 +226,15 @@ export class NXB extends Component {
             nxb_Id,
             nxb_TenNhaXuatBan
         } = this.state;
+
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(nxbs.length / itemsPerPage);
+
+        // Lọc dữ liệu theo trang hiện tại
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = nxbs.slice(indexOfFirstItem, indexOfLastItem);
+
 
         return (
             <div className={cx('wrapper')}>
@@ -272,7 +307,7 @@ export class NXB extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {nxbs.map(dep =>
+                        {currentItems.map(dep =>
                             <tr key={dep.nxb_Id}>
                                 <td className="text-start">{dep.nxb_Id}</td>
                                 <td className="text-start">{dep.nxb_TenNhaXuatBan}</td>
@@ -301,6 +336,41 @@ export class NXB extends Component {
                             </tr>)}
                     </tbody>
                 </table>
+
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
                 <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
                     <div className="modal-dialog modal-lg modal-dialog-centered ">
                         <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">
@@ -312,7 +382,7 @@ export class NXB extends Component {
 
                             <div className="modal-body">
                                 <div className="input-group mb-3 input-group-lg">
-                                    <span className="input-group-text fw-bold">Tên Danh Mục</span>
+                                    <span className="input-group-text fw-bold">Tên Nhà xuất bản</span>
                                     <input type="text" className="form-control fs-2"
                                         value={nxb_TenNhaXuatBan}
                                         onChange={this.changenxb_TenNXB} />
@@ -341,6 +411,7 @@ export class NXB extends Component {
                         </div>
                     </div>
                 </div>
+
             </div>
         )
     }

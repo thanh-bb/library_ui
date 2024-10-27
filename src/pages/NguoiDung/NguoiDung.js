@@ -18,7 +18,12 @@ export class NguoiDung extends Component {
             nd_IdFilter: "",
             nd_UsernameFilter: "",
             nd_HoTenFilter: "",
-            nguoidungsWithoutFilter: []
+            nguoidungsWithoutFilter: [],
+
+
+            currentPage: 1,
+            itemsPerPage: 8,
+            totalPages: 0
         }
     }
 
@@ -41,8 +46,6 @@ export class NguoiDung extends Component {
         this.setState({ nguoidungs: filteredData });
     }
 
-
-
     sortResult(prop, asc) {
         var sortedData = this.state.nguoidungsWithoutFilter.sort(function (a, b) {
             if (asc) {
@@ -55,8 +58,6 @@ export class NguoiDung extends Component {
 
         this.setState({ nguoidungs: sortedData });
     }
-
-
 
     changend_UsernameFilter = (e) => {
         this.setState({ nd_UsernameFilter: e.target.value }, () => {
@@ -75,9 +76,12 @@ export class NguoiDung extends Component {
         fetch("https://localhost:44315/api/NguoiDung")
             .then(response => response.json())
             .then(data => {
+                const totalPages = Math.ceil(data.length / this.state.itemsPerPage);
                 this.setState({
                     nguoidungs: data,
-                    nguoidungsWithoutFilter: data  // Update nguoidungsWithoutFilter with fetched data
+                    nguoidungsWithoutFilter: data,  // Update nguoidungsWithoutFilter with fetched data
+                    totalPages: totalPages
+
                 });
             })
             .catch(error => {
@@ -181,6 +185,27 @@ export class NguoiDung extends Component {
         }
     }
 
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage } = this.state;
+        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
 
     render() {
         const {
@@ -191,58 +216,76 @@ export class NguoiDung extends Component {
 
         } = this.state;
 
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(nguoidungs.length / itemsPerPage);
+
+        // Lọc dữ liệu theo trang hiện tại
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = nguoidungs.slice(indexOfFirstItem, indexOfLastItem);
+
+
         return (
             <div className={cx('wrapper')}>
+                <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+                    <div className="col-6">
+                        <div className="d-flex flex-row">
+                            <input className="form-control m-2 fs-4"
+                                onChange={this.changend_UsernameFilter}
+                                placeholder="Tìm theo ký tự" />
 
-                <table className="table table-hover"  >
-                    <thead className="table-danger">
+                            <button type="button" className="btn btn-light"
+                                onClick={() => this.sortResult('nd_Username', true)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
+                                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
+                                </svg>
+                            </button>
+
+                            <button type="button" className="btn btn-light"
+                                onClick={() => this.sortResult('nd_Username', false)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                                    <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
+                                </svg>
+                            </button>
+                        </div >
+                    </div>
+                    <div className="col-6">
+                        <div className="d-flex flex-row">
+                            <input className="form-control m-2 fs-4"
+                                onChange={this.changend_HoTenFilter}
+                                placeholder="Tìm theo Họ Tên" />
+
+                            <button type="button" className="btn btn-light"
+                                onClick={() => this.sortResult('nd_HoTen', true)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
+                                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
+                                </svg>
+                            </button>
+
+                            <button type="button" className="btn btn-light"
+                                onClick={() => this.sortResult('nd_HoTen', false)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
+                                    <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
+                                </svg>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
+                    <thead >
                         <tr >
                             <th>
                                 ID
                             </th>
                             <th className="text-start w-25">
-                                <div className="d-flex flex-row">
-                                    <input className="form-control m-2 fs-4"
-                                        onChange={this.changend_UsernameFilter}
-                                        placeholder="Tìm theo ký tự" />
 
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('nd_Username', true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
-                                        </svg>
-                                    </button>
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('nd_Username', false)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
-                                        </svg>
-                                    </button>
-                                </div >
                                 Username
                             </th>
                             <th className="text-start w-25 ">
-                                <div className="d-flex flex-row">
-                                    <input className="form-control m-2 fs-4"
-                                        onChange={this.changend_HoTenFilter}
-                                        placeholder="Tìm theo Họ Tên" />
 
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('nd_HoTen', true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
-                                        </svg>
-                                    </button>
-
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('nd_HoTen', false)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
-                                        </svg>
-                                    </button>
-
-                                </div>
                                 Tên Người Dùng
                             </th>
                             <th>
@@ -261,7 +304,7 @@ export class NguoiDung extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {nguoidungs.map(dep =>
+                        {currentItems.map(dep =>
 
                             <tr key={dep.nd_Id}>
                                 <td className="text-start">{dep.nd_Id}</td>
@@ -293,19 +336,54 @@ export class NguoiDung extends Component {
                             </tr>)}
                     </tbody>
                 </table>
-                <div className="modal fade" id="exampleModal" tabIndex="-1" aria-hidden="true">
-                    <div className="modal-dialog modal-lg modal-dialog-centered">
-                        <div className="modal-content">
+
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
+                    <div className="modal-dialog modal-lg modal-dialog-centered ">
+                        <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">
                             <div className="modal-header">
-                                <h5 className="modal-title">{modalTitle}</h5>
+                                <h5 className="modal-title fs-2">{modalTitle}</h5>
                                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                 ></button>
                             </div>
 
                             <div className="modal-body">
-                                <div className="input-group mb-3">
-                                    <span className="input-group-text">Trạng thái tài khoản</span>
-                                    <select className="form-select"
+                                <div className="input-group mb-3 input-group-lg">
+                                    <span className="input-group-text fw-bold">Trạng thái tài khoản</span>
+                                    <select className="form-select form-control fs-2"
                                         onChange={this.changend_Active}
                                         value={nd_active}>
                                         <option value="">Chọn trạng thái</option>
@@ -317,14 +395,14 @@ export class NguoiDung extends Component {
 
                                 {nd_Id === 0 ?
                                     <button type="button"
-                                        className="btn btn-primary float-start"
+                                        className={cx('btn-create')}
                                         onClick={() => this.createClick()}>
                                         Create
                                     </button> : null}
 
                                 {nd_Id !== 0 ?
                                     <button type="button"
-                                        className="btn btn-primary float-start"
+                                        className={cx('btn-create')}
                                         onClick={() => this.updateClick()}>
                                         Update
                                     </button> : null}

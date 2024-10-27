@@ -32,7 +32,7 @@ export class Sach extends Component {
             s_MoTa: "",
             s_TrongLuong: "",
             s_NamXuatBan: 0,
-            s_TrangThaiMuon: true,
+            //   s_TrangThaiMuon: true,
             s_ChiDoc: true,
             tg_Id: 0,
             nxb_Id: 0,
@@ -48,6 +48,13 @@ export class Sach extends Component {
             images: [''],
             bookImages: {},
             hmh_Id: 0,
+
+            currentPage: 1,
+            itemsPerPage: 5,
+            totalPages: 0,
+
+            nhapKhoQuantity: 0, // To store quantity for Nhập Kho
+            showNhapKhoModal: false, // To control modal visibility
         };
 
     }
@@ -64,7 +71,7 @@ export class Sach extends Component {
         if (!this.state.ks_Id) errors.ks_Id = "Vui lòng chọn kệ sách";
         if (!this.state.os_Id) errors.os_Id = "Vui lòng chọn ô sách";
         if (!this.state.ls_Id) errors.ls_Id = "Vui lòng chọn loại sách";
-        if (this.state.s_TrangThaiMuon === null || this.state.s_TrangThaiMuon === undefined) errors.s_TrangThaiMuon = "Vui lòng chọn trạng thái mượn";
+        //  if (this.state.s_TrangThaiMuon === null || this.state.s_TrangThaiMuon === undefined) errors.s_TrangThaiMuon = "Vui lòng chọn trạng thái mượn";
         if (this.state.s_ChiDoc === null || this.state.s_ChiDoc === undefined) errors.s_ChiDoc = "Vui lòng chọn tình trạng mượn sách";
 
         const validImages = this.state.images.filter(image => image !== ''); // Lọc những ảnh đã được chọn
@@ -133,9 +140,11 @@ export class Sach extends Component {
         fetch("https://localhost:44315/api/Sach")
             .then(response => response.json())
             .then(data => {
+                const totalPages = Math.ceil(this.state.sachs.length / this.state.itemsPerPage);
                 this.setState({
                     sachs: data,
-                    sachsWithoutFilter: data
+                    sachsWithoutFilter: data,
+                    totalPages: totalPages
                 });
 
                 // Fetch images for each book after the book list is loaded
@@ -210,8 +219,6 @@ export class Sach extends Component {
             });
     };
 
-
-
     componentDidMount() {
         this.refreshList();
     }
@@ -225,7 +232,7 @@ export class Sach extends Component {
             s_MoTa: "",
             s_TrongLuong: "",
             s_NamXuatBan: 0,
-            s_TrangThaiMuon: true,
+            // s_TrangThaiMuon: true,
             s_ChiDoc: true,
             tg_Id: 0,
             nxb_Id: 0,
@@ -247,7 +254,7 @@ export class Sach extends Component {
             s_MoTa: dep.s_MoTa,
             s_TrongLuong: dep.s_TrongLuong,
             s_NamXuatBan: dep.s_NamXuatBan,
-            s_TrangThaiMuon: dep.s_TrangThaiMuon,
+            //     s_TrangThaiMuon: dep.s_TrangThaiMuon,
             s_ChiDoc: dep.s_ChiDoc,
             tg_Id: dep.tg_Id,
             nxb_Id: dep.nxb_Id,
@@ -268,6 +275,14 @@ export class Sach extends Component {
                 });
             });
 
+    }
+
+    editTrangThaiClick(dep) {
+        this.setState({
+            modalTitle: "Chỉnh sửa trạng thái Sách",
+            s_Id: dep.s_Id,
+            s_TrangThaiMuon: dep.s_TrangThaiMuon,
+        });
     }
 
     handleFileChange = async (e, fieldName, index) => {
@@ -320,7 +335,7 @@ export class Sach extends Component {
                     sMoTa: this.state.s_MoTa,
                     sTrongLuong: this.state.s_TrongLuong,
                     sNamXuatBan: this.state.s_NamXuatBan,
-                    sTrangThaiMuon: this.state.s_TrangThaiMuon,
+                    //   sTrangThaiMuon: this.state.s_TrangThaiMuon,
                     sChiDoc: this.state.s_ChiDoc,
                     tgId: this.state.tg_Id,
                     nxbId: this.state.nxb_Id,
@@ -384,6 +399,30 @@ export class Sach extends Component {
             }));
         }
     };
+
+
+    updateTrangThaiClick() {
+
+        fetch("https://localhost:44315/api/Sach/Put_TrangThai", {
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sId: this.state.s_Id,
+                sTrangThaiMuon: this.state.s_TrangThaiMuon
+            })
+        })
+            .then(res => res.json())
+            .then((result) => {
+                alert(result);
+                this.refreshList();
+            }, (error) => {
+                alert('Failed');
+            })
+    }
+
 
     // cập nhật hình ảnh
     updateImages() {
@@ -483,7 +522,7 @@ export class Sach extends Component {
                 sMoTa: this.state.s_MoTa,
                 sTrongLuong: this.state.s_TrongLuong,
                 sNamXuatBan: this.state.s_NamXuatBan,
-                sTrangThaiMuon: this.state.s_TrangThaiMuon,
+                //    sTrangThaiMuon: this.state.s_TrangThaiMuon,
                 sChiDoc: this.state.s_ChiDoc,
                 tgId: this.state.tg_Id,
                 nxbId: this.state.nxb_Id,
@@ -524,6 +563,68 @@ export class Sach extends Component {
         }
     }
 
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage } = this.state;
+        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
+    openNhapKhoModal = (id) => {
+        this.setState({ s_Id: id, showNhapKhoModal: true });
+        console.log(id);
+    }
+
+    closeNhapKhoModal = () => {
+        this.setState({ s_Id: 0, nhapKhoQuantity: 0, showNhapKhoModal: false });
+    }
+
+    handleNhapKhoChange = (e) => {
+        this.setState({ nhapKhoQuantity: e.target.value });
+    }
+
+    submitNhapKho = () => {
+        const { s_Id, nhapKhoQuantity } = this.state;
+
+        fetch(`https://localhost:44315/api/Sach/NhapKho/${s_Id}?soLuongNhap=${nhapKhoQuantity}`, {
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then((result) => {
+                alert(result);
+                this.refreshList();
+                this.closeNhapKhoModal();
+            })
+            .catch(error => {
+                console.error("Error during Nhập Kho:", error);
+                alert('Failed to update inventory');
+            });
+    }
+
+    editSLClick(dep) {
+        this.setState({
+            s_Id: dep.s_Id,
+            s_SoLuong: dep.s_SoLuong
+        });
+    }
 
     render() {
         const {
@@ -550,8 +651,20 @@ export class Sach extends Component {
             s_ChiDoc,
             s_MoTa,
             errors,
-            images
+            images,
+
+
         } = this.state;
+
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(sachs.length / itemsPerPage);
+
+        // Lọc dữ liệu theo trang hiện tại
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = sachs.slice(indexOfFirstItem, indexOfLastItem);
+
+        const { showNhapKhoModal, nhapKhoQuantity } = this.state;
 
         const formattedDate = new Date(s_NamXuatBan).toISOString().split("T")[0];
 
@@ -615,20 +728,24 @@ export class Sach extends Component {
                 <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
                     <thead >
                         <tr >
-                            <th className="text-start w-25">
+                            <th className="text-start ">
                                 ID Sách
                             </th>
                             <th className="text-start">Hình Ảnh</th>
                             <th className="text-start">
                                 Tên Sách
                             </th>
+                            <th className="text-start ">
+                                Số lượng hiện có
+                            </th>
+                            <th></th>
                             <th>
                                 Options
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {sachs?.map(dep => (
+                        {currentItems?.map(dep => (
                             <tr key={dep.s_Id}>
                                 <td className="text-start">{dep.s_Id}</td>
 
@@ -653,6 +770,20 @@ export class Sach extends Component {
 
                                 <td className="text-start">{dep.s_TenSach}</td>
 
+                                <td className="text-start">{dep.s_SoLuong}</td>
+
+                                <td>
+                                    <button type="button"
+                                        className="btn btn-outline-secondary fs-4 fw-bold"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#nhapKhoModal"
+                                        onClick={() => this.editSLClick(dep)}>
+
+                                        Nhập kho sách
+                                    </button>
+
+                                </td>
+
                                 <td className="position-relative">
                                     <button type="button"
                                         className="btn btn-light mr-1"
@@ -667,16 +798,58 @@ export class Sach extends Component {
 
                                     <button type="button"
                                         className="btn btn-light mr-1"
-                                        onClick={() => this.deleteClick(dep.s_Id)}>
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal123"
+                                        onClick={() => this.editTrangThaiClick(dep)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash-fill" viewBox="0 0 16 16">
                                             <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0" />
                                         </svg>
                                     </button>
+
+
                                 </td>
+
+
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
+
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
 
                 <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
                     <div className="modal-dialog modal-lg modal-dialog-centered ">
@@ -778,7 +951,7 @@ export class Sach extends Component {
                                                 </option>)}
                                             </select>
                                         </div>
-                                        <div className="form-group mb-3 text-start w-75">
+                                        {/* <div className="form-group mb-3 text-start w-75">
                                             <label className="fw-medium ">Trạng thái trong kho<span className="text-danger">*</span></label>
                                             {errors.s_TrangThaiMuon && (
                                                 <span className="text-danger fs-4 float-end">{errors.s_TrangThaiMuon}</span>
@@ -790,7 +963,7 @@ export class Sach extends Component {
                                                 <option value={true}>Trong kho sẵn sàng</option>
                                                 <option value={false}>Chưa sẵn sàng</option>
                                             </select>
-                                        </div>
+                                        </div> */}
 
 
                                         <div className="form-group mb-3 text-start w-75">
@@ -932,8 +1105,75 @@ export class Sach extends Component {
                         </div>
                     </div>
                 </div>
-            </div >
 
+                <div className="modal fade " id="nhapKhoModal" tabIndex="-1" aria-hidden="true">
+                    <div className="modal-dialog modal-lg modal-dialog-centered ">
+                        <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">
+                            <div className="modal-header">
+                                <h5 className="modal-title fs-2">Nhập kho sách</h5>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                ></button>
+                            </div>
+
+                            <div className="modal-body ">
+                                <div className="input-group mb-3 input-group-lg">
+                                    <span className="input-group-text fw-bold">Số lượng nhập</span>
+                                    <input
+                                        type="number"
+                                        className="form-control fs-2"
+                                        value={nhapKhoQuantity}
+                                        onChange={this.handleNhapKhoChange}
+                                    />
+                                </div>
+
+                                {this.state.validationError && (
+                                    <p className="fw-bold text-danger float-start fs-4" role="alert">
+                                        Lưu ý: {this.state.validationError}
+                                    </p>
+                                )}
+                                <button type="button" className={cx('btn-create')} onClick={this.submitNhapKho}>
+                                    Xác nhận Nhập Kho
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade " id="exampleModal123" tabIndex="-1" aria-hidden="true">
+                    <div className="modal-dialog modal-lg modal-dialog-centered ">
+                        <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">
+                            <div className="modal-header">
+                                <h5 className="modal-title fs-2">Trạng thái sách</h5>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                ></button>
+                            </div>
+
+                            <div className="modal-body ">
+                                <div className="input-group mb-3 input-group-lg">
+                                    <span className="input-group-text fw-bold">Trạng thái</span>
+                                    <select className={cx('form-control  form-select p-2  fs-3 bg-body-secondary border-0 aria-label="Default select example"')}
+                                        onChange={this.changes_TrangThaiMuon}
+                                        value={s_TrangThaiMuon}>
+                                        <option value="">Chọn trạng thái</option>
+                                        <option value={true}>Hiển thị trên hệ thống</option>
+                                        <option value={false}>Ẩn khỏi hệ thống</option>
+                                    </select>
+                                </div>
+
+
+                                <button type="button"
+                                    className={cx('btn-create')}
+                                    onClick={() => this.updateTrangThaiClick()}>
+                                    Cập nhật
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div >
         )
     }
-}
+};
+

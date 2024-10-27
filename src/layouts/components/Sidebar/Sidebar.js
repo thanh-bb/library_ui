@@ -78,11 +78,7 @@ function Sidebar() {
                                 to={config.routes.sach}
 
                             />
-                            <MenuItem
-                                title="Nhập Kho Sách"
-                                to={config.routes.nhapkhosach}
 
-                            />
                         </div>
                     )}
 

@@ -4,25 +4,126 @@
     margin-right: 15px;
     // font-size: large;
     text-align: center;
+    padding-bottom: 120px;
+}
+
+.head-table {
+    font-size: 16px;
+    background-color: cornflowerblue;
 }
 
 .btn-grad {
-    background-image: linear-gradient(to right, #f4608a 0%, #e45796 51%, #f1468d 100%);
-    margin: 10px;
-    padding: 15px 45px;
+    background-color: #435ebe;
+    padding: 10px 30px;
     text-align: center;
     text-transform: uppercase;
     transition: 0.5s;
     background-size: 200% auto;
     color: white;
     box-shadow: 0 0 20px #eee;
-    border-radius: 10px;
-    display: block;
-    float: right;
+    border-radius: 20%;
+    font-size: 50px;
+
+    /* New properties to position the button */
+    position: fixed; /* or 'absolute' */
+    bottom: 30px; /* Adjust as needed */
+    right: 40px; /* Adjust as needed */
+    z-index: 9999; /* Ensures it appears on top */
 }
 
 .btn-grad:hover {
     background-position: right center; /* change the direction of the change here */
     color: #fff;
     text-decoration: none;
+}
+
+.btn-create {
+    background-color: #435ebe;
+    padding: 10px 30px;
+    text-align: center;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    font-size: 15px;
+    border: 2px solid #435ebe;
+    float: right;
+}
+
+.btn-create:hover {
+    color: #435ebe;
+    background-color: #c1c1ff30;
+    font-weight: bold;
+    border: 2px solid #435ebe;
+}
+
+// phân trang
+
+.pagination button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background-color: #435ebe;
+    color: white;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-item {
+    position: fixed;
+    left: 350px;
+    bottom: 60px; /* Adjust this value as needed */
+    // z-index: 9999;
+}
+
+.pagination {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.page-item {
+    margin: 0 0.2rem;
+    padding: 5px;
+}
+
+.page-link {
+    display: block;
+    padding: 0.5rem 0.8rem;
+    color: #030d34;
+    text-decoration: none;
+    //    font-size: 1.25rem;
+    border-radius: 0.3rem;
+    transition: background-color 0.2s, color 0.2s;
+
+    width: 30px;
+}
+
+.page-link:hover {
+    background-color: #435ebe;
+    color: white;
+}
+
+.page-item.active .page-link {
+    background-color: #435ebe;
+    color: white;
+    font-weight: bold;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: default;
 }
