@@ -6,18 +6,17 @@ import { useLocation, Link } from 'react-router-dom';
 const cx = classNames.bind(styles);
 
 const VNPay = () => {
-    const location = useLocation(); // Sử dụng hook useLocation để lấy URL params
+    const location = useLocation();
     const [success, setSuccess] = useState(null);
     const [transactionId, setTransactionId] = useState('');
     const [orderId, setOrderId] = useState('');
-
     const [orderType, setOrderType] = useState('electric');
     const [name, setName] = useState('');
     const [amount, setAmount] = useState('');
     const [orderDescription, setOrderDescription] = useState('');
 
     useEffect(() => {
-        const searchParams = new URLSearchParams(location.search); // Lấy các tham số từ URL
+        const searchParams = new URLSearchParams(location.search);
         const success = searchParams.get('success') === 'True';
         const transactionId = searchParams.get('transactionId');
         const orderId = searchParams.get('orderId');
@@ -25,7 +24,7 @@ const VNPay = () => {
         setSuccess(success);
         setTransactionId(transactionId);
         setOrderId(orderId);
-    }, [location.search]); // Theo dõi sự thay đổi của location.search
+    }, [location.search]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,22 +33,19 @@ const VNPay = () => {
             orderType,
             name,
             amount: parseFloat(amount),
-            orderDescription
+            orderDescription,
         };
 
         try {
             const response = await fetch('http://localhost:5000/api/vnpay/CreatePaymentUrl', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(paymentData)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(paymentData),
             });
 
             const data = await response.json();
 
             if (data.paymentUrl) {
-                // Chuyển hướng đến trang thanh toán VNPAY
                 window.location.href = data.paymentUrl;
             } else {
                 alert('Có lỗi xảy ra khi tạo URL thanh toán.');
@@ -61,17 +57,19 @@ const VNPay = () => {
     };
 
     return (
-        <div className={cx('vnpay-result')}>
-            <h2>Kết quả giao dịch VNPay</h2>
+        <div className={cx('vnpay-result', 'container')}>
+            <h2 className={cx('title', 'text-center', 'mt-5')}>Kết quả giao dịch VNPay</h2>
+
             {success === null ? (
-                <div>
-                    <p>Điền thông tin thanh toán</p>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
+                <div className={cx('payment-form', 'card', 'shadow', 'p-4', 'mt-4')}>
+                    <p className="text-center">Điền thông tin thanh toán</p>
+                    <form onSubmit={handleSubmit} className="form-container">
+                        <div className={cx('form-group', 'mb-3')}>
                             <label htmlFor="ordertype">Loại hàng hóa</label>
                             <select
                                 id="ordertype"
                                 name="ordertype"
+                                className="form-control"
                                 value={orderType}
                                 onChange={(e) => setOrderType(e.target.value)}
                                 required
@@ -82,35 +80,38 @@ const VNPay = () => {
                             </select>
                         </div>
 
-                        <div className="form-group">
+                        <div className={cx('form-group', 'mb-3')}>
                             <label htmlFor="name">Tên khách hàng</label>
                             <input
                                 type="text"
                                 id="name"
                                 name="name"
+                                className="form-control"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 required
                             />
                         </div>
 
-                        <div className="form-group">
+                        <div className={cx('form-group', 'mb-3')}>
                             <label htmlFor="amount">Số tiền (VNĐ)</label>
                             <input
                                 type="number"
                                 id="amount"
                                 name="amount"
+                                className="form-control"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
                                 required
                             />
                         </div>
 
-                        <div className="form-group">
+                        <div className={cx('form-group', 'mb-3')}>
                             <label htmlFor="orderDescription">Nội dung thanh toán</label>
                             <textarea
                                 id="orderDescription"
                                 name="orderDescription"
+                                className="form-control"
                                 rows="3"
                                 value={orderDescription}
                                 onChange={(e) => setOrderDescription(e.target.value)}
@@ -118,20 +119,28 @@ const VNPay = () => {
                             ></textarea>
                         </div>
 
-                        <button type="submit">Thanh toán (Checkout)</button>
+                        <div className="text-center">
+                            <button type="submit" className={cx('btn', 'btn-primary', 'btn-lg', 'fw-bold')}>
+                                Thanh toán (Checkout)
+                            </button>
+                        </div>
                     </form>
                 </div>
             ) : success ? (
-                <div>
-                    <p>Giao dịch thành công!</p>
+                <div className="text-center">
+                    <p className="text-success">Giao dịch thành công!</p>
                     <p>Mã giao dịch: {transactionId}</p>
                     <p>Mã đơn hàng: {orderId}</p>
-                    <Link to="/">Quay lại trang chủ</Link>
+                    <Link to="/userhome" className={cx('btn-payment')}>
+                        Quay lại trang chủ
+                    </Link>
                 </div>
             ) : (
-                <div>
-                    <p>Giao dịch thất bại!</p>
-                    <Link to="/">Quay lại trang chủ</Link>
+                <div className="text-center">
+                    <p className="text-danger">Giao dịch thất bại!</p>
+                    <Link to="/userhome" className={cx('btn-payment mt-3 ')}>
+                        Quay lại trang chủ
+                    </Link>
                 </div>
             )}
         </div>

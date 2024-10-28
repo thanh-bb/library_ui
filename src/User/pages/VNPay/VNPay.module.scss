@@ -140,4 +140,45 @@
     font-weight: bold;
     height: 40px;
     width: 100%;
+    padding: 5px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 24px;
+    color: #333;
+}
+
+.payment-form {
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #555;
+}
+
+.form-control {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn {
+    width: 100%;
+}
+
+.text-success {
+    color: green;
+    font-weight: bold;
+}
+
+.text-danger {
+    color: red;
+    font-weight: bold;
 }
