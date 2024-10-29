@@ -55,7 +55,9 @@ export class Cart extends Component {
             numberOfBorrowReceipts: 0,
             maxBorrowingsPerMonth: 5,
             numberOfBorrowReceipts_Off: 0,
-            numberOfBorrowReceipts_Onl: 0
+            numberOfBorrowReceipts_Onl: 0,
+
+            borrowedBooks: []
 
         };
     }
@@ -72,8 +74,9 @@ export class Cart extends Component {
             fetch(`https://localhost:44315/api/Cart/GetListCart/${userId}`)
                 .then(response => response.json())
                 .then(data => {
-                    this.setState({
-                        listcarts: data,
+                    this.setState({ listcarts: data }, () => {
+                        // Gọi checkBookBorrowedStatus sau khi cập nhật listcarts
+                        this.checkBookBorrowedStatus();
                     });
                 })
                 .catch(error => {
@@ -211,12 +214,36 @@ export class Cart extends Component {
         this.setState({ numberOfBorrowReceipts: totalBorrowReceipts }); // Cập nhật tổng vào state
     };
 
+    // sach muon chua
+    checkBookBorrowedStatus = async () => {
+        const token = sessionStorage.getItem('jwttoken');
+        if (token) {
+            const userId = jwtDecode(token).nameid;
+
+            const borrowedPromises = this.state.listcarts.map(async (book) => {
+                const response = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckMuon/${userId}/${book.s_Id}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    return result === 'Chờ xét duyệt' ? book.s_Id : null;
+                }
+                return null;
+            });
+
+            const borrowedBooks = (await Promise.all(borrowedPromises)).filter(id => id !== null);
+            this.setState({ borrowedBooks });
+        }
+    };
+
+
+
 
     componentDidMount() {
         this.refreshList();
         this.fetchRankingData();
-        this.fetchBorrowCount(); // Gọi hàm để cập nhật số lần mượn
+        this.fetchBorrowCount();
+        this.checkBookBorrowedStatus();
     }
+
 
     // Function to set the selected category
     setSelectedCategory = (tl_Id) => {
@@ -321,10 +348,16 @@ export class Cart extends Component {
                                         <div className="col-1 m-auto ">
                                             <div className="form-check">
                                                 <input
-                                                    className="form-check-input border border-dark fs-1"
+                                                    className={cx(' fs-1 form-check-input', {
+                                                        'disabled-checkbox': this.state.borrowedBooks.includes(dep.s_Id)  // Áp dụng lớp khi bị vô hiệu hóa
+                                                    })}
                                                     type="checkbox"
                                                     onChange={(e) => this.handleCheckboxChange(dep.s_Id, e.target.checked)}
+                                                    disabled={this.state.borrowedBooks.includes(dep.s_Id)}
                                                 />
+
+
+
                                             </div>
                                         </div>
 

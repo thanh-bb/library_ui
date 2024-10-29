@@ -123,3 +123,15 @@
 .list-item {
     margin-bottom: 100px;
 }
+
+.disabled-checkbox {
+    background-color: #f0f0f0; /* Màu nền xám nhạt */
+    border-color: #ccc; /* Màu viền xám */
+    cursor: not-allowed; /* Con trỏ chuột sẽ thay đổi thành dạng không cho phép */
+    opacity: 0.6; /* Làm mờ checkbox */
+}
+
+.disabled-checkbox:checked {
+    background-color: #e0e0e0; /* Màu nền khi được chọn */
+    border-color: #bbb;
+}

@@ -29,6 +29,7 @@ function ChiTietSach() {
     const [hmhList, setHmhList] = useState([]);
 
     const [isBookAvailable, setIsBookAvailable] = useState(false);
+    const [isBookBorrowed, setIsBookBorrowed] = useState(false);
 
     const decodedToken = jwtDecode(jwttoken);
     const userId = decodedToken.nameid;
@@ -107,6 +108,31 @@ function ChiTietSach() {
     };
 
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Existing code to fetch book details
+                const response = await fetch(`https://localhost:44315/api/Sach/${id}`);
+                const bookData = await response.json();
+                setSach(bookData[0]);
+
+                // Check if the book is already borrowed
+                const checkBorrowStatus = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckMuon/${userId}/${id}`);
+                if (checkBorrowStatus.ok) {
+                    const result = await checkBorrowStatus.json();
+                    if (result === 'Chờ xét duyệt' || result === 'Đang mượn') {
+                        setIsBookBorrowed(true);
+                    }
+                }
+                setLoading(false);
+            } catch (error) {
+                setError(error.message);
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id, userId]);
 
 
     useEffect(() => {
@@ -419,10 +445,18 @@ function ChiTietSach() {
                                                 {/* Hiển thị nút "Tiến hành mượn sách" nếu sách có sẵn để mượn */}
                                                 {userActive.nd_active && sach?.s_TrangThaiMuon && (
                                                     <>
+                                                        <div className='d-flex justify-content-end me-4'>
+                                                            <span className={cx("btn rounded-pill bg-danger-subtle text-danger fw-bold mt-3 ")}>
+                                                                {(numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) >= maxBorrowingsPerMonth && (
+                                                                    <p className="mb-0 fw-bold fs-3 pe-auto">Bạn không thể mượn sách về nhà</p>
+                                                                )}
+                                                            </span>
+                                                        </div>
+
                                                         {(sach?.s_ChiDoc === false && sach?.s_SoLuong > 1) ? (
                                                             <div className="row d-flex justify-content-between mt-5">
+                                                                {/* Nút "Thêm vào giỏ sách" */}
                                                                 {!isBookAvailable ? (
-                                                                    // Nếu sách đã có trong giỏ hàng, hiển thị nút "Sách đã có trong giỏ sách" và disable
                                                                     <button
                                                                         type="button"
                                                                         className={cx('col', 'btn-existed', 'me-5')}
@@ -431,29 +465,18 @@ function ChiTietSach() {
                                                                         Sách đã có trong giỏ sách
                                                                     </button>
                                                                 ) : (
-                                                                    (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) > maxBorrowingsPerMonth ? (
-                                                                        // Nếu vượt quá số lượng mượn cho phép, hiển thị nút "Không thể thêm vào giỏ sách" và disable
-                                                                        <button
-                                                                            type="button"
-                                                                            className={cx('col', 'btn-disable', 'me-5')}
-                                                                            disabled
-                                                                        >
-                                                                            Không thể thêm vào giỏ sách
-                                                                        </button>
-                                                                    ) : (
-                                                                        // Nếu sách chưa có trong giỏ hàng và chưa vượt quá giới hạn mượn, hiển thị nút "Thêm vào giỏ sách"
-                                                                        <button
-                                                                            type="button"
-                                                                            className={cx('col', 'btn-continue', 'me-5')}
-                                                                            onClick={handleAddToCart}
-                                                                        >
-                                                                            Thêm vào giỏ sách
-                                                                        </button>
-                                                                    )
-                                                                )}
+                                                                    <button
+                                                                        type="button"
+                                                                        className={cx('col', 'btn-continue', 'me-5')}
+                                                                        onClick={handleAddToCart}
+                                                                    >
+                                                                        Thêm vào giỏ sách
+                                                                    </button>
+                                                                )
+                                                                }
 
-                                                                {/* Nút "Mượn sách ngay" */}
-                                                                {(numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) <= maxBorrowingsPerMonth ? (
+                                                                {/* Nút "Mượn sách ngay" chỉ hiển thị khi chưa mượn sách */}
+                                                                {!isBookBorrowed && (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) < maxBorrowingsPerMonth ? (
                                                                     <Link to={`/chitietsach/formphieumuon/${sach?.s_Id}`}
                                                                         className={cx('col', 'btn-return')}
                                                                     >
@@ -465,7 +488,7 @@ function ChiTietSach() {
                                                                         className={cx('col', 'btn-disable')}
                                                                         disabled
                                                                     >
-                                                                        Bạn không thể mượn sách về nhà
+                                                                        Bạn đã mượn sách này
                                                                     </button>
                                                                 )}
                                                             </div>
@@ -474,6 +497,7 @@ function ChiTietSach() {
                                                                 <button
                                                                     type="button"
                                                                     className={cx('col', 'btn-disable')}
+                                                                    disabled
                                                                 >
                                                                     Bạn không thể mượn sách về nhà
                                                                 </button>
@@ -481,6 +505,10 @@ function ChiTietSach() {
                                                         )}
                                                     </>
                                                 )}
+
+
+
+
 
 
 
@@ -494,11 +522,11 @@ function ChiTietSach() {
 
                     <div className={cx("row d-flex justify-content-center")}>
                         <div className="col-10">
-                            <div className={cx("row d-flex justify-content-center", "board-item",)}>
+                            <div className={cx("row d-flex justify-content-center", "board-item")}>
                                 {sach && (
                                     <>
+                                        <h2 className='fw-bold mb-5'>Thông tin chi tiết</h2>
                                         <table className="table">
-                                            <h2 className='fw-bold mb-5'> Thông tin chi tiết</h2>
                                             <tbody>
                                                 <tr>
                                                     <th className='fw-medium w-50'>Tên sách</th>
@@ -514,17 +542,12 @@ function ChiTietSach() {
                                                 </tr>
                                                 <tr>
                                                     <th className='fw-medium w-50'>Ngày xuất bản</th>
-                                                    <td>  {new Date(sach?.s_NamXuatBan).toLocaleDateString('en-GB')}</td>
+                                                    <td>{new Date(sach?.s_NamXuatBan).toLocaleDateString('en-GB')}</td>
                                                 </tr>
                                                 <tr>
                                                     <th className='fw-medium w-50'>Nhà xuất bản</th>
-                                                    <td>  {new Date(sach?.s_NamXuatBan).toLocaleDateString('en-GB')}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th className='fw-medium w-50'>Ngày xuất bản</th>
                                                     <td>{getNXBNameById(sach?.nxb_Id)}</td>
                                                 </tr>
-
                                                 <tr>
                                                     <th className='fw-medium w-50'>Số lượng sách thực có tại thư viện</th>
                                                     <td>{sach?.s_SoLuong}</td>
@@ -535,16 +558,16 @@ function ChiTietSach() {
                                                 </tr>
                                                 <tr>
                                                     <th className='fw-medium w-50'>Vị trí sách tại thư viện</th>
-                                                    <td>  {getKeById(sach?.ks_Id)} - {getOById(sach?.os_Id)}</td>
-                                                </tr>    <tr>
+                                                    <td>{getKeById(sach?.ks_Id)} - {getOById(sach?.os_Id)}</td>
+                                                </tr>
+                                                <tr>
                                                     <th className='fw-medium w-50'>Trạng thái mượn</th>
-                                                    <td>{sach?.s_TrangThaiMuon === true ? " Trong kho sẵn sàng" : sach?.s_TrangThaiMuon === false ? "Chưa sẵn sàng" : "Trạng thái không xác định"}</td>
+                                                    <td>{sach?.s_TrangThaiMuon === true ? "Trong kho sẵn sàng" : sach?.s_TrangThaiMuon === false ? "Chưa sẵn sàng" : "Trạng thái không xác định"}</td>
                                                 </tr>
                                                 <tr>
                                                     <th className='fw-medium w-50'>Cho phép mượn về</th>
                                                     <td>{sach?.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach?.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</td>
                                                 </tr>
-
                                             </tbody>
                                         </table>
                                     </>

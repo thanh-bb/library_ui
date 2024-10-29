@@ -382,51 +382,65 @@ export class CTPMOnline extends Component {
             return;
         }
 
-        if (this.state.paymentMethod === "VNPAY") {
-            const customerName = this.state.selectedAddress.dcgh_TenNguoiNhan;
-            const amount = this.state.amount || 30000;
-            const orderDescription = "Thanh toán cho đơn hàng";
+        if (token) {
+            const decodedToken = jwtDecode(token);
+            const userId = decodedToken.nameid;
 
-            const paymentUrl = `https://localhost:44393/?customerName=${encodeURIComponent(customerName)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}`;
-            window.location.href = paymentUrl;
-        } else {
-            if (token) {
-                const decodedToken = jwtDecode(token);
-                const userId = decodedToken.nameid;
+            const orderData = {
+                ndId: userId,
+                pmoNgayDat: new Date().toISOString(),
+                pmoLoaiGiaoHang: this.state.deliveryMethod,
+                pmoPhuongThucThanhToan: this.state.paymentMethod,
+                dcghId: this.state.selectedAddress ? this.state.selectedAddress.dcgh_Id : null,
+                pmoTrangThai: "Chờ xử lý",
+                ChiTietPhieuMuonOnlines: selectedBooks.map(book => ({
+                    SId: book.s_Id,
+                    CtpmoSoLuongSachMuon: 1
+                }))
+            };
 
-                const orderData = {
-                    ndId: userId,
-                    pmoNgayDat: new Date().toISOString(),
-                    pmoLoaiGiaoHang: this.state.deliveryMethod,
-                    pmoPhuongThucThanhToan: this.state.paymentMethod,
-                    dcghId: this.state.selectedAddress ? this.state.selectedAddress.dcgh_Id : null,
-                    pmoTrangThai: "Chờ xử lý",
-                    ChiTietPhieuMuonOnlines: selectedBooks.map(book => ({
-                        SId: book.s_Id,
-                        CtpmoSoLuongSachMuon: 1
-                    }))
-                };
+            fetch("https://localhost:44315/api/CTPMOnline", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+                .then(response => response.json()) // Chuyển đổi phản hồi sang JSON
+                .then(result => {
+                    console.log("Phản hồi từ backend:", result);  // Kiểm tra xem result có chứa pmo_Id không
 
-                fetch("https://localhost:44315/api/CTPMOnline", {
-                    method: "POST",
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(orderData)
+                    if (result) {
+                        // Lưu pmo_Id vào localStorage khi tạo phiếu mượn thành công
+                        localStorage.setItem("pmo_Id", result);
+
+                        // Thêm thời gian chờ trước khi chuyển hướng để đảm bảo pmo_Id được lưu trước
+                        if (this.state.paymentMethod === "VNPAY") {
+                            const customerName = this.state.selectedAddress.dcgh_TenNguoiNhan;
+                            const amount = this.state.amount || 30000;
+                            const orderDescription = "Thanh toán cho đơn hàng";
+
+                            const paymentUrl = `https://localhost:44393/?customerName=${encodeURIComponent(customerName)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}&orderId=${result.pmo_Id}`;
+
+                            setTimeout(() => {
+                                window.location.href = paymentUrl;
+                            }, 500); // Chờ 0.5 giây để đảm bảo pmo_Id đã được lưu
+                        } else {
+                            alert("Đặt sách thành công!");
+                            window.location.href = '/quanlyphieumuon';
+                        }
+                    } else {
+                        console.error("Không nhận được pmo_Id từ backend.");
+                    }
                 })
-                    .then(response => response.json())
-                    .then(result => {
-                        alert("Đặt sách thành công!");
-                        window.location.href = '/quanlyphieumuon';
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert("Đặt sách thất bại, vui lòng thử lại.");
-                    });
-            }
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Đặt sách thất bại, vui lòng thử lại.");
+                });
         }
     }
+
 
 
 
@@ -736,7 +750,7 @@ export class CTPMOnline extends Component {
                                     <div>
                                         <div className="form-check mx-5" onClick={() => document.getElementById('flexRadioCOD').click()}>
                                             <input
-                                                che
+                                                data-che="true"
                                                 value="COD"
                                                 checked={paymentMethod === "COD"}
                                                 className="form-check-input mt-4"
@@ -744,8 +758,8 @@ export class CTPMOnline extends Component {
                                                 name="paymentMethod"
                                                 id="flexRadioCOD"
                                                 onChange={this.handlePaymentChange}
-
                                             />
+
                                             <p
                                                 role="button"
                                                 tabIndex="0"
