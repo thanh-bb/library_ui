@@ -116,7 +116,7 @@ function ChiTietSach() {
                 const bookData = await response.json();
                 setSach(bookData[0]);
 
-                // Check if the book is already borrowed
+                // Check if the book is already borrowed (offline)
                 const checkBorrowStatus = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckMuon/${userId}/${id}`);
                 if (checkBorrowStatus.ok) {
                     const result = await checkBorrowStatus.json();
@@ -124,6 +124,16 @@ function ChiTietSach() {
                         setIsBookBorrowed(true);
                     }
                 }
+
+                // Check if the book is borrowed online with status "Chờ xử lý"
+                const checkOnlineBorrowStatus = await fetch(`https://localhost:44315/api/PhieuMuonOnline/CheckMuonOnl/${userId}/${id}`);
+                if (checkOnlineBorrowStatus.ok) {
+                    const onlineResult = await checkOnlineBorrowStatus.json();
+                    if (onlineResult === 'Chờ xử lý') {
+                        setIsBookBorrowed(true);
+                    }
+                }
+
                 setLoading(false);
             } catch (error) {
                 setError(error.message);
@@ -133,6 +143,7 @@ function ChiTietSach() {
 
         fetchData();
     }, [id, userId]);
+
 
 
     useEffect(() => {

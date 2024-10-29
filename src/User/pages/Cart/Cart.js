@@ -215,24 +215,44 @@ export class Cart extends Component {
     };
 
     // sach muon chua
+    // Modify the checkBookBorrowedStatus method in Cart.js
+
     checkBookBorrowedStatus = async () => {
         const token = sessionStorage.getItem('jwttoken');
         if (token) {
             const userId = jwtDecode(token).nameid;
 
             const borrowedPromises = this.state.listcarts.map(async (book) => {
-                const response = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckMuon/${userId}/${book.s_Id}`);
-                if (response.ok) {
-                    const result = await response.json();
-                    return result === 'Chờ xét duyệt' ? book.s_Id : null;
+                // Offline borrow status check
+                const offlineResponse = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckMuon/${userId}/${book.s_Id}`);
+                let isBorrowed = false;
+
+                if (offlineResponse.ok) {
+                    const offlineResult = await offlineResponse.json();
+                    if (offlineResult === 'Chờ xét duyệt' || offlineResult === 'Đang mượn') {
+                        isBorrowed = true;
+                    }
                 }
-                return null;
+
+                // Online borrow status check
+                if (!isBorrowed) {
+                    const onlineResponse = await fetch(`https://localhost:44315/api/PhieuMuonOnline/CheckMuonOnl/${userId}/${book.s_Id}`);
+                    if (onlineResponse.ok) {
+                        const onlineResult = await onlineResponse.json();
+                        if (onlineResult === 'Chờ xử lý') {
+                            isBorrowed = true;
+                        }
+                    }
+                }
+
+                return isBorrowed ? book.s_Id : null;
             });
 
             const borrowedBooks = (await Promise.all(borrowedPromises)).filter(id => id !== null);
             this.setState({ borrowedBooks });
         }
     };
+
 
 
 
