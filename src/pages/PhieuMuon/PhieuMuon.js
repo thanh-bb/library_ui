@@ -361,6 +361,15 @@ export class PhieuMuon extends Component {
                                 Đã trả
                             </button>
                         </div>
+                        <div className="col-3">
+                            <button
+                                type="button"
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Từ chối xét duyệt" })}
+                                onClick={() => this.handleTagSelection("Từ chối xét duyệt")}
+                            >
+                                Từ chối xét duyệt
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -435,9 +444,16 @@ export class PhieuMuon extends Component {
                             <th className="text-start">
                                 Trạng Thái
                             </th>
-                            <th className="text-start">
-                                Số ngày trễ hạn
-                            </th>
+                            {(selectedTag === "Đang mượn" || selectedTag === "Đã trả") && (
+                                <th className="text-start">
+                                    Số ngày trễ hạn
+                                </th>)}
+
+                            {(selectedTag === "Chờ xét duyệt") && (
+                                <th className="text-start">
+                                    Số ngày còn lại để xét duyệt
+                                </th>)}
+
                             <th className="text-start">
                                 Options
                             </th>
@@ -453,39 +469,65 @@ export class PhieuMuon extends Component {
                                 <td className="text-start">{dep.TenSach}</td>
                                 <td className="text-start">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
                                 <td className="text-start">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
-                                <td className="text-start">{dep.TrangThaiMuon}</td>
 
-                                <td className="text-start">
-                                    {dep.TrangThaiMuon === "Đã trả" ?
-                                        ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
-                                            `Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày `
-                                            :
-                                            "Đúng hạn"
-                                        :
-                                        dep.TrangThaiMuon === "Đang mượn" ?
+
+                                {(selectedTag === "Chờ xét duyệt") && (
+                                    <td className="text-start">{dep.TrangThaiXetDuyet}</td>
+                                )}
+
+                                {(selectedTag === "Đang mượn" || selectedTag === "Đã trả") && (
+                                    <td className="text-start">{dep.TrangThaiMuon}</td>
+                                )}
+
+                                {(selectedTag === "Từ chối xét duyệt") && (
+                                    <td className="text-start">{dep.TrangThaiXetDuyet}</td>
+                                )}
+
+                                {(selectedTag === "Đang mượn" || selectedTag === "Đã trả") && (
+                                    <td className="text-start">
+                                        {dep.TrangThaiMuon === "Đã trả" ?
                                             ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
-                                                ` ${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn trả) `
-
+                                                `Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày `
                                                 :
-                                                ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
-                                                    `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
-                                                    :
-                                                    "Còn hạn"
+                                                "Đúng hạn"
                                             :
-                                            dep.HanTra ?
-                                                ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
-                                                    `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
-                                                    :
-                                                    "Còn hạn"
-                                                :
-                                                "Chưa cập nhật hạn trả"
-                                    }
-                                </td>
+                                            dep.TrangThaiMuon === "Đang mượn" ?
+                                                ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) < 0 ?
+                                                    ` ${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn trả) `
 
+                                                    :
+                                                    ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
+                                                        `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
+                                                        :
+                                                        "Còn hạn"
+                                                :
+                                                dep.HanTra ?
+                                                    ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
+                                                        `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
+                                                        :
+                                                        "Còn hạn"
+                                                    :
+                                                    "Chưa cập nhật hạn trả"
+                                        }
+                                    </td>
+                                )}
+
+                                {(selectedTag === "Chờ xét duyệt") && (
+                                    <td className="text-start">
+                                        {dep.HanTra ?
+                                            ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
+                                                `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
+                                                :
+                                                "Còn hạn"
+                                            :
+                                            "Chưa cập nhật hạn trả"
+                                        }
+                                    </td>
+                                )}
 
 
                                 <td className="position-relative">
-                                    {dep.TrangThaiMuon !== "Đã trả" ? ( // Add condition to enable/disable button
+                                    {(dep.TrangThaiMuon !== "Đã trả") && (dep.TrangThaiXetDuyet !== "Từ chối xét duyệt") ? ( // Add condition to enable/disable button
                                         <button type="button"
                                             className="btn btn-light mr-1 "
                                             data-bs-toggle="modal"

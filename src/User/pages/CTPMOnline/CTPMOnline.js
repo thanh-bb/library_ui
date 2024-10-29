@@ -386,18 +386,29 @@ export class CTPMOnline extends Component {
             const decodedToken = jwtDecode(token);
             const userId = decodedToken.nameid;
 
+            // Get current date
+            const currentDate = new Date();
+
+            // Calculate due date (2 weeks later)
+            const dueDate = new Date(currentDate);
+            dueDate.setDate(dueDate.getDate() + 14); // Add 14 days
+
             const orderData = {
                 ndId: userId,
-                pmoNgayDat: new Date().toISOString(),
+                pmoNgayDat: currentDate.toISOString(), // Current date in ISO format
                 pmoLoaiGiaoHang: this.state.deliveryMethod,
                 pmoPhuongThucThanhToan: this.state.paymentMethod,
                 dcghId: this.state.selectedAddress ? this.state.selectedAddress.dcgh_Id : null,
-                pmoTrangThai: "Chờ xử lý",
+                // Set the status based on the delivery method
+                pmoTrangThai: this.state.deliveryMethod === "Giao sách tận nơi" ? "Đang chuẩn bị giao sách từ thư viện" : "Chờ nhận sách",
+                pmoHanTra: dueDate.toISOString(), // Due date in ISO format
+
                 ChiTietPhieuMuonOnlines: selectedBooks.map(book => ({
                     SId: book.s_Id,
                     CtpmoSoLuongSachMuon: 1
                 }))
             };
+
 
             fetch("https://localhost:44315/api/CTPMOnline", {
                 method: "POST",

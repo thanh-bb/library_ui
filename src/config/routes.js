@@ -27,6 +27,7 @@ const routes = {
     userhome: '/userhome',
     chitietsach: '/chitietsach/:id',
     quanlyphieumuon: '/quanlyphieumuon',
+    quanlyphieumuononline: '/quanlyphieumuononline',
     quanlyphieutra: '/quanlyphieutra',
     formphieumuon: '/chitietsach/formphieumuon/:id',
     chitietphieutra: '/chitietphieutra/:id',

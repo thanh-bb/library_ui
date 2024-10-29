@@ -39,6 +39,7 @@ import ChiTietNDDK from '~/pages/ChiTietNDDK';
 import Cart from '~/User/pages/Cart';
 import { CTPMOnline } from '~/User/pages/CTPMOnline/CTPMOnline';
 import VNPay from '~/User/pages/VNPay';
+import QuanLyPhieuMuonOnline from '~/User/pages/QuanLyPhieuMuonOnline';
 
 
 // Public routes
@@ -71,6 +72,7 @@ const publicRoutes = [
     { path: config.routes.userhome, component: UserHome, layout: UserLayout },
     { path: config.routes.chitietsach, component: ChiTietSach, layout: UserLayout },
     { path: config.routes.quanlyphieumuon, component: QuanLyPhieuMuon, layout: UserLayout },
+    { path: config.routes.quanlyphieumuononline, component: QuanLyPhieuMuonOnline, layout: UserLayout },
     { path: config.routes.quanlyphieutra, component: QuanLyPhieuTra, layout: UserLayout },
     { path: config.routes.quanlypdp_user, component: PDP_User, layout: UserLayout },
     { path: config.routes.thongtintaikhoan, component: ThongTinTaiKhoan, layout: UserLayout },

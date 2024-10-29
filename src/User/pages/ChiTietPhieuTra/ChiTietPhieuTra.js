@@ -107,7 +107,7 @@ function ChiTietPhieuTra() {
                                         </tr>
                                         <tr>
                                             <th scope="row">Trạng thái:</th>
-                                            <td > {phieumuons.TrangThai}</td>
+                                            <td > {phieumuons.TrangThaiMuon}</td>
 
                                         </tr>
                                         <tr>
@@ -135,7 +135,7 @@ function ChiTietPhieuTra() {
                                 <table className="table table-bordered fs-3">
                                     <tbody>
                                         <tr >
-                                            <th scope="row">Số phiếu</th>
+                                            <th scope="row">Số phiếu trả</th>
                                             <td >  {phieutras.PtId}</td>
 
                                         </tr >
