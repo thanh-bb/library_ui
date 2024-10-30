@@ -52,31 +52,32 @@ function Sidebar() {
                             <MenuItem
                                 title="Danh Mục"
                                 to={config.routes.danhmuc}
+                                icon=""
                             />
                             <MenuItem
                                 title="Loại sách"
                                 to={config.routes.loaisach}
-
+                                icon=""
                             />
                             <MenuItem
                                 title="Thể Loại"
                                 to={config.routes.theloai}
-
+                                icon=""
                             />
                             <MenuItem
                                 title="Nhà xuất bản"
                                 to={config.routes.NXB}
-
+                                icon=""
                             />
                             <MenuItem
                                 title="Tác Giả"
                                 to={config.routes.tacgia}
-
+                                icon=""
                             />
                             <MenuItem
                                 title="Sách"
                                 to={config.routes.sach}
-
+                                icon=""
                             />
 
                         </div>
@@ -98,17 +99,17 @@ function Sidebar() {
                             <MenuItem
                                 title="Người Dùng"
                                 to={config.routes.nguoidung}
-
+                                icon=""
                             />
                             <MenuItem
                                 title="ImportFile"
                                 to={config.routes.import}
-
+                                icon=""
                             />
                             <MenuItem
                                 title="Quản lý đăng ký mới"
                                 to={config.routes.nguoidungdangky}
-
+                                icon=""
                             />
                         </div>
                     )}
@@ -129,12 +130,12 @@ function Sidebar() {
                             <MenuItem
                                 title="Phiếu Mượn"
                                 to={config.routes.phieumuon}
-
+                                icon=""
                             />
                             <MenuItem
                                 title="Phiếu Trả"
                                 to={config.routes.phieutra}
-
+                                icon=""
                             />
                         </div>
                     )}
@@ -154,7 +155,7 @@ function Sidebar() {
                             <MenuItem
                                 title="Phiếu Đóng Phạt"
                                 to={config.routes.phieudongphat}
-
+                                icon=""
                             />
                         </div>
                     )}

@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import { ToastContainer } from 'react-toastify';
 import Login from "./Login/Login";
 import Signup from "./Signup";
+import VNPay_SU from "./User/pages/VNPay_SU";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path='/login' element={<Login />}></Route>
           <Route path='/signup' element={<Signup />}></Route>
+          <Route path='/VnpayForSignUp' element={<VNPay_SU />}></Route>
 
           {publicRoutes.map((route, index) => {
             const Page = route.component;

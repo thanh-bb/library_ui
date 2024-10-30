@@ -390,7 +390,7 @@ export class CTPMOnline extends Component {
             const currentDate = new Date();
 
             // Calculate due date (2 weeks later)
-            const dueDate = new Date(currentDate);
+            const dueDate = new Date();
             dueDate.setDate(dueDate.getDate() + 14); // Add 14 days
 
             const orderData = {

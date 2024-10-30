@@ -285,12 +285,13 @@ export class PhieuMuon extends Component {
 
     // Chuyển sang trang kế tiếp
     nextPage = () => {
-        const { currentPage } = this.state;
-        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        const { currentPage, phieumuons, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(phieumuons.length / itemsPerPage);
         this.setState({
             currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
         });
     }
+
 
     // Chuyển đến trang cụ thể
     goToPage = (pageNumber) => {

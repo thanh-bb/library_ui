@@ -40,6 +40,7 @@ import Cart from '~/User/pages/Cart';
 import { CTPMOnline } from '~/User/pages/CTPMOnline/CTPMOnline';
 import VNPay from '~/User/pages/VNPay';
 import QuanLyPhieuMuonOnline from '~/User/pages/QuanLyPhieuMuonOnline';
+import VNPay_SU from '~/User/pages/VNPay_SU';
 
 
 // Public routes
@@ -81,6 +82,7 @@ const publicRoutes = [
     { path: config.routes.giosach, component: Cart, layout: UserLayout },
     { path: config.routes.chitietphieumuonOnline, component: CTPMOnline, layout: UserLayout },
     { path: config.routes.vnpay, component: VNPay, layout: UserLayout },
+    { path: config.routes.vnpay_su, component: VNPay_SU, layout: UserLayout },
 
 ];
 

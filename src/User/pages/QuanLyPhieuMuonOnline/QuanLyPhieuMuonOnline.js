@@ -11,14 +11,15 @@ export class QuanLyPhieuMuonOnline extends Component {
         super(props);
 
         this.state = {
-            chitietpms: [],
+            chitietpmos: [],
             tenSachFilter: '',
             tensachWithoutFilter: [],// Khởi tạo mảng chitietpmsWithoutFilter
-            selectedTag: "Đang mượn",
+            selectedTag: "Nhận trực tiếp tại thư viện",
             phieumuonWithoutFilter: [],
-            phieumuons: [],
-            TrangThaiMuon: "",
-            TrangThaiXetDuyet: ""
+            phieumuononls: [],
+            PmoLoaiGiaoHang: "",
+            PmoPhuongThucThanhToan: "",
+            PmoTrangThai: ""
         }
     }
 
@@ -36,7 +37,7 @@ export class QuanLyPhieuMuonOnline extends Component {
             }
         });
 
-        this.setState({ chitietpms: sortedData });
+        this.setState({ chitietpmos: sortedData });
     }
 
     refreshList() {
@@ -45,12 +46,12 @@ export class QuanLyPhieuMuonOnline extends Component {
             const decodedToken = jwtDecode(token);
             const nd_id = decodedToken.nameid;
 
-            fetch(`https://localhost:44315/api/QuanLyPhieuMuon/${nd_id}`)
+            fetch(`https://localhost:44315/api/PhieuMuonOnline/${nd_id}`)
                 .then(response => response.json())
                 .then(data => {
                     this.setState({
-                        chitietpms: data.filter(pm => pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag),
-                        tensachWithoutFilter: data // Lưu toàn bộ dữ liệu phiếu mượn
+                        chitietpmos: data.filter(pm => pm.PmoTrangThai === this.state.selectedTag || pm.PmoLoaiGiaoHang === this.state.selectedTag || pm.PmoPhuongThucThanhToan === this.state.selectedTag),
+                        tensachWithoutFilter: data,
                     }, () => {
                         // Lọc danh sách dựa trên trạng thái đã chọn
                         this.FilterFn();
@@ -75,12 +76,12 @@ export class QuanLyPhieuMuonOnline extends Component {
         // Lọc dựa trên selectedTag
         const filteredData = tensachWithoutFilter.filter(el => {
             return (
-                el.TrangThaiMuon === selectedTag || el.TrangThaiXetDuyet === selectedTag
+                el.PmoTrangThai === selectedTag || el.PmoPhuongThucThanhToan === selectedTag || el.PmoLoaiGiaoHang === selectedTag
             );
         });
 
         console.log("Dữ liệu sau khi lọc:", filteredData); // Kiểm tra dữ liệu sau khi lọc
-        this.setState({ phieumuons: filteredData });
+        this.setState({ phieumuononls: filteredData });
     }
 
 
@@ -96,7 +97,7 @@ export class QuanLyPhieuMuonOnline extends Component {
 
     render() {
 
-        const { phieumuons, tenSachFilter } = this.state;
+        const { phieumuononls, tenSachFilter } = this.state;
 
         // const filteredChitietpms = chitietpms.filter(pm =>
         //     pm.TenSach.toLowerCase().includes(tenSachFilter.toLowerCase())
@@ -110,33 +111,33 @@ export class QuanLyPhieuMuonOnline extends Component {
                 <div className="row d-flex justify-content-end mb-3">
                     <h1 className="fw-bold mt-5 mb-5 ">Phiếu Mượn Sách Online</h1>
                     <hr></hr>
-                    <div className="col-2">
+                    <div className="col-3">
                         <button
                             type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ xét duyệt" })}
-                            onClick={() => this.handleTagSelection("Chờ xét duyệt")}
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Nhận trực tiếp tại thư viện" })}
+                            onClick={() => this.handleTagSelection("Nhận trực tiếp tại thư viện")}
 
                         >
-                            Chờ xét duyệt
+                            Nhận trực tiếp
                         </button>
                     </div>
-                    <div className="col-2">
+                    <div className="col-3">
                         <button
                             type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đang mượn" })}
-                            onClick={() => this.handleTagSelection("Đang mượn")}
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Giao sách tận nơi" })}
+                            onClick={() => this.handleTagSelection("Giao sách tận nơi")}
 
                         >
-                            Đang mượn
+                            Giao tận nơi
                         </button>
                     </div>
-                    <div className="col-2">
+                    <div className="col-3">
                         <button
                             type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đã trả" })}
-                            onClick={() => this.handleTagSelection("Đã trả")}
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đã hoàn thành" })}
+                            onClick={() => this.handleTagSelection("Đã hoàn thành")}
                         >
-                            Đã trả
+                            Đã hoàn thành
                         </button>
                     </div>
                 </div>
@@ -167,44 +168,60 @@ export class QuanLyPhieuMuonOnline extends Component {
                 <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
                     <thead >
                         <tr>
-                            <th className="text-start">ID Phiếu</th>
-                            <th className="text-start w-25">
-
-                                Tên Sách
+                            <th className="text-start">ID đơn hàng</th>
+                            <th className="text-start">Tên sách</th>
+                            <th className="text-center">
+                                Ngày đặt
                             </th>
                             <th className="text-center">Số lượng</th>
-                            <th className="text-center ">Ngày Mượn</th>
+
+                            {(selectedTag === "Nhận trực tiếp tại thư viện" && (
+                                <>
+                                    <th className="text-center ">Phương thức nhận sách</th>
+                                    <th className="text-center">Trạng Thái Nhận Sách</th>
+                                </>
+
+                            ))}
+
+                            {(selectedTag !== "Nhận trực tiếp tại thư viện" && (
+                                <>
+                                    <th className="text-center">Phương Thức Thanh Toán</th>
+                                    <th className="text-center">Trạng Thái Thanh Toán</th>
+                                    <th className="text-center">Trạng Thái Giao Hàng</th>
+                                </>
+
+                            ))}
+
                             <th className="text-center ">Hạn Trả</th>
-                            <th className="text-center">Trạng Thái</th>
                             <th className="text-center">Options</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {phieumuons.map(dep =>
-                            <tr key={dep.Id_PhieuMuon}>
-                                <td className="text-start">{dep.Id_PhieuMuon}</td>
+                        {phieumuononls.map(dep =>
+                            <tr key={dep.PmoId}>
+                                <td className="text-start">{dep.PmoId}</td>
                                 <td className="text-start">{dep.TenSach}</td>
+                                <td className="text-center">{new Date(dep.PmoNgayDat).toLocaleDateString('en-GB')}</td>
                                 <td className="text-center">{dep.SoLuongSach}</td>
-                                <td className="text-center">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
+
+
+                                {(selectedTag === "Nhận trực tiếp tại thư viện" &&
+                                    <>
+                                        <td className="text-center">{dep.PmoLoaiGiaoHang}</td>
+                                        <td className="text-center">{dep.PmoTrangThai}</td>
+                                    </>
+                                )}
+
+                                {(selectedTag !== "Nhận trực tiếp tại thư viện" &&
+                                    <>
+                                        <td className="text-center">{dep.TtPhuongThuc}</td>
+                                        <td className="text-center">{dep.TtTrangThai}</td>
+                                        <td className="text-center">{dep.PmoTrangThai}</td>
+                                    </>
+                                )}
+
+
                                 <td className="text-center">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
-                                <td className="text-center">
-                                    {dep.TrangThaiMuon === "Đã trả" ? (
-                                        (new Date(dep.HanTra) - new Date()) < 0 ?
-                                            `Đã trả - Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày` :
-                                            "Đã trả - Đúng hạn"
-                                    ) : dep.TrangThaiMuon === "Đang mượn" ? (
-                                        (new Date(dep.HanTra) - new Date()) < 0 ?
-                                            `${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn)` :
-                                            `Đang mượn - Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày đến hạn`
-                                    ) : dep.TrangThaiXetDuyet === "Chờ xét duyệt" ? (
-                                        "Chờ xét duyệt"
-                                    ) : (
-                                        "Trạng thái không xác định"
-
-                                    )}
-                                </td>
-
-
                                 <td className="text-center">
                                     <Link type="button" to={`/chitietphieutra/${dep.Id_PhieuMuon}`} className={`btn btn-link fs-4`}>Xem chi tiết</Link>
                                 </td>

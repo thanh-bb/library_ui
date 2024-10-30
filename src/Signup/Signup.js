@@ -123,10 +123,25 @@ export class Signup extends Component {
         })
             .then(res => res.json())
             .then((result) => {
-                alert(result);
-                window.location.href = '/';
+                alert("Đăng ký thành công!");
+
+                // Kiểm tra nếu phương thức thanh toán là VNPAY, điều hướng tới URL VNPAY
+                if (this.state.nddk_HinhThucTraPhi === "Trả phí qua VNPAY") {
+                    const customerName = this.state.nddk_HoTen;
+                    const amount = prices[this.state.nddk_ThoiGianSuDung];  // Sử dụng giá từ gói hội viên
+                    const orderDescription = "Thanh toán phí hội viên";
+
+                    const paymentUrl = `https://localhost:44393/Home/Index1/?customerName=${encodeURIComponent(customerName)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}&orderId=${result}`;
+
+                    setTimeout(() => {
+                        window.location.href = paymentUrl;
+                    }, 500); // Thời gian chờ trước khi chuyển hướng
+                } else {
+                    // Nếu không chọn VNPAY, quay lại trang chủ hoặc trang khác
+                    window.location.href = '/';
+                }
             }, (error) => {
-                alert('Failed');
+                alert('Failed to register');
             });
 
     }

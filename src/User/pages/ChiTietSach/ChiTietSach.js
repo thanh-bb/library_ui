@@ -120,7 +120,7 @@ function ChiTietSach() {
                 const checkBorrowStatus = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckMuon/${userId}/${id}`);
                 if (checkBorrowStatus.ok) {
                     const result = await checkBorrowStatus.json();
-                    if (result === 'Chờ xét duyệt' || result === 'Đang mượn') {
+                    if (result === 'Chờ xét duyệt' || result === 'Đang mượn' || result === 'Đã trả') {
                         setIsBookBorrowed(true);
                     }
                 }

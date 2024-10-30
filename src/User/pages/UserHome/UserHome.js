@@ -211,7 +211,7 @@ export class UserHome extends Component {
                             </div>
                             <div className="col-4">
                                 <div className={cx('board-item')}>
-                                    <p className="fw-bold p-3 mx-2">Bảng xếp hạng bạn đọc:</p>
+                                    <p className="fw-bold p-3 mx-2">Bảng xếp hạng bạn đọc (hình thức mượn trực tiếp):</p>
                                     <table className={cx("table", "text-center", "fs-3")}>
                                         <thead>
                                             <tr>

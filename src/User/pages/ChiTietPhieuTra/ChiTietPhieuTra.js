@@ -38,6 +38,7 @@ function ChiTietPhieuTra() {
                     const data = await response.json();
                     setPhieuTras(data[0]);
                     setLoading(false);
+                    console.log(data)
                 } else {
                     throw new Error('Failed to fetch data');
                 }

@@ -47,12 +47,16 @@ export class ThongTinTaiKhoan extends Component {
         this.refreshList();
     }
 
+    handlePasswordChange = () => {
+        console.log("Đổi mật khẩu button clicked");
+        // Add any functionality for password change here
+    }
 
     render() {
         const {
             thongtins
         } = this.state;
-        console.log(thongtins)
+        //console.log(thongtins)
         return (
             <div className={cx('wrapper')}>
                 <div className={cx("container")}>
@@ -159,9 +163,11 @@ export class ThongTinTaiKhoan extends Component {
                                             <button
                                                 type="button"
                                                 className={cx('btn-continue')}
-                                                onClick={""}
-                                            >   Đổi mật khẩu
+                                                onClick={this.handlePasswordChange}
+                                            >
+                                                Đổi mật khẩu
                                             </button>
+
 
                                         </div>
                                     </div>
