@@ -208,7 +208,7 @@ export class NXB extends Component {
     // Chuyển sang trang kế tiếp
     nextPage = () => {
         const { currentPage } = this.state;
-        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        const totalPages = Math.ceil(this.state.nxbs.length / this.state.itemsPerPage);
         this.setState({
             currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
         });

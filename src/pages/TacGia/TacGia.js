@@ -159,7 +159,7 @@ export class TacGia extends Component {
         })
             .then(res => res.json())
             .then((result) => {
-                alert(result);
+                alert("Cập nhật thành công");
                 this.refreshList();
                 this.clearForm();
             }, (error) => {
@@ -204,7 +204,7 @@ export class TacGia extends Component {
     // Chuyển sang trang kế tiếp
     nextPage = () => {
         const { currentPage } = this.state;
-        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        const totalPages = Math.ceil(this.state.tacgias.length / this.state.itemsPerPage);
         this.setState({
             currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
         });

@@ -112,6 +112,11 @@ function ChiTietPhieuTra() {
 
                                         </tr>
                                         <tr>
+                                            <th scope="row">Trạng thái xét duyệt:</th>
+                                            <td > {phieumuons.TrangThaiXetDuyet}</td>
+
+                                        </tr>
+                                        <tr>
                                             <th scope="row">Ngày mượn:</th>
                                             <td > {new Date(phieumuons.NgayMuon).toLocaleDateString('en-GB')}</td>
 

@@ -164,6 +164,7 @@ export class UserHome extends Component {
         this.setState({ selectedCategory: tl_Id });
     };
 
+
     render() {
         const {
             sachs,
@@ -189,6 +190,10 @@ export class UserHome extends Component {
         const filteredBooks = selectedCategory
             ? sachs.filter(book => book.tl_Id === selectedCategory && book.s_TrangThaiMuon === true)
             : sachs.filter(book => book.s_TrangThaiMuon === true);
+
+        const categoriesWithBooks = theloais.filter(category =>
+            sachs.some(book => book.tl_Id === category.tl_Id)
+        );
 
 
         return (
@@ -284,12 +289,19 @@ export class UserHome extends Component {
                                     {/* hiển thị phân loại */}
                                     <div className="float-start mx-5">
 
-                                        <div className={cx("btn btn-outline-primary me-4 rounded-pill mx-2")} onClick={() => this.setSelectedCategory(null)}>
-                                            <p className="mb-0 fs-4" >All</p>
+                                        <div
+                                            className={cx("btn btn-outline-primary me-4 rounded-pill mx-2 mb-4", {
+                                                selected: selectedCategory === null
+                                            })}
+                                            onClick={() => this.setSelectedCategory(null)}
+                                        >
+                                            <p className="mb-0 fs-4">All</p>
                                         </div>
-                                        {theloais?.map(dep =>
+                                        {categoriesWithBooks?.map(dep =>
                                             <div
-                                                className={cx("btn btn-outline-primary rounded-pill mx-2")}
+                                                className={cx("btn btn-outline-primary rounded-pill mx-2 mb-4", {
+                                                    selected: selectedCategory === dep.tl_Id
+                                                })}
                                                 key={dep.tl_Id}
                                                 onClick={() => this.setSelectedCategory(dep.tl_Id)}
                                             >
@@ -321,7 +333,7 @@ export class UserHome extends Component {
                                                 </div>
                                                 <div>
                                                     <h4 className="mt-2">
-                                                        {dep.s_TenSach.length > 20 ? dep.s_TenSach.substring(0, 50) + "..." : dep.s_TenSach}
+                                                        {dep.s_TenSach.length > 19 ? dep.s_TenSach.substring(0, 19) + "..." : dep.s_TenSach}
                                                     </h4>
                                                     <h5>{getAuthorNameById(dep.tg_Id)}</h5>
                                                 </div>

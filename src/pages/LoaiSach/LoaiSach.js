@@ -203,7 +203,7 @@ export class LoaiSach extends Component {
     // Chuyển sang trang kế tiếp
     nextPage = () => {
         const { currentPage } = this.state;
-        const totalPages = Math.ceil(this.state.danhmucs.length / this.state.itemsPerPage);
+        const totalPages = Math.ceil(this.state.loaisachs.length / this.state.itemsPerPage);
         this.setState({
             currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
         });

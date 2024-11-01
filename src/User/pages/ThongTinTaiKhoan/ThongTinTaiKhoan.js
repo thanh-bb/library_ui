@@ -138,7 +138,7 @@ export class ThongTinTaiKhoan extends Component {
 
                                             <div className="form-group mb-3">
                                                 <label className="fw-medium">Thuộc đối tượng người dùng</label>
-                                                : {thongtins?.lnd_LoaiNguoiDung}
+                                                : {thongtins?.lnd_LoaiNguoiDung === 1 ? "Sinh viên của trường" : "Bạn đọc ngoài nhà trường"}
                                             </div>
 
                                             <div className="form-group mb-3 text-success fw-bold">

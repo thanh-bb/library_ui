@@ -143,3 +143,9 @@
     height: 40px;
     width: 100%;
 }
+
+.selected {
+    background-color: #2b6dff; /* Màu nền khi chọn */
+    color: #fff; /* Màu chữ khi chọn */
+    font-weight: bold;
+}
