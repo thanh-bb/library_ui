@@ -377,10 +377,10 @@ export class CTPMOnline extends Component {
     }
 
     handleOrderSubmit = () => {
-        if (this.state.deliveryMethod === "Giao sách tận nơi" && !this.state.selectedAddress) {
-            alert("Vui lòng cung cấp địa chỉ giao sách.");
-            return;
-        }
+        // if (this.state.deliveryMethod === "Giao sách tận nơi" && !this.state.selectedAddress) {
+        //     alert("Vui lòng cung cấp địa chỉ giao sách.");
+        //     return;
+        // }
 
         if (token) {
             const decodedToken = jwtDecode(token);
@@ -439,7 +439,7 @@ export class CTPMOnline extends Component {
                             }, 500); // Chờ 0.5 giây để đảm bảo pmo_Id đã được lưu
                         } else {
                             alert("Đặt sách thành công!");
-                            window.location.href = '/quanlyphieumuon';
+                            window.location.href = '/quanlyphieumuononline';
                         }
                     } else {
                         console.error("Không nhận được pmo_Id từ backend.");
@@ -513,8 +513,8 @@ export class CTPMOnline extends Component {
                             <div className="col-6">
                                 <div className="row d-flex justify-content-center p-5 ">
                                     <div className="col border border border-dark-subtle p-5 pt-3">
-                                        <h2>Thông tin nhận sách</h2>
-                                        {this.state.selectedAddress ? (
+                                        <h2>Thông tin địa chỉ nhận sách</h2>
+                                        {/* {this.state.selectedAddress ? (
                                             <div className="row d-flex justify-content-start mt-5">
                                                 <div className="form-group mb-3">
                                                     <label className="fw-medium">Họ tên<span className="text-danger">*</span></label>
@@ -547,15 +547,17 @@ export class CTPMOnline extends Component {
 
                                         ) : (
                                             <p>Không có địa chỉ nào được chọn.</p>
-                                        )}
+                                        )} */}
+
+                                        <p>Thư viện Trường Đại học Cần Thơ,  Khu II, Đ. 3 Tháng 2, Xuân Khánh, Ninh Kiều, Cần Thơ</p>
                                         <div className="col-4 float-end">
 
-                                            <button type="button"
+                                            {/* <button type="button"
                                                 className={cx('btn-continue')}
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#exampleModal">
                                                 Thay đổi
-                                            </button>
+                                            </button> */}
 
 
                                             <div className="modal fade" id="exampleModal" tabIndex="-1" aria-hidden="true">
@@ -735,7 +737,7 @@ export class CTPMOnline extends Component {
                                 </div>
 
                                 {/* Giao sách tận nơi */}
-                                <div className="form-check" onClick={() => document.getElementById('flexRadioDefault2').click()}>
+                                {/* <div className="form-check" onClick={() => document.getElementById('flexRadioDefault2').click()}>
                                     <input
                                         value="Giao sách tận nơi"
                                         checked={deliveryMethod === "Giao sách tận nơi"}
@@ -754,10 +756,10 @@ export class CTPMOnline extends Component {
                                         Giao sách tận nơi
 
                                     </p>
-                                </div>
+                                </div> */}
 
                                 {/* Show additional radio options only when 'Giao sách tận nơi' is selected */}
-                                {deliveryMethod === 'Giao sách tận nơi' && (
+                                {/* {deliveryMethod === 'Giao sách tận nơi' && (
                                     <div>
                                         <div className="form-check mx-5" onClick={() => document.getElementById('flexRadioCOD').click()}>
                                             <input
@@ -806,7 +808,7 @@ export class CTPMOnline extends Component {
                                             </p>
                                         </div>
                                     </div>
-                                )}
+                                )} */}
                             </div>
 
                             <div className="col-6">

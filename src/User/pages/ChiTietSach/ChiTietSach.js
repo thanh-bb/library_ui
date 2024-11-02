@@ -120,7 +120,7 @@ function ChiTietSach() {
                 const checkBorrowStatus = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckMuon/${userId}/${id}`);
                 if (checkBorrowStatus.ok) {
                     const result = await checkBorrowStatus.json();
-                    if (result === 'Chờ xét duyệt' || result === 'Đang mượn' || result === 'Đã trả') {
+                    if (result === 'Chờ xét duyệt' || result === 'Đang mượn') {
                         setIsBookBorrowed(true);
                     }
                 }
@@ -129,7 +129,7 @@ function ChiTietSach() {
                 const checkOnlineBorrowStatus = await fetch(`https://localhost:44315/api/PhieuMuonOnline/CheckMuonOnl/${userId}/${id}`);
                 if (checkOnlineBorrowStatus.ok) {
                     const onlineResult = await checkOnlineBorrowStatus.json();
-                    if (onlineResult === 'Chờ xử lý') {
+                    if (onlineResult === "Chờ nhận sách" || onlineResult === "Đang chuẩn bị giao sách từ thư viện" || onlineResult === "Ðon hàng đã được tạo") {
                         setIsBookBorrowed(true);
                     }
                 }

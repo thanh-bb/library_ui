@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom'; // Thêm Link vào imports
 import classNames from 'classnames/bind';
 import styles from './ChiTietPhieuTra.module.scss';
 
@@ -7,7 +7,6 @@ const cx = classNames.bind(styles);
 
 function ChiTietPhieuTra() {
     let { id } = useParams();
-
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,28 +21,28 @@ function ChiTietPhieuTra() {
                 if (response.ok) {
                     const data = await response.json();
                     setPhieuMuons(data[0]);
-                    setLoading(false);
                 } else {
                     throw new Error('Failed to fetch data');
                 }
             } catch (error) {
                 setError(error.message);
+            } finally {
                 setLoading(false);
             }
         };
+
         const fetchPhieuTra = async () => {
             try {
                 const response = await fetch(`https://localhost:44315/api/QuanLyPhieuTra/${id}`);
                 if (response.ok) {
                     const data = await response.json();
                     setPhieuTras(data[0]);
-                    setLoading(false);
-                    console.log(data)
                 } else {
                     throw new Error('Failed to fetch data');
                 }
             } catch (error) {
                 setError(error.message);
+            } finally {
                 setLoading(false);
             }
         };
@@ -62,12 +61,9 @@ function ChiTietPhieuTra() {
             }
         };
 
-
         fetchPhieuMuon();
         fetchPhieuTra();
         fetchTacGia();
-
-
     }, [id]);
 
     if (loading) {
@@ -78,55 +74,44 @@ function ChiTietPhieuTra() {
         return <p>Error: {error}</p>;
     }
 
-
-
     return (
         <div className={cx('wrapper')}>
             <div className="row m-5 ">
-
-
                 <div className="col-md-6">
                     <div className='text-start'>
                         {phieumuons && (
-                            <> <h2 className='text-center'>Thông tin mượn</h2>
+                            <>
+                                <h2 className='text-center'>Thông tin mượn</h2>
                                 <table className="table table-bordered fs-3">
                                     <tbody>
-                                        <tr >
+                                        <tr>
                                             <th scope="row">Số phiếu</th>
-                                            <td > {phieumuons.Id_PhieuMuon}</td>
-
-                                        </tr >
-                                        <tr >
-                                            <th scope="row">Tên sách: </th>
+                                            <td>{phieumuons.Id_PhieuMuon}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Tên sách:</th>
                                             <td>{phieumuons.TenSach}</td>
-
                                         </tr>
                                         <tr>
                                             <th scope="row">Số lượng sách:</th>
                                             <td>{phieumuons.SoLuongSach}</td>
-
                                         </tr>
                                         <tr>
                                             <th scope="row">Trạng thái:</th>
-                                            <td > {phieumuons.TrangThaiMuon}</td>
-
+                                            <td>{phieumuons.TrangThaiMuon}</td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Trạng thái xét duyệt:</th>
-                                            <td > {phieumuons.TrangThaiXetDuyet}</td>
-
+                                            <td>{phieumuons.TrangThaiXetDuyet}</td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Ngày mượn:</th>
-                                            <td > {new Date(phieumuons.NgayMuon).toLocaleDateString('en-GB')}</td>
-
+                                            <td>{new Date(phieumuons.NgayMuon).toLocaleDateString('en-GB')}</td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Hạn trả sách:</th>
-                                            <td >  {new Date(phieumuons.HanTra).toLocaleDateString('en-GB')}</td>
-
+                                            <td>{new Date(phieumuons.HanTra).toLocaleDateString('en-GB')}</td>
                                         </tr>
-
                                     </tbody>
                                 </table>
                             </>
@@ -140,41 +125,38 @@ function ChiTietPhieuTra() {
                                 <h2 className='text-center'>Thông tin trả</h2>
                                 <table className="table table-bordered fs-3">
                                     <tbody>
-                                        <tr >
-                                            <th scope="row">Số phiếu trả</th>
-                                            <td >  {phieutras.PtId}</td>
-
-                                        </tr >
                                         <tr>
-                                            <th scope="row">Ngày Trả: </th>
-                                            <td >  {new Date(phieutras.PtNgayTra).toLocaleDateString('en-GB')}</td>
-
+                                            <th scope="row">Số phiếu trả</th>
+                                            <td>{phieutras.PtId}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Ngày Trả:</th>
+                                            <td>{new Date(phieutras.PtNgayTra).toLocaleDateString('en-GB')}</td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Số lượng sách trả:</th>
-                                            <td >  {phieutras.CtptSoLuongSachTra}</td>
-
+                                            <td>{phieutras.CtptSoLuongSachTra}</td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Số ngày trễ hạn:</th>
                                             <td className='text-danger fw-bold'>
                                                 {phieutras.SoNgayTre <= 0 ? "Đúng hạn" : `${phieutras.SoNgayTre} ngày (Trễ hạn)`}
                                             </td>
-
                                         </tr>
-
                                     </tbody>
                                 </table>
-
+                                {phieumuons.TrangThaiMuon === "Đã trả" && ( // Kiểm tra trạng thái
+                                    <Link to={`/chitietsach/${phieumuons.Id_Sach}`} className={cx('col', 'btn-return')}>
+                                        Mượn lại
+                                    </Link>
+                                )}
                             </>
                         )}
                     </div>
                 </div>
             </div>
         </div>
-
     );
 }
-
 
 export default ChiTietPhieuTra;

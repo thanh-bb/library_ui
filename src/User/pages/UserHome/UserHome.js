@@ -269,7 +269,7 @@ export class UserHome extends Component {
                                             </div>
                                             <div>
                                                 <h4 className="mt-2">
-                                                    {dep.STenSach.length > 20 ? dep.STenSach.substring(0, 50) + "..." : dep.STenSach}
+                                                    {dep.STenSach.length > 19 ? dep.STenSach.substring(0, 19) + "..." : dep.STenSach}
                                                 </h4>
                                                 <h5>{getAuthorNameById(dep.TgId)}</h5>
                                             </div>
