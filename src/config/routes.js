@@ -16,6 +16,8 @@ const routes = {
     chitietNDDK: '/admin/chitietNDDK/:id',
     phieumuon: '/admin/phieumuon',
     phieutra: '/admin/phieutra',
+    phieumuononline: '/admin/phieumuononline',
+    phieutraonline: '/admin/phieutraonline',
     phieudongphat: '/admin/phieudongphat',
     quanlypdp: '/admin/phieudongphat/quanly',
     NXB: '/admin/NXB',

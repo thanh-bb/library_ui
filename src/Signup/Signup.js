@@ -32,7 +32,7 @@ export class Signup extends Component {
             nddk_NgayDangKy: "",
             nddk_ThoiGianSuDung: "6 tháng",
             nddk_HinhThucTraPhi: "Trả phí trực tiếp bằng tiền mặt",
-            nddk_TrangThaiThanhToan: "",
+            nddk_TrangThaiThanhToan: "Chờ thanh toán",
             nddk_TrangThaiDuyet: "Chưa xét duyệt",
             currentStep: 1, // Step 1: Personal Information, Step 2: Payment Method
             buttonText: "Đăng ký",
@@ -117,7 +117,7 @@ export class Signup extends Component {
                 nddkNgayDangKy: new Date().toISOString(),
                 nddkThoiGianSuDung: this.state.nddk_ThoiGianSuDung,
                 nddkHinhThucTraPhi: this.state.nddk_HinhThucTraPhi,
-                nddkTrangThaiThanhToan: "",
+                nddkTrangThaiThanhToan: "Chờ thanh toán",
                 nddkTrangThaiDuyet: "Chưa xét duyệt",
             })
         })
@@ -125,24 +125,30 @@ export class Signup extends Component {
             .then((result) => {
                 alert("Đăng ký thành công!");
 
-                // Kiểm tra nếu phương thức thanh toán là VNPAY, điều hướng tới URL VNPAY
-                if (this.state.nddk_HinhThucTraPhi === "Trả phí qua VNPAY") {
-                    const customerName = this.state.nddk_HoTen;
-                    const amount = prices[this.state.nddk_ThoiGianSuDung];  // Sử dụng giá từ gói hội viên
-                    const orderDescription = "Thanh toán phí hội viên";
+                if (result) {
+                    // Lưu pmo_Id vào localStorage khi tạo phiếu mượn thành công
+                    localStorage.setItem("nddk_Id", result);
 
-                    const paymentUrl = `https://localhost:44393/Home/Index1/?customerName=${encodeURIComponent(customerName)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}&orderId=${result}`;
+                    // Kiểm tra nếu phương thức thanh toán là VNPAY, điều hướng tới URL VNPAY
+                    if (this.state.nddk_HinhThucTraPhi === "Trả phí qua VNPAY") {
+                        const customerName = this.state.nddk_HoTen;
+                        const amount = prices[this.state.nddk_ThoiGianSuDung];  // Sử dụng giá từ gói hội viên
+                        const orderDescription = "Thanh toán phí hội viên";
 
-                    setTimeout(() => {
-                        window.location.href = paymentUrl;
-                    }, 500); // Thời gian chờ trước khi chuyển hướng
-                } else {
-                    // Nếu không chọn VNPAY, quay lại trang chủ hoặc trang khác
-                    window.location.href = '/';
+                        const paymentUrl = `https://localhost:44393/Home/Index1/?customerName=${encodeURIComponent(customerName)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}&orderId=${result}`;
+
+                        setTimeout(() => {
+                            window.location.href = paymentUrl;
+                        }, 500); // Thời gian chờ trước khi chuyển hướng
+                    } else {
+                        // Nếu không chọn VNPAY, quay lại trang chủ hoặc trang khác
+                        window.location.href = '/';
+                    }
                 }
             }, (error) => {
                 alert('Failed to register');
             });
+
 
     }
 

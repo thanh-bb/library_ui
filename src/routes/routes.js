@@ -41,6 +41,8 @@ import { CTPMOnline } from '~/User/pages/CTPMOnline/CTPMOnline';
 import VNPay from '~/User/pages/VNPay';
 import QuanLyPhieuMuonOnline from '~/User/pages/QuanLyPhieuMuonOnline';
 import VNPay_SU from '~/User/pages/VNPay_SU';
+import PhieuMuonOnline from '~/pages/PhieuMuonOnline';
+import PhieuTraOnline from '~/pages/PhieuTraOnline';
 
 
 // Public routes
@@ -59,6 +61,9 @@ const publicRoutes = [
     { path: config.routes.theloai, component: TheLoai },
     { path: config.routes.phieumuon, component: PhieuMuon },
     { path: config.routes.phieutra, component: PhieuTra },
+    { path: config.routes.phieumuononline, component: PhieuMuonOnline },
+    { path: config.routes.phieutraonline, component: PhieuTraOnline },
+
     { path: config.routes.phieudongphat, component: PhieuDongPhat },
     { path: config.routes.quanlypdp, component: QuanLyPDP },
     { path: config.routes.upload, component: Upload, layout: HeaderOnly },

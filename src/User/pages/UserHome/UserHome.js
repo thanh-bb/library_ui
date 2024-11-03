@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import classNames from 'classnames/bind';
 import styles from './UserHome.module.scss';
-import images from "~/assets/images";
+// import images from "~/assets/images";
 import { Link } from "react-router-dom";
 
 const cx = classNames.bind(styles);
@@ -50,8 +50,37 @@ export class UserHome extends Component {
             selectedCategories: null,
             bookImages: {},
 
+            // Pagination states
+            currentPage: 1,
+            booksPerPage: 10,
+            prominentCurrentPage: 1,
+            prominentItemsPerPage: 12,
+            categoriesCurrentPage: 1,
+            categoriesItemsPerPage: 12
+
         };
     }
+
+
+    // Pagination control functions
+    handleProminentPageChange = (pageNumber) => {
+        this.setState({ prominentCurrentPage: pageNumber });
+    };
+
+    handleCategoriesPageChange = (pageNumber) => {
+        this.setState({ categoriesCurrentPage: pageNumber });
+    };
+
+    // handleCategoryChange = (categoryId) => {
+    //     this.setState({
+    //         selectedCategory: categoryId,
+    //         currentPage: 1, // Reset trang về 1 khi chọn thể loại mới
+    //     });
+    // };
+
+    // handlePageChange = (pageNumber) => {
+    //     this.setState({ currentPage: pageNumber });
+    // };
 
 
     refreshList() {
@@ -64,8 +93,9 @@ export class UserHome extends Component {
 
                 this.setState({
                     sachs: availableBooks,
-                    sachsWithoutFilter: availableBooks
-                });
+                    sachsWithoutFilter: availableBooks,
+                    currentPage: 1
+                }, this.updateCurrentBooks);
 
                 // Fetch images for each book after the filtered book list is loaded
                 availableBooks.forEach(book => {
@@ -159,9 +189,75 @@ export class UserHome extends Component {
         this.fetchRankingData();
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        // Nếu thể loại hoặc số trang thay đổi, tự động làm mới sách
+        if (
+            prevState.selectedCategory !== this.state.selectedCategory ||
+            prevState.currentPage !== this.state.currentPage
+        ) {
+            this.updateCurrentBooks();
+        }
+    }
+
     // Function to set the selected category
     setSelectedCategory = (tl_Id) => {
-        this.setState({ selectedCategory: tl_Id });
+        this.setState(
+            {
+                selectedCategory: tl_Id,
+                categoriesCurrentPage: 1
+            },
+            this.updateCurrentBooks
+        );
+    };
+
+    // Thay đổi thể loại và reset về trang 1
+    handleCategoryChange = (categoryId) => {
+        this.setState(
+            {
+                selectedCategory: categoryId,
+                currentPage: 1 // Đặt lại về trang 1 khi chọn thể loại mới
+            },
+            this.updateCurrentBooks // Gọi ngay để cập nhật danh sách sách
+        );
+    };
+
+    // Cập nhật danh sách sách hiện tại dựa trên `selectedCategory` và `currentPage`
+
+    updateCurrentBooks = () => {
+        const { sachs, selectedCategory, categoriesCurrentPage, categoriesItemsPerPage } = this.state;
+
+        const filteredBooks = sachs.filter(book =>
+            selectedCategory ? book.tl_Id === selectedCategory && book.s_TrangThaiMuon === true : book.s_TrangThaiMuon === true
+        );
+
+        const categoriesIndexOfLastItem = categoriesCurrentPage * categoriesItemsPerPage;
+        const categoriesIndexOfFirstItem = categoriesIndexOfLastItem - categoriesItemsPerPage;
+        const currentCategoryBooks = filteredBooks.slice(categoriesIndexOfFirstItem, categoriesIndexOfLastItem);
+
+        this.setState({ currentCategoryBooks });
+    };
+
+    handlePageChange = (pageNumber) => {
+        this.setState({ categoriesCurrentPage: pageNumber }, this.updateCurrentBooks);
+    };
+
+
+
+    renderPagination = (items, itemsPerPage, currentPage, handlePageChange) => {
+        const totalPages = Math.ceil(items.length / itemsPerPage);
+        return (
+            <div className={cx("pagination")}>
+                {[...Array(totalPages)].map((_, index) => (
+                    <button
+                        key={index}
+                        onClick={() => handlePageChange(index + 1)}
+                        className={cx("page-btn", { active: currentPage === index + 1 })}
+                    >
+                        {index + 1}
+                    </button>
+                ))}
+            </div>
+        );
     };
 
 
@@ -170,31 +266,46 @@ export class UserHome extends Component {
             sachs,
             PhotoPath,
             tacgias = [],
-            theloais = [],
+            //      theloais = [],
             selectedCategory,
-            hinhminhhoas,
             listsachnoibats,
-            ranking
+            ranking,
+            prominentCurrentPage,
+            prominentItemsPerPage,
+            categoriesCurrentPage,
+            categoriesItemsPerPage,
+
         } = this.state;
 
         const getAuthorNameById = (tg_Id) => {
             const author = tacgias.find(author => author.tg_Id === tg_Id);
             return author ? author.tg_TenTacGia : "Unknown Author";
         };
-        const getTheLoaiById = (tl_Id) => {
-            const tl = theloais.find(tl => tl.tl_Id === tl_Id);
-            return tl ? tl.tl_TenTheLoai : "Không xác định";
-        };
+
+        // const getTheLoaiById = (tl_Id) => {
+        //     const tl = theloais.find(tl => tl.tl_Id === tl_Id);
+        //     return tl ? tl.tl_TenTheLoai : "Không xác định";
+        // };
 
         // Filter books based on selected category and TrangThaiMuon
         const filteredBooks = selectedCategory
             ? sachs.filter(book => book.tl_Id === selectedCategory && book.s_TrangThaiMuon === true)
             : sachs.filter(book => book.s_TrangThaiMuon === true);
 
-        const categoriesWithBooks = theloais.filter(category =>
-            sachs.some(book => book.tl_Id === category.tl_Id)
+        // Lọc các thể loại có ít nhất một cuốn sách
+        const categoriesWithBooks = this.state.theloais.filter(category =>
+            this.state.sachs.some(book => book.tl_Id === category.tl_Id)
         );
 
+
+        // Helper functions for pagination
+        const prominentIndexOfLastItem = prominentCurrentPage * prominentItemsPerPage;
+        const prominentIndexOfFirstItem = prominentIndexOfLastItem - prominentItemsPerPage;
+        const currentProminentBooks = listsachnoibats.slice(prominentIndexOfFirstItem, prominentIndexOfLastItem);
+
+        const categoriesIndexOfLastItem = categoriesCurrentPage * categoriesItemsPerPage;
+        const categoriesIndexOfFirstItem = categoriesIndexOfLastItem - categoriesItemsPerPage;
+        const currentCategoryBooks = filteredBooks.slice(categoriesIndexOfFirstItem, categoriesIndexOfLastItem);
 
         return (
             <div className={cx('wrapper')}>
@@ -239,56 +350,38 @@ export class UserHome extends Component {
                             </div>
                         </div>
 
+                        {/* Top Sách Nổi Bật */}
                         <div className="row mt-3 mt-5">
                             <div className={cx("prominent")}>
                                 <p className="fw-bold p-3 mx-2">Top những sách nổi bật</p>
-
                                 <div className={cx("d-flex", "justify-content-around", "flex-wrap")}>
-
-                                    {listsachnoibats.map(dep => (
+                                    {currentProminentBooks.map(dep => (
                                         <div className={cx("book-item")} key={dep.SId}>
                                             <div className={cx("book-image-container")}>
-                                                {this.state.bookImages[dep.SId]?.[0]?.hmh_HinhAnhMaHoa ? (
-                                                    <img
-                                                        src={`${PhotoPath}${this.state.bookImages[dep.SId]?.[0]?.hmh_HinhAnhMaHoa}`}
-                                                        alt={dep.STenSach}
-
-
-                                                        className={cx("book-cover")}
-                                                    />
-                                                ) : (
-                                                    <img
-                                                        alt="Không có hình ảnh"
-                                                        src="https://example.com/default-image.jpg"  // Đường dẫn ảnh mặc định nếu không có hình
-                                                    />
-                                                )}
-                                                {/* Lớp phủ và chữ "Xem chi tiết" */}
+                                                <img
+                                                    src={`${PhotoPath}${this.state.bookImages[dep.SId]?.[0]?.hmh_HinhAnhMaHoa || 'default-image.jpg'}`}
+                                                    alt={dep.STenSach}
+                                                    className={cx("book-cover")}
+                                                />
                                                 <Link to={`/chitietsach/${dep.SId}`} className={cx("overlay")}>
                                                     <span className={cx("view-detail-text")}>Xem chi tiết</span>
                                                 </Link>
                                             </div>
-                                            <div>
-                                                <h4 className="mt-2">
-                                                    {dep.STenSach.length > 19 ? dep.STenSach.substring(0, 19) + "..." : dep.STenSach}
-                                                </h4>
-                                                <h5>{getAuthorNameById(dep.TgId)}</h5>
-                                            </div>
+                                            <h4 className="mt-2">
+                                                {dep.STenSach.length > 19 ? `${dep.STenSach.substring(0, 19)}...` : dep.STenSach}
+                                            </h4>
+                                            <h5>{getAuthorNameById(dep.TgId)}</h5>
                                         </div>
-
                                     ))}
-
                                 </div>
-                            </div>
+                                {this.renderPagination(listsachnoibats, prominentItemsPerPage, prominentCurrentPage, this.handleProminentPageChange)}                            </div>
                         </div>
-
+                        {/* Phân loại sách */}
                         <div className="row mt-3 mt-5">
                             <div className={cx("categories")}>
                                 <p className="fw-bold p-3 mx-2">Categories</p>
                                 <div className="d-flex flex-column">
-
-                                    {/* hiển thị phân loại */}
                                     <div className="float-start mx-5">
-
                                         <div
                                             className={cx("btn btn-outline-primary me-4 rounded-pill mx-2 mb-4", {
                                                 selected: selectedCategory === null
@@ -297,7 +390,7 @@ export class UserHome extends Component {
                                         >
                                             <p className="mb-0 fs-4">All</p>
                                         </div>
-                                        {categoriesWithBooks?.map(dep =>
+                                        {categoriesWithBooks.map(dep => (
                                             <div
                                                 className={cx("btn btn-outline-primary rounded-pill mx-2 mb-4", {
                                                     selected: selectedCategory === dep.tl_Id
@@ -307,42 +400,31 @@ export class UserHome extends Component {
                                             >
                                                 <p className="mb-0 fs-4">{dep.tl_TenTheLoai}</p>
                                             </div>
-                                        )}
+                                        ))}
                                     </div>
 
                                     <div className={cx("d-flex", "justify-content-around", "flex-wrap")}>
-                                        {filteredBooks.map(dep => (
+                                        {currentCategoryBooks.map(dep => (
                                             <div className={cx("book-item", "pb-5")} key={dep.s_Id}>
                                                 <div className={cx("book-image-container")}>
-                                                    {this.state.bookImages[dep.s_Id]?.[0]?.hmh_HinhAnhMaHoa ? (
-                                                        <img
-                                                            src={`${PhotoPath}${this.state.bookImages[dep.s_Id]?.[0]?.hmh_HinhAnhMaHoa}`}
-                                                            alt={dep.s_TenSach}
-                                                            className={cx("book-cover")}
-                                                        />
-                                                    ) : (
-                                                        <img
-                                                            alt="Không có hình ảnh"
-                                                            src="https://via.placeholder.com/150"
-                                                            className={cx("book-cover")}
-                                                        />
-                                                    )}
+                                                    <img
+                                                        src={`${PhotoPath}${this.state.bookImages[dep.s_Id]?.[0]?.hmh_HinhAnhMaHoa || 'default-image.jpg'}`}
+                                                        alt={dep.s_TenSach}
+                                                        className={cx("book-cover")}
+                                                    />
                                                     <Link to={`/chitietsach/${dep.s_Id}`} className={cx("overlay")}>
                                                         <span className={cx("view-detail-text")}>Xem chi tiết</span>
                                                     </Link>
                                                 </div>
-                                                <div>
-                                                    <h4 className="mt-2">
-                                                        {dep.s_TenSach.length > 19 ? dep.s_TenSach.substring(0, 19) + "..." : dep.s_TenSach}
-                                                    </h4>
-                                                    <h5>{getAuthorNameById(dep.tg_Id)}</h5>
-                                                </div>
+                                                <h4 className="mt-2">
+                                                    {dep.s_TenSach.length > 19 ? `${dep.s_TenSach.substring(0, 19)}...` : dep.s_TenSach}
+                                                </h4>
+                                                <h5>{getAuthorNameById(dep.tg_Id)}</h5>
                                             </div>
-
                                         ))}
                                     </div>
+                                    {this.renderPagination(filteredBooks, categoriesItemsPerPage, categoriesCurrentPage, this.handlePageChange)}
                                 </div>
-
                             </div>
                         </div>
                     </div>

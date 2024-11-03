@@ -128,13 +128,23 @@ function Sidebar() {
                     {isBorrowReturnOpen && (
                         <div className={cx('dropdown-content')}>
                             <MenuItem
-                                title="Phiếu Mượn"
+                                title="Phiếu Mượn Trực Tiếp"
                                 to={config.routes.phieumuon}
                                 icon=""
                             />
                             <MenuItem
-                                title="Phiếu Trả"
+                                title="Phiếu Trả Trực Tiếp"
                                 to={config.routes.phieutra}
+                                icon=""
+                            />
+                            <MenuItem
+                                title="Phiếu Mượn Online"
+                                to={config.routes.phieumuononline}
+                                icon=""
+                            />
+                            <MenuItem
+                                title="Phiếu Trả Online"
+                                to={config.routes.phieutraonline}
                                 icon=""
                             />
                         </div>
