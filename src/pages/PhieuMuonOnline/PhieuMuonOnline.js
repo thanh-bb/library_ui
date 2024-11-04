@@ -15,30 +15,32 @@ export class PhieuMuonOnline extends Component {
             nguoidungs: [],
             phieutras: [],
             modalTitle: "",
-            pm_NgayMuon: "",
-            pm_HanTra: "",
-            pm_Id: 0,
+            PmoNgayDat: "",
+            HanTra: "",
+            PmoId: 0,
 
             pm_HanTraFilter: "",
             pm_NgayMuonFilter: "",
             phieumuonsWithoutFilter: [],
 
 
-            selectedTag: "Đang mượn",
+            selectedTag: "Chờ nhận sách",
             phieumuonWithoutFilter: [],
-            TrangThaiMuon: "",
-            TrangThaiXetDuyet: "",
+            PmoTrangThai: "",
+
 
             currentPage: 1,
             itemsPerPage: 5,
-            totalPages: 0
+            totalPages: 0,
+
+            countdowns: {}
         }
     }
 
     FilterFn() {
         const { selectedTag, phieumuonsWithoutFilter } = this.state;
         var filteredData = phieumuonsWithoutFilter.filter(function (el) {
-            return el.TrangThaiMuon === selectedTag || el.TrangThaiXetDuyet === selectedTag;
+            return el.PmoTrangThai === selectedTag;
         });
 
         console.log("Filtered data (only status): ", filteredData);  // Kiểm tra kết quả lọc chỉ theo trạng thái
@@ -72,21 +74,23 @@ export class PhieuMuonOnline extends Component {
     }
 
     refreshList() {
-        fetch("https://localhost:44315/api/QuanLyPhieuMuon")
+        fetch("https://localhost:44315/api/PhieuMuonOnline/QLPMO")
             .then(response => response.json())
             .then(data => {
                 const totalPages = Math.ceil(data.length / this.state.itemsPerPage);
 
                 // Lọc ra chỉ các phiếu mượn có trạng thái "Đang mượn"
-                const filteredData = data.filter(pm => pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag);
+                const filteredData = data.filter(pm => pm.PmoTrangThai === this.state.selectedTag);
 
                 // Sắp xếp dữ liệu theo ngày mượn giảm dần
-                filteredData.sort((a, b) => new Date(b.pm_NgayMuon) - new Date(a.pm_NgayMuon));
+                filteredData.sort((a, b) => new Date(b.PmoNgayDat) - new Date(a.PmoNgayDat));
 
                 this.setState({
                     phieumuons: filteredData,
-                    phieumuonsWithoutFilter: data, // Update phieumuonsWithoutFilter with fetched data
+                    phieumuonsWithoutFilter: data,
                     totalPages: totalPages
+                }, () => {
+                    this.startCountdowns(); // Start countdowns after data is set
                 });
             })
             .catch(error => {
@@ -109,14 +113,11 @@ export class PhieuMuonOnline extends Component {
 
     componentDidMount() {
         this.refreshList();
+        this.startCountdowns();
     }
 
     changepm_TrangThai = (e) => {
         this.setState({ pm_TrangThaiMuon: e.target.value });
-    }
-
-    changepm_TrangThaiXetDuyet = (e) => {
-        this.setState({ pm_TrangThaiXetDuyet: e.target.value });
     }
 
 
@@ -299,15 +300,89 @@ export class PhieuMuonOnline extends Component {
     }
 
 
+
+    startCountdowns() {
+        const { phieumuons } = this.state;
+
+        phieumuons.forEach((item) => {
+            const countdownId = `countdown-${item.PmoId}-${item.SId}`;
+            const ngayDatDate = new Date(item.PmoNgayDat);
+            let remainingHours = 48;
+
+            if (isNaN(ngayDatDate.getTime())) return; // Skip if PmoNgayDat date is invalid
+
+            if (this.state.countdowns[countdownId]) {
+                clearInterval(this.state.countdowns[countdownId]);
+            }
+
+            const intervalId = setInterval(() => {
+                let now = new Date();
+                let hoursLeft = this.calculateWorkingHoursLeft(now, ngayDatDate, remainingHours);
+
+                if (hoursLeft <= 0) {
+                    clearInterval(intervalId);
+                    this.setState((prevState) => ({
+                        countdowns: {
+                            ...prevState.countdowns,
+                            [countdownId]: "Expired"
+                        }
+                    }));
+                } else {
+                    const hours = Math.floor(hoursLeft);
+                    const minutes = Math.floor((hoursLeft % 1) * 60);
+
+                    this.setState((prevState) => ({
+                        countdowns: {
+                            ...prevState.countdowns,
+                            [countdownId]: `${hours}h ${minutes}m`
+                        }
+                    }));
+                }
+            }, 1000);
+
+            this.setState((prevState) => ({
+                countdowns: {
+                    ...prevState.countdowns,
+                    [countdownId]: intervalId
+                }
+            }));
+        });
+    }
+
+    calculateWorkingHoursLeft(currentDate, startDate, totalHours) {
+        let hoursRemaining = totalHours;
+        let current = new Date(currentDate);
+        current.setHours(startDate.getHours(), startDate.getMinutes(), startDate.getSeconds());
+
+        while (hoursRemaining > 0) {
+            current.setHours(current.getHours() + 1);
+
+            // Skip hours on Saturday and Sunday
+            if (current.getDay() !== 0 && current.getDay() !== 6) {
+                hoursRemaining -= 1;
+            }
+        }
+
+        // Calculate hours between `currentDate` and the target date with working hours
+        return (current - currentDate) / (1000 * 60 * 60);
+    }
+
+
+
+    // Stop timers when component unmounts to avoid memory leaks
+    componentWillUnmount() {
+        Object.values(this.state.countdowns).forEach((intervalId) => clearInterval(intervalId));
+    }
+
     render() {
         const {
             phieumuons,
             modalTitle,
-            pm_Id,
-            pm_TrangThaiMuon,
-            pm_TrangThaiXetDuyet,
+            PmoId,
+            PmoTrangThai,
             nguoidungs,
-            selectedTag
+            selectedTag,
+            countdowns
         } = this.state;
 
         const { currentPage, itemsPerPage } = this.state;
@@ -324,8 +399,8 @@ export class PhieuMuonOnline extends Component {
 
                 <div className="row d-flex justify-content-between mb-3">
                     {/* Tiêu đề bên trái */}
-                    <div className="col-4 mt-1">
-                        <h3 className="fw-bold text-start mt fs-2 text-decoration-underline">Quản Lý Phiếu Mượn Tại Thư Viện</h3>
+                    <div className="col-3 mt-1">
+                        <h3 className="fw-bold text-start mt fs-2 text-decoration-underline">Quản Lý Phiếu Mượn Online </h3>
 
                     </div>
 
@@ -334,22 +409,22 @@ export class PhieuMuonOnline extends Component {
                         <div className="col-2">
                             <button
                                 type="button"
-                                className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ xét duyệt" })}
-                                onClick={() => this.handleTagSelection("Chờ xét duyệt")}
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ nhận sách" })}
+                                onClick={() => this.handleTagSelection("Chờ nhận sách")}
 
                             >
-                                Chờ xét duyệt
+                                Chờ nhận sách
                             </button>
                         </div>
 
                         <div className="col-2">
                             <button
                                 type="button"
-                                className={cx('btn-status', { 'btn-selected': selectedTag === "Đang mượn" })}
-                                onClick={() => this.handleTagSelection("Đang mượn")}
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Đã nhận sách" })}
+                                onClick={() => this.handleTagSelection("Đã nhận sách")}
 
                             >
-                                Đang mượn
+                                Đã nhận sách
                             </button>
                         </div>
 
@@ -365,10 +440,10 @@ export class PhieuMuonOnline extends Component {
                         <div className="col-3">
                             <button
                                 type="button"
-                                className={cx('btn-status', { 'btn-selected': selectedTag === "Từ chối xét duyệt" })}
-                                onClick={() => this.handleTagSelection("Từ chối xét duyệt")}
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Quá hạn nhận sách" })}
+                                onClick={() => this.handleTagSelection("Quá hạn nhận sách")}
                             >
-                                Từ chối xét duyệt
+                                Quá hạn nhận sách
                             </button>
                         </div>
                     </div>
@@ -382,14 +457,14 @@ export class PhieuMuonOnline extends Component {
                         {/* Sắp xếp theo ngày mượn */}
                         <span className="me-2">Sắp xếp theo ngày mượn</span>
                         <button type="button" className="btn btn-light"
-                            onClick={() => this.sortResult('NgayMuon', true)}>
+                            onClick={() => this.sortResult('PmoNgayDat', true)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
                                 <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
                             </svg>
                         </button>
 
                         <button type="button" className="btn btn-light"
-                            onClick={() => this.sortResult('NgayMuon', false)}>
+                            onClick={() => this.sortResult('PmoNgayDat', false)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
                                 <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
                             </svg>
@@ -414,7 +489,7 @@ export class PhieuMuonOnline extends Component {
 
                     <div className="col-2 ">
                         {/* Phần bên phải: Nút Gửi mail */}
-                        {selectedTag === "Đang mượn" && (
+                        {selectedTag === "Chờ nhận sách" && (
                             <div className="col-auto">
                                 <button type="button" className={cx('btn-mail')} onClick={() => this.sendEmail()}>
                                     Gửi mail
@@ -431,13 +506,13 @@ export class PhieuMuonOnline extends Component {
                                 ID Phiếu
                             </th>
                             <th className="text-start">
-                                Người mượn
+                                Thông tin người mượn
                             </th>
                             <th className="text-start">
                                 Sách mượn
                             </th>
                             <th className="text-start ">
-                                Ngày Mượn
+                                Ngày Đặt
                             </th>
                             <th className="text-start ">
                                 Hạn Trả
@@ -445,14 +520,14 @@ export class PhieuMuonOnline extends Component {
                             <th className="text-start">
                                 Trạng Thái
                             </th>
-                            {(selectedTag === "Đang mượn" || selectedTag === "Đã trả") && (
+                            {(selectedTag === "Đã nhận sách" || selectedTag === "Đã trả") && (
                                 <th className="text-start">
                                     Số ngày trễ hạn
                                 </th>)}
 
-                            {(selectedTag === "Chờ xét duyệt") && (
+                            {(selectedTag === "Chờ nhận sách") && (
                                 <th className="text-start">
-                                    Số ngày còn lại để xét duyệt
+                                    Thời gian còn lại để nhận sách
                                 </th>)}
 
                             <th className="text-start">
@@ -462,27 +537,18 @@ export class PhieuMuonOnline extends Component {
                     </thead>
                     <tbody>
                         {currentItems.map(dep =>
-                            <tr key={dep.Id_PhieuMuon}>
-                                <td className="text-start">{dep.Id_PhieuMuon}</td>
+
+                            <tr key={`${dep.PmoId}-${dep.SId}`}>
+                                <td className="text-start">{dep.PmoId}</td>
                                 <td className="text-start">
-                                    {nguoidungs.find(ng => ng.nd_Id === dep.Id_User)?.nd_Username}
+                                    {nguoidungs.find(ng => ng.nd_Id === dep.NdId)?.nd_Username} -  {nguoidungs.find(ng => ng.nd_Id === dep.NdId)?.nd_HoTen}
                                 </td>
                                 <td className="text-start">{dep.TenSach}</td>
-                                <td className="text-start">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
+                                <td className="text-start">{new Date(dep.PmoNgayDat).toLocaleDateString('en-GB')}</td>
                                 <td className="text-start">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
+                                <td className="text-start">{dep.PmoTrangThai}</td>
+                                <td>{countdowns[`countdown-${dep.PmoId}-${dep.SId}`]}</td>
 
-
-                                {(selectedTag === "Chờ xét duyệt") && (
-                                    <td className="text-start">{dep.TrangThaiXetDuyet}</td>
-                                )}
-
-                                {(selectedTag === "Đang mượn" || selectedTag === "Đã trả") && (
-                                    <td className="text-start">{dep.TrangThaiMuon}</td>
-                                )}
-
-                                {(selectedTag === "Từ chối xét duyệt") && (
-                                    <td className="text-start">{dep.TrangThaiXetDuyet}</td>
-                                )}
 
                                 {(selectedTag === "Đang mượn" || selectedTag === "Đã trả") && (
                                     <td className="text-start">
@@ -608,35 +674,23 @@ export class PhieuMuonOnline extends Component {
                                         <span className="input-group-text">Trạng thái</span>
                                         <select className="form-select"
                                             onChange={this.changepm_TrangThai}
-                                            value={pm_TrangThaiMuon}>
+                                            value={PmoTrangThai}>
                                             <option value="">Chọn trạng thái</option>
                                             <option value={"Đang mượn"}>Đang mượn</option>
                                             <option value={"Đã trả"}>Đã trả</option>
                                         </select>
                                     </div>)}
 
-                                {selectedTag === "Chờ xét duyệt" && (
-                                    <div className="input-group mb-3">
-                                        <span className="input-group-text">Trạng thái</span>
-                                        <select className="form-select"
-                                            onChange={this.changepm_TrangThaiXetDuyet}
-                                            value={pm_TrangThaiXetDuyet}>
-                                            <option value="">Chọn trạng thái</option>
-                                            <option value={"Từ chối xét duyệt"}>Từ chối xét duyệt</option>
-                                            <option value={"Đã xét duyệt"}>Xét duyệt</option>
-                                        </select>
-                                    </div>
-                                )}
 
 
-                                {pm_Id === 0 ?
+                                {PmoId === 0 ?
                                     <button type="button"
                                         className="btn btn-primary float-start"
                                         onClick={() => this.createClick()}>
                                         Create
                                     </button> : null}
 
-                                {pm_Id !== 0 && (
+                                {PmoId !== 0 && (
                                     <>
                                         {selectedTag === "Đang mượn" && (
                                             <button type="button"
