@@ -8,6 +8,11 @@ const cx = classNames.bind(styles);
 const token = sessionStorage.getItem('jwttoken');
 const selectedBooks = JSON.parse(sessionStorage.getItem('selectedBooks'));
 
+function formatDateToString(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+}
+
+
 export class CTPMOnline extends Component {
     constructor(props) {
         super(props);
@@ -160,32 +165,29 @@ export class CTPMOnline extends Component {
     }
 
 
+
     handleOrderSubmit = () => {
         const token = sessionStorage.getItem('jwttoken');
         if (token) {
             const decodedToken = jwtDecode(token);
             const userId = decodedToken.nameid;
 
-            // Set the current date and due date for reservation
             const currentDate = new Date();
-            const dueDate = new Date();
-            dueDate.setDate(dueDate.getDate() + 14); // Book is reserved for 14 days
+            const dueDate = new Date(currentDate.getTime() + 14 * 24 * 60 * 60 * 1000); // 14 ngày sau
 
-            // Build order data with LoaiMuon as "Đặt online"
             const orderData = {
                 ndId: userId,
-                pmNgayMuon: currentDate.toISOString(), // Current date in ISO format
-                pmHanTra: dueDate.toISOString(),
-                ttmId: 3,  // Reservation duration
-                pmLoaiMuon: "Đặt online", // Type of reservation
-                pmTrangThaiXetDuyet: "", // Waiting for approval
+                pmNgayMuon: formatDateToString(currentDate), // Lưu dạng chuỗi ngày cho NgayMuon
+                pmHanTra: formatDateToString(dueDate),       // Lưu dạng chuỗi ngày cho HanTra
+                ttmId: 3,
+                pmLoaiMuon: "Đặt online",
+                pmTrangThaiXetDuyet: "",
                 chiTietPhieuMuons: selectedBooks.map(book => ({
                     sId: book.s_Id,
-                    ctpmSoLuongSachMuon: 1 // Assuming 1 copy per book
+                    ctpmSoLuongSachMuon: 1
                 }))
             };
 
-            // Send the request to create a reservation order
             fetch("https://localhost:44315/api/PhieuMuon", {
                 method: "POST",
                 headers: {

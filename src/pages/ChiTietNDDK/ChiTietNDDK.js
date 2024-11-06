@@ -144,22 +144,22 @@ function ChiTietNDDK() {
                 throw new Error('Failed to update data');
             }
 
-            const defaultAddress = await fetch('https://localhost:44315/api/DiaChiGiaoHang', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ndId: userId,
-                    dcghTenNguoiNhan: NDDK.nddk_HoTen,
-                    dcghSoDienThoai: NDDK.nddk_SoDienThoai,
-                    dcghDiaChi: NDDK.nddk_DiaChi,
-                }),
-            });
-            if (!defaultAddress.ok) {
-                throw new Error('Failed to create data');
-            }
+            // const defaultAddress = await fetch('https://localhost:44315/api/DiaChiGiaoHang', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Accept': 'application/json',
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({
+            //         ndId: userId,
+            //         dcghTenNguoiNhan: NDDK.nddk_HoTen,
+            //         dcghSoDienThoai: NDDK.nddk_SoDienThoai,
+            //         dcghDiaChi: NDDK.nddk_DiaChi,
+            //     }),
+            // });
+            // if (!defaultAddress.ok) {
+            //     throw new Error('Failed to create data');
+            // }
 
 
             alert('Xét duyệt và cấp tài khoản thành công');
