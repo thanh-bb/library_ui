@@ -5,6 +5,13 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
+const trangThaiMuonMapping = {
+    1: "Đang mượn",
+    2: "Đã trả",
+    3: "Đang giữ sách",
+    4: "Quá hạn nhận sách"
+};
+
 
 export class PhieuMuon extends Component {
     constructor(props) {
@@ -44,6 +51,7 @@ export class PhieuMuon extends Component {
         console.log("Filtered data (only status): ", filteredData);  // Kiểm tra kết quả lọc chỉ theo trạng thái
         this.setState({ phieumuons: filteredData });
     }
+
 
     sortResult(prop, asc) {
         var sortedData = this.state.phieumuonsWithoutFilter.sort(function (a, b) {
@@ -119,15 +127,15 @@ export class PhieuMuon extends Component {
         this.setState({ pm_TrangThaiXetDuyet: e.target.value });
     }
 
-
     editClick(dep) {
         this.setState({
             modalTitle: "Chỉnh sửa trạng thái phiếu mượn",
             pm_Id: dep.Id_PhieuMuon,
-            pm_TrangThaiMuon: dep.TrangThaiMuon,
+            ttm_Id: dep.ttm_Id,  // Sử dụng ttm_Id thay vì pm_TrangThaiMuon
             nd_Id: dep.Id_User
         });
     }
+
 
     updateClick() {
         fetch("https://localhost:44315/api/PhieuMuon", {
@@ -138,7 +146,7 @@ export class PhieuMuon extends Component {
             },
             body: JSON.stringify({
                 pmId: this.state.pm_Id,
-                pmTrangThaiMuon: this.state.pm_TrangThaiMuon
+                ttm_Id: this.state.ttm_Id
             })
         })
             .then(res => res.json())
@@ -276,6 +284,7 @@ export class PhieuMuon extends Component {
         });
     }
 
+
     // Chuyển trang trước
     prevPage = () => {
         this.setState((prevState) => ({
@@ -330,24 +339,20 @@ export class PhieuMuon extends Component {
                     </div>
 
                     <div className=" col-8 row d-flex justify-content-end ">
-
                         <div className="col-2">
                             <button
                                 type="button"
                                 className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ xét duyệt" })}
                                 onClick={() => this.handleTagSelection("Chờ xét duyệt")}
-
                             >
                                 Chờ xét duyệt
                             </button>
                         </div>
-
                         <div className="col-2">
                             <button
                                 type="button"
                                 className={cx('btn-status', { 'btn-selected': selectedTag === "Đang mượn" })}
                                 onClick={() => this.handleTagSelection("Đang mượn")}
-
                             >
                                 Đang mượn
                             </button>
@@ -362,15 +367,27 @@ export class PhieuMuon extends Component {
                                 Đã trả
                             </button>
                         </div>
-                        <div className="col-3">
+
+                        <div className="col-2">
                             <button
                                 type="button"
-                                className={cx('btn-status', { 'btn-selected': selectedTag === "Từ chối xét duyệt" })}
-                                onClick={() => this.handleTagSelection("Từ chối xét duyệt")}
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Đang giữ sách" })}
+                                onClick={() => this.handleTagSelection("Đang giữ sách")}
                             >
-                                Từ chối xét duyệt
+                                Đang giữ sách
                             </button>
                         </div>
+
+                        <div className="col-2">
+                            <button
+                                type="button"
+                                className={cx('btn-status', { 'btn-selected': selectedTag === "Quá hạn nhận sách" })}
+                                onClick={() => this.handleTagSelection("Quá hạn nhận sách")}
+                            >
+                                Quá hạn nhận sách
+                            </button>
+                        </div>
+
                     </div>
                 </div>
 
@@ -470,6 +487,7 @@ export class PhieuMuon extends Component {
                                 <td className="text-start">{dep.TenSach}</td>
                                 <td className="text-start">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
                                 <td className="text-start">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
+                                <td className="text-start">{trangThaiMuonMapping[dep.ttm_Id]}</td>
 
 
                                 {(selectedTag === "Chờ xét duyệt") && (
@@ -606,13 +624,14 @@ export class PhieuMuon extends Component {
                                 {selectedTag === "Đang mượn" && (
                                     <div className="input-group mb-3">
                                         <span className="input-group-text">Trạng thái</span>
-                                        <select className="form-select"
-                                            onChange={this.changepm_TrangThai}
-                                            value={pm_TrangThaiMuon}>
+                                        <select className="form-select" onChange={this.changepm_TrangThai} value={this.state.ttm_Id}>
                                             <option value="">Chọn trạng thái</option>
-                                            <option value={"Đang mượn"}>Đang mượn</option>
-                                            <option value={"Đã trả"}>Đã trả</option>
+                                            <option value={1}>Đang mượn</option>
+                                            <option value={2}>Đã trả</option>
+                                            <option value={3}>Đang giữ sách</option>
+                                            <option value={4}>Quá hạn nhận sách</option>
                                         </select>
+
                                     </div>)}
 
                                 {selectedTag === "Chờ xét duyệt" && (

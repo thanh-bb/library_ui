@@ -160,9 +160,10 @@ function PhieuMuonUser() {
                 body: JSON.stringify({
                     pmNgayMuon: ngayMuon,
                     pmHanTra: ngayHanTra,
-                    pmTrangThaiMuon: 'Không xác định',
+                    ttmId: 3, // Sử dụng ttm_Id cho trạng thái "Đang giữ sách"
                     ndId: user.nd_Id,
                     pmTrangThaiXetDuyet: "Chờ xét duyệt",
+                    pmLoaiMuon: "Mượn trực tiếp",
                     chiTietPhieuMuons: [{
                         sId: sach.s_Id,
                         ctpmSoLuongSachMuon: soLuongNhap,

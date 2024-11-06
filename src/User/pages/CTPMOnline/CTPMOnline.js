@@ -94,22 +94,6 @@ export class CTPMOnline extends Component {
                     console.error('Error fetching data: ', error);
                 });
 
-
-            // list delivery address
-            fetch(`https://localhost:44315/api/DiaChiGiaoHang/${userId}`)
-                .then(response => response.json())
-                .then(data => {
-                    this.setState({
-                        listAddress: data,
-                        // Nếu danh sách có ít nhất một địa chỉ, đặt địa chỉ đầu tiên làm mặc định
-                        selectedAddress: data.length > 0 ? data[0] : null
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching data: ', error);
-                });
-
-
         }
 
         // Fetch list of books
@@ -171,246 +155,38 @@ export class CTPMOnline extends Component {
             });
     };
 
-    fetchBookPromiment() {
-        fetch("https://localhost:44315/api/ThongKe/SachNoiBat")
-            .then(response => response.json())
-            .then(data => {
-                this.setState({
-                    listsachnoibats: data
-                });
-
-                // Fetch images for each prominent book
-                data.forEach(book => {
-                    this.fetchBookImages(book.s_Id); // Lấy ảnh cho sách nổi bật
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching prominent books:', error);
-            });
-    }
-
-    fetchRankingData() {
-        fetch("https://localhost:44315/api/ThongKe/TopReaders")  // Adjust the endpoint as needed
-            .then(response => response.json())
-            .then(data => {
-                this.setState({ ranking: data });
-            })
-            .catch(error => {
-                console.error('Error fetching ranking data:', error);
-            });
-    }
-
     componentDidMount() {
         this.refreshList();
-        this.fetchRankingData();
     }
 
-    // Function to set the selected category
-    setSelectedCategory = (tl_Id) => {
-        this.setState({ selectedCategory: tl_Id });
-    };
-
-    // input form 
-    changes_HoTenNguoiNhan = (e) => {
-        this.setState({ dcgh_TenNguoiNhan: e.target.value });
-    }
-
-    changes_DiaChiNguoiNhan = (e) => {
-        this.setState({ dcgh_DiaChi: e.target.value });
-    }
-
-    changes_SoDienThoaiNguoiNhan = (e) => {
-        this.setState({ dcgh_SoDienThoai: e.target.value });
-    }
-
-
-    // Handle change for delivery method
-    handleDeliveryChange = (e) => {
-        this.setState({
-            deliveryMethod: e.target.value,
-            paymentMethod: e.target.value === 'Giao sách tận nơi' ? 'COD' : '', // Chọn mặc định COD khi giao hàng tận nơi
-        });
-    };
-
-
-    // Handle change for payment method
-    handlePaymentChange = (e) => {
-        this.setState({
-            paymentMethod: e.target.value,
-        });
-    };
-
-    handleSelectAddress = (address) => {
-        this.setState({
-            selectedAddress: address  // Cập nhật selectedAddress khi người dùng chọn
-
-        });
-        const addAddressModal = document.getElementById('exampleModal');
-        const modalInstance = window.bootstrap.Modal.getInstance(addAddressModal);
-        modalInstance.hide();
-    };
-
-    addClick = () => {
-        this.setState({
-            nd_Id: 0,
-            dcgh_Id: 0,
-            dcgh_TenNguoiNhan: "",
-            dcgh_SoDienThoai: "",
-            dcgh_DiaChi: ""
-        });
-    }
-
-    editClick(dep) {
-        this.setState({
-            dcgh_Id: dep.dcgh_Id,
-            dcgh_TenNguoiNhan: dep.dcgh_TenNguoiNhan,
-            dcgh_SoDienThoai: dep.dcgh_SoDienThoai,
-            dcgh_DiaChi: dep.dcgh_DiaChi
-        });
-    }
-
-
-    createClick = () => {
-        if (token) {
-            // Giải mã token để lấy nd_id
-            const decodedToken = jwtDecode(token);
-            const userId = decodedToken.nameid;
-
-            fetch("https://localhost:44315/api/DiaChiGiaoHang", {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ndId: userId,
-                    dcghTenNguoiNhan: this.state.dcgh_TenNguoiNhan,
-                    dcghSoDienThoai: this.state.dcgh_SoDienThoai,
-                    dcghDiaChi: this.state.dcgh_DiaChi
-
-                })
-            })
-                .then(res => res.json())
-                .then((result) => {
-                    alert("Thêm địa chỉ thành công"); this.refreshList();
-
-
-                    // Đóng modal thêm địa chỉ
-                    const addAddressModal = document.getElementById('exampleModal1');
-                    const modalInstance = window.bootstrap.Modal.getInstance(addAddressModal);
-                    modalInstance.hide();
-
-                    // Mở lại modal chọn địa chỉ
-                    const selectAddressModal = new window.bootstrap.Modal(document.getElementById('exampleModal'));
-                    selectAddressModal.show();
-                }, (error) => {
-                    alert('Failed');
-                })
-        }
-    }
-
-    updateClick() {
-        if (token) {
-            // Giải mã token để lấy nd_id
-            const decodedToken = jwtDecode(token);
-            const userId = decodedToken.nameid;
-
-            fetch("https://localhost:44315/api/DiaChiGiaoHang", {
-                method: "PUT",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    dcghId: this.state.dcgh_Id,
-                    ndId: userId,
-                    dcghTenNguoiNhan: this.state.dcgh_TenNguoiNhan,
-                    dcghSoDienThoai: this.state.dcgh_SoDienThoai,
-                    dcghDiaChi: this.state.dcgh_DiaChi
-                })
-            })
-                .then(res => res.json())
-                .then((result) => {
-                    alert("Cập nhật địa chỉ thành công");
-                    this.refreshList();
-                    // Đóng modal thêm địa chỉ
-                    const addAddressModal = document.getElementById('exampleModal1');
-                    const modalInstance = window.bootstrap.Modal.getInstance(addAddressModal);
-                    modalInstance.hide();
-
-                    // Mở lại modal chọn địa chỉ
-                    const selectAddressModal = new window.bootstrap.Modal(document.getElementById('exampleModal'));
-                    selectAddressModal.show();
-                }, (error) => {
-                    alert('Failed');
-                })
-        }
-    }
-
-
-    deleteClick(id) {
-        if (window.confirm("Bạn có chắc chắn muốn xóa?")) {
-            fetch("https://localhost:44315/api/DiaChiGiaoHang/" + id, {
-                method: "DELETE",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(res => res.json())
-                .then((result) => {
-                    this.refreshList();
-                    const selectAddressModal = new window.bootstrap.Modal(document.getElementById('exampleModal'));
-                    selectAddressModal.show();
-                    // Ensure toast element is available
-                    setTimeout(() => {
-                        const toastEl = document.getElementById('successToast');
-                        if (toastEl) {
-                            const toast = new window.bootstrap.Toast(toastEl);  // Initialize toast
-                            toast.show();  // Show the toast
-                        }
-                    }, 0);  // Delay to ensure the element is available
-                }, (error) => {
-                    alert('Failed');
-                });
-        }
-    }
 
     handleOrderSubmit = () => {
-        // if (this.state.deliveryMethod === "Giao sách tận nơi" && !this.state.selectedAddress) {
-        //     alert("Vui lòng cung cấp địa chỉ giao sách.");
-        //     return;
-        // }
-
+        const token = sessionStorage.getItem('jwttoken');
         if (token) {
             const decodedToken = jwtDecode(token);
             const userId = decodedToken.nameid;
 
-            // Get current date
+            // Set the current date and due date for reservation
             const currentDate = new Date();
-
-            // Calculate due date (2 weeks later)
             const dueDate = new Date();
-            dueDate.setDate(dueDate.getDate() + 14); // Add 14 days
+            dueDate.setDate(dueDate.getDate() + 14); // Book is reserved for 14 days
 
+            // Build order data with LoaiMuon as "Đặt online"
             const orderData = {
                 ndId: userId,
-                pmoNgayDat: currentDate.toISOString(), // Current date in ISO format
-                pmoLoaiGiaoHang: this.state.deliveryMethod,
-                pmoPhuongThucThanhToan: this.state.paymentMethod,
-                dcghId: this.state.selectedAddress ? this.state.selectedAddress.dcgh_Id : null,
-                // Set the status based on the delivery method
-                pmoTrangThai: this.state.deliveryMethod === "Giao sách tận nơi" ? "Đang chuẩn bị giao sách từ thư viện" : "Chờ nhận sách",
-                pmoHanTra: dueDate.toISOString(), // Due date in ISO format
-
-                ChiTietPhieuMuonOnlines: selectedBooks.map(book => ({
-                    SId: book.s_Id,
-                    CtpmoSoLuongSachMuon: 1
+                pmNgayMuon: currentDate.toISOString(), // Current date in ISO format
+                pmHanTra: dueDate.toISOString(),
+                ttmId: 3,  // Reservation duration
+                pmLoaiMuon: "Đặt online", // Type of reservation
+                pmTrangThaiXetDuyet: "", // Waiting for approval
+                chiTietPhieuMuons: selectedBooks.map(book => ({
+                    sId: book.s_Id,
+                    ctpmSoLuongSachMuon: 1 // Assuming 1 copy per book
                 }))
             };
 
-
-            fetch("https://localhost:44315/api/CTPMOnline", {
+            // Send the request to create a reservation order
+            fetch("https://localhost:44315/api/PhieuMuon", {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
@@ -418,31 +194,13 @@ export class CTPMOnline extends Component {
                 },
                 body: JSON.stringify(orderData)
             })
-                .then(response => response.json()) // Chuyển đổi phản hồi sang JSON
+                .then(response => response.json())
                 .then(result => {
-                    console.log("Phản hồi từ backend:", result);  // Kiểm tra xem result có chứa pmo_Id không
-
                     if (result) {
-                        // Lưu pmo_Id vào localStorage khi tạo phiếu mượn thành công
-                        localStorage.setItem("pmo_Id", result);
-
-                        // Thêm thời gian chờ trước khi chuyển hướng để đảm bảo pmo_Id được lưu trước
-                        if (this.state.paymentMethod === "VNPAY") {
-                            const customerName = this.state.selectedAddress.dcgh_TenNguoiNhan;
-                            const amount = this.state.amount || 30000;
-                            const orderDescription = "Thanh toán cho đơn hàng";
-
-                            const paymentUrl = `https://localhost:44393/?customerName=${encodeURIComponent(customerName)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}&orderId=${result.pmo_Id}`;
-
-                            setTimeout(() => {
-                                window.location.href = paymentUrl;
-                            }, 500); // Chờ 0.5 giây để đảm bảo pmo_Id đã được lưu
-                        } else {
-                            alert("Đặt sách thành công!");
-                            window.location.href = '/quanlyphieumuononline';
-                        }
+                        alert("Đặt sách thành công! Vui lòng đến thư viện để nhận sách.");
+                        window.location.href = '/quanlyphieumuononline';
                     } else {
-                        console.error("Không nhận được pmo_Id từ backend.");
+                        console.error("Failed to receive response from backend.");
                     }
                 })
                 .catch(error => {
@@ -466,7 +224,7 @@ export class CTPMOnline extends Component {
 
         } = this.state;
 
-        const { deliveryMethod, paymentMethod } = this.state;
+        const { deliveryMethod } = this.state;
 
         return (
             <div className={cx('wrapper')}>
@@ -514,51 +272,9 @@ export class CTPMOnline extends Component {
                                 <div className="row d-flex justify-content-center p-5 ">
                                     <div className="col border border border-dark-subtle p-5 pt-3">
                                         <h2>Thông tin địa chỉ nhận sách</h2>
-                                        {/* {this.state.selectedAddress ? (
-                                            <div className="row d-flex justify-content-start mt-5">
-                                                <div className="form-group mb-3">
-                                                    <label className="fw-medium">Họ tên<span className="text-danger">*</span></label>
-                                                    <input
-                                                        value={this.state.selectedAddress ? this.state.selectedAddress.dcgh_TenNguoiNhan : ""}
-                                                        className={cx('form-control p-2  fs-3 bg-body-secondary border-0')}
-                                                        disabled
-                                                    />
-                                                </div>
-
-                                                <div className="form-group mb-3">
-                                                    <label className="fw-medium">Số điện thoại<span className="text-danger">*</span></label>
-                                                    <input
-                                                        value={this.state.selectedAddress ? this.state.selectedAddress.dcgh_SoDienThoai : ""}
-                                                        className={cx('form-control p-2  fs-3 bg-body-secondary border-0')}
-                                                        disabled
-                                                    />
-                                                </div>
-
-                                                <div className="form-group mb-3">
-                                                    <label className="fw-medium">Địa chỉ<span className="text-danger">*</span></label>
-                                                    <textarea
-                                                        value={this.state.selectedAddress ? this.state.selectedAddress.dcgh_DiaChi : ""}
-                                                        className="form-control p-2  fs-3 bg-body-secondary border-0"
-                                                        disabled
-                                                    />
-                                                </div>
-
-                                            </div>
-
-                                        ) : (
-                                            <p>Không có địa chỉ nào được chọn.</p>
-                                        )} */}
 
                                         <p>Thư viện Trường Đại học Cần Thơ,  Khu II, Đ. 3 Tháng 2, Xuân Khánh, Ninh Kiều, Cần Thơ</p>
                                         <div className="col-4 float-end">
-
-                                            {/* <button type="button"
-                                                className={cx('btn-continue')}
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#exampleModal">
-                                                Thay đổi
-                                            </button> */}
-
 
                                             <div className="modal fade" id="exampleModal" tabIndex="-1" aria-hidden="true">
                                                 <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -647,63 +363,6 @@ export class CTPMOnline extends Component {
                                             </div>
 
 
-                                            {/* Separate Modal for Adding New Address */}
-                                            <div className="modal fade" id="exampleModal1" tabIndex="-1" aria-hidden="true">
-                                                <div className="modal-dialog modal-lg modal-dialog-centered">
-                                                    <div className="modal-content w-75 position-absolute top-50 start-50 translate-middle">
-
-                                                        <div className="modal-header">
-                                                            <h5 className="modal-title fs-2">Thêm Địa Chỉ Mới</h5>
-                                                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-
-                                                        <div className="modal-body">
-                                                            <div className="input-group mb-3 input-group-lg">
-                                                                <span className="input-group-text fw-bold">Họ tên người nhận</span>
-                                                                <input type="text" className="form-control fs-4"
-                                                                    value={dcgh_TenNguoiNhan}
-                                                                    onChange={this.changes_HoTenNguoiNhan} />
-                                                            </div>
-
-                                                            <div className="input-group mb-3 input-group-lg">
-                                                                <span className="input-group-text fw-bold">Số điện thoại</span>
-                                                                <input type="text" className="form-control fs-4"
-                                                                    value={dcgh_SoDienThoai}
-                                                                    onChange={this.changes_SoDienThoaiNguoiNhan} />
-                                                            </div>
-                                                            <div className="input-group mb-3 input-group-lg">
-                                                                <span className="input-group-text fw-bold">Địa chỉ</span>
-                                                                <textarea
-                                                                    type="text"
-                                                                    className="form-control fs-4"
-                                                                    style={{ height: "40px" }}
-                                                                    value={dcgh_DiaChi}
-                                                                    maxLength={2000} // Giới hạn độ dài tại đây
-                                                                    onChange={this.changes_DiaChiNguoiNhan}
-                                                                />
-                                                            </div>
-
-
-                                                            {dcgh_Id === 0 ?
-                                                                <button type="button"
-                                                                    className={cx('btn-edit')}
-                                                                    onClick={() => this.createClick()}>
-                                                                    Thêm
-                                                                </button> : null}
-
-                                                            {dcgh_Id !== 0 ?
-                                                                <button type="button"
-                                                                    className={cx('btn-edit')}
-                                                                    onClick={() => this.updateClick()}>
-                                                                    Cập nhật
-                                                                </button> : null}
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-
-
                                         </div>
                                     </div>
 
@@ -736,79 +395,6 @@ export class CTPMOnline extends Component {
                                     </p>
                                 </div>
 
-                                {/* Giao sách tận nơi */}
-                                {/* <div className="form-check" onClick={() => document.getElementById('flexRadioDefault2').click()}>
-                                    <input
-                                        value="Giao sách tận nơi"
-                                        checked={deliveryMethod === "Giao sách tận nơi"}
-                                        className="form-check-input mt-4"
-                                        type="radio"
-                                        name="deliveryMethod"
-                                        id="flexRadioDefault2"
-                                        onChange={this.handleDeliveryChange}
-                                    />
-                                    <p
-                                        role="button"
-                                        tabIndex="0"
-                                        className="form-check-label border border-dark-subtle p-3 rounded-4 w-75 text-center fw-bold"
-                                        htmlFor="flexRadioDefault2"
-                                    >
-                                        Giao sách tận nơi
-
-                                    </p>
-                                </div> */}
-
-                                {/* Show additional radio options only when 'Giao sách tận nơi' is selected */}
-                                {/* {deliveryMethod === 'Giao sách tận nơi' && (
-                                    <div>
-                                        <div className="form-check mx-5" onClick={() => document.getElementById('flexRadioCOD').click()}>
-                                            <input
-                                                data-che="true"
-                                                value="COD"
-                                                checked={paymentMethod === "COD"}
-                                                className="form-check-input mt-4"
-                                                type="radio"
-                                                name="paymentMethod"
-                                                id="flexRadioCOD"
-                                                onChange={this.handlePaymentChange}
-                                            />
-
-                                            <p
-                                                role="button"
-                                                tabIndex="0"
-                                                className="form-check-label border border-dark-subtle p-3 rounded-4 w-75 text-center"
-                                                htmlFor="flexRadioCOD"
-                                            >
-                                                Thanh toán COD
-                                            </p>
-                                        </div>
-
-                                        <div className="form-check mx-5" onClick={() => document.getElementById('flexRadioVNPAY').click()}>
-                                            <input
-                                                value="VNPAY"
-                                                checked={paymentMethod === "VNPAY"}
-                                                className="form-check-input mt-4"
-                                                type="radio"
-                                                name="paymentMethod"
-                                                id="flexRadioVNPAY"
-                                                onChange={this.handlePaymentChange}
-                                            />
-                                            <p
-                                                role="button"
-                                                tabIndex="0"
-                                                className="form-check-label border border-dark-subtle p-3 rounded-4 w-75 text-center"
-                                                htmlFor="flexRadioVNPAY"
-                                            >
-                                                Thanh toán VNPAY
-                                                <img
-                                                    src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png"
-                                                    alt="VNPAY Logo"
-                                                    style={{ height: '20px', verticalAlign: 'middle', marginLeft: '5px' }}
-                                                />
-                                            </p>
-                                        </div>
-                                    </div>
-                                )} */}
                             </div>
 
                             <div className="col-6">

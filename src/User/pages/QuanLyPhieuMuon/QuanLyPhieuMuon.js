@@ -48,13 +48,17 @@ export class QuanLyPhieuMuon extends Component {
             fetch(`https://localhost:44315/api/QuanLyPhieuMuon/${nd_id}`)
                 .then(response => response.json())
                 .then(data => {
+
                     this.setState({
                         chitietpms: data.filter(pm => pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag),
                         tensachWithoutFilter: data // Lưu toàn bộ dữ liệu phiếu mượn
                     }, () => {
                         // Lọc danh sách dựa trên trạng thái đã chọn
+
+
                         this.FilterFn();
                     });
+
                 })
                 .catch(error => {
                     console.error('Error fetching data: ', error);
@@ -71,7 +75,7 @@ export class QuanLyPhieuMuon extends Component {
 
     FilterFn() {
         const { selectedTag, tensachWithoutFilter } = this.state;
-
+        console.log(selectedTag)
         // Lọc dựa trên selectedTag
         const filteredData = tensachWithoutFilter.filter(el => {
             return (
@@ -123,11 +127,19 @@ export class QuanLyPhieuMuon extends Component {
                     <div className="col-2">
                         <button
                             type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đang mượn" })}
-                            onClick={() => this.handleTagSelection("Đang mượn")}
-
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Từ chối xét duyệt" })}
+                            onClick={() => this.handleTagSelection("Từ chối xét duyệt")}
                         >
-                            Đang mượn
+                            Từ chối xét duyệt
+                        </button>
+                    </div>
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Ðang mượn" })}
+                            onClick={() => this.handleTagSelection("Ðang mượn")}
+                        >
+                            Ðang mượn
                         </button>
                     </div>
                     <div className="col-2">

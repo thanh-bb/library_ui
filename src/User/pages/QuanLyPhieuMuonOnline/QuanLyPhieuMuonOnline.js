@@ -221,7 +221,7 @@ export class QuanLyPhieuMuonOnline extends Component {
                 <div className="row d-flex justify-content-end mb-3">
                     <h1 className="fw-bold mt-5 mb-5 ">Phiếu Mượn Sách Online</h1>
                     <hr></hr>
-                    <div className="col-3">
+                    <div className="col-2">
                         <button
                             type="button"
                             className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ nhận sách" })}
@@ -231,7 +231,7 @@ export class QuanLyPhieuMuonOnline extends Component {
                             Chờ nhận sách
                         </button>
                     </div>
-                    <div className="col-3">
+                    <div className="col-2">
                         <button
                             type="button"
                             className={cx('btn-status', { 'btn-selected': selectedTag === "Đã nhận sách" })}
@@ -241,7 +241,7 @@ export class QuanLyPhieuMuonOnline extends Component {
                             Đã nhận sách
                         </button>
                     </div>
-                    <div className="col-3">
+                    <div className="col-2">
                         <button
                             type="button"
                             className={cx('btn-status', { 'btn-selected': selectedTag === "Đã hoàn thành" })}
@@ -250,7 +250,7 @@ export class QuanLyPhieuMuonOnline extends Component {
                             Đã hoàn thành
                         </button>
                     </div>
-                    <div className="col-3">
+                    <div className="col-2">
                         <button
                             type="button"
                             className={cx('btn-status', { 'btn-selected': selectedTag === "Quá hạn nhận sách" })}
