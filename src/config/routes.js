@@ -25,6 +25,7 @@ const routes = {
     tacgia: '/admin/tacgia',
     datra: '/admin/datra',
     nhapkhosach: '/admin/nhapkhosach',
+    thongke: '/admin/thongke',
     //User
     userhome: '/userhome',
     chitietsach: '/chitietsach/:id',

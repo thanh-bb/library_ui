@@ -79,6 +79,11 @@ function Sidebar() {
                                 to={config.routes.sach}
                                 icon=""
                             />
+                            <MenuItem
+                                title="Thống kê"
+                                to={config.routes.thongke}
+                                icon=""
+                            />
 
                         </div>
                     )}
