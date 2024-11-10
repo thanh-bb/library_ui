@@ -125,14 +125,6 @@ function ChiTietSach() {
                     }
                 }
 
-                // Check if the book is borrowed online with status "Chờ xử lý"
-                const checkOnlineBorrowStatus = await fetch(`https://localhost:44315/api/PhieuMuonOnline/CheckMuonOnl/${userId}/${id}`);
-                if (checkOnlineBorrowStatus.ok) {
-                    const onlineResult = await checkOnlineBorrowStatus.json();
-                    if (onlineResult === "Chờ nhận sách" || onlineResult === "Đang chuẩn bị giao sách từ thư viện" || onlineResult === "Ðon hàng đã được tạo") {
-                        setIsBookBorrowed(true);
-                    }
-                }
 
                 setLoading(false);
             } catch (error) {
@@ -182,20 +174,6 @@ function ChiTietSach() {
             }
         };
 
-
-        const fetchNumberOfBorrowReceipts_Onl = async () => {
-            try {
-                const response = await fetch(`https://localhost:44315/api/PhieuMuonOnline/Count/${userId}`);
-                if (response.ok) {
-                    const count = await response.json();
-                    setNumberOfBorrowReceipts_Onl(count);
-                } else {
-                    throw new Error('Failed to fetch number of borrow receipts');
-                }
-            } catch (error) {
-                console.error('Error fetching number of borrow receipts:', error);
-            }
-        };
 
         const fetchSach = async () => {
             try {
@@ -290,7 +268,6 @@ function ChiTietSach() {
         fetchKe();
         fetchO();
         fetchNumberOfBorrowReceipts_Off();
-        fetchNumberOfBorrowReceipts_Onl();
         setMaxBorrowingsPerMonth(5);
     }, [jwttoken, id]);
 

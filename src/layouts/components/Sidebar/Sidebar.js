@@ -12,7 +12,9 @@ import {
     WarningIcon,
     WarningActiveIcon,
     CardIcon,
-    CardActiveIcon
+    CardActiveIcon,
+    ChartIcon,
+    ChartActiveIcon
 } from '~/components/Icons';
 // import SuggestedAccounts from '~/components/SuggestedAccounts';
 import config from '~/config';
@@ -37,6 +39,28 @@ function Sidebar() {
         <aside className={cx('wrapper')}>
             <div className={cx('side-bar mb-lg-5')}>
                 <Menu>
+                    {/* Quản lý thống kê */}
+                    <div className="d-flex flex-column" onClick={toggleUserManagement} style={{ cursor: 'pointer' }}>
+                        <TitleMenu
+                            title="Thống kê"
+                            icon={<ChartIcon />}
+                            activeIcon={<ChartActiveIcon />}
+                            to={config.routes.thongke}
+                        />
+                        <hr style={{ margin: '0' }}></hr>
+                    </div>
+                    {isUserManagementOpen && (
+                        <div className={cx('dropdown-content')}>
+
+                            <MenuItem
+                                title="Thống kê mượn sách"
+                                to={config.routes.thongke}
+                                icon=""
+                            />
+
+                        </div>
+                    )}
+
                     {/* Quản lý thông tin sách */}
                     <div className="d-flex flex-column" onClick={toggleBookInfo} style={{ cursor: 'pointer' }}>
                         <TitleMenu
@@ -77,11 +101,6 @@ function Sidebar() {
                             <MenuItem
                                 title="Sách"
                                 to={config.routes.sach}
-                                icon=""
-                            />
-                            <MenuItem
-                                title="Thống kê"
-                                to={config.routes.thongke}
                                 icon=""
                             />
 

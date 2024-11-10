@@ -411,3 +411,31 @@ export const DeleteIcon = ({ width = '2rem', height = '2rem', className }) => (
 
     </svg >
 );
+
+export const ChartActiveIcon = ({ width = '3rem', height = '3rem', className }) => (
+    <svg
+        className={className}
+        width={width}
+        height={height}
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path d="M15,24h-6V2c0-1.1,.9-2,2-2h2c1.1,0,2,.9,2,2V24Zm9,0h-6V8c0-1.1,.9-2,2-2h2c1.1,0,2,.9,2,2V24Zm-18,0H0V14c0-1.1,.9-2,2-2h2c1.1,0,2,.9,2,2v10Z" /></svg>
+
+
+);
+
+export const ChartIcon = ({ width = '3rem', height = '3rem', className }) => (
+    <svg
+        className={className}
+        width={width}
+        height={height}
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path d="M13,0h-2c-1.1,0-2,.9-2,2V24h6V2c0-1.1-.9-2-2-2Zm0,22h-2V2h2V22ZM22,6h-2c-1.1,0-2,.9-2,2V24h6V8c0-1.1-.9-2-2-2Zm0,16h-2V8h2v14ZM4,12H2c-1.1,0-2,.9-2,2v10H6V14c0-1.1-.9-2-2-2Zm0,10H2V14h2v8Z" /></svg>
+
+
+);

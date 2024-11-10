@@ -27,17 +27,17 @@ export class QuanLyPhieuMuon extends Component {
     }
 
     sortResult(prop, asc) {
-        var sortedData = this.state.tensachWithoutFilter.sort(function (a, b) {
+        const sortedData = [...this.state.phieumuons].sort((a, b) => {
             if (asc) {
                 return (a[prop] > b[prop]) ? 1 : ((a[prop] < b[prop]) ? -1 : 0);
-            }
-            else {
+            } else {
                 return (b[prop] > a[prop]) ? 1 : ((b[prop] < a[prop]) ? -1 : 0);
             }
         });
 
-        this.setState({ chitietpms: sortedData });
+        this.setState({ phieumuons: sortedData });
     }
+
 
     refreshList() {
         const token = sessionStorage.getItem('jwttoken');
@@ -50,7 +50,7 @@ export class QuanLyPhieuMuon extends Component {
                 .then(data => {
 
                     this.setState({
-                        chitietpms: data.filter(pm => pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag),
+                        chitietpms: data.filter(pm => (pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag) && pm.PmLoaiMuon === "Mượn trực tiếp"),
                         tensachWithoutFilter: data // Lưu toàn bộ dữ liệu phiếu mượn
                     }, () => {
                         // Lọc danh sách dựa trên trạng thái đã chọn
@@ -79,7 +79,8 @@ export class QuanLyPhieuMuon extends Component {
         // Lọc dựa trên selectedTag
         const filteredData = tensachWithoutFilter.filter(el => {
             return (
-                el.TrangThaiMuon === selectedTag || el.TrangThaiXetDuyet === selectedTag
+                (el.TrangThaiMuon === selectedTag || el.TrangThaiXetDuyet === selectedTag) &&
+                el.PmLoaiMuon === "Mượn trực tiếp"
             );
         });
 
@@ -102,9 +103,9 @@ export class QuanLyPhieuMuon extends Component {
 
         const { phieumuons, tenSachFilter } = this.state;
 
-        // const filteredChitietpms = chitietpms.filter(pm =>
-        //     pm.TenSach.toLowerCase().includes(tenSachFilter.toLowerCase())
-        // );
+        const filteredPhieumuons = phieumuons.filter(pm =>
+            pm.TenSach.toLowerCase().includes(tenSachFilter.toLowerCase())
+        );
 
         const { selectedTag } = this.state;
 
@@ -176,6 +177,7 @@ export class QuanLyPhieuMuon extends Component {
                         </button>
                     </div>
                 </div>
+
                 <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
                     <thead >
                         <tr>
@@ -192,28 +194,29 @@ export class QuanLyPhieuMuon extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {phieumuons.map(dep =>
+                        {filteredPhieumuons.map(dep =>
                             <tr key={dep.Id_PhieuMuon}>
                                 <td className="text-start">{dep.Id_PhieuMuon}</td>
                                 <td className="text-start">{dep.TenSach}</td>
                                 <td className="text-center">{dep.SoLuongSach}</td>
                                 <td className="text-center">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
                                 <td className="text-center">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
+
                                 <td className="text-center">
                                     {dep.TrangThaiMuon === "Đã trả" ? (
                                         (new Date(dep.HanTra) - new Date()) < 0 ?
                                             `Đã trả - Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày` :
                                             "Đã trả - Đúng hạn"
-                                    ) : dep.TrangThaiMuon === "Đang mượn" ? (
+                                    ) : dep.TrangThaiMuon === "Ðang mượn" ? (
                                         (new Date(dep.HanTra) - new Date()) < 0 ?
                                             `${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn)` :
                                             `Đang mượn - Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày đến hạn`
                                     ) : dep.TrangThaiXetDuyet === "Chờ xét duyệt" ? (
                                         "Chờ xét duyệt"
-                                    ) : (
-                                        "Trạng thái không xác định"
+                                    ) : dep.TrangThaiXetDuyet === "Từ chối xét duyệt" ? (
+                                        "Từ chối xét duyệt"
 
-                                    )}
+                                    ) : ("")}
                                 </td>
 
 

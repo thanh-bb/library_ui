@@ -55,7 +55,6 @@ export class Cart extends Component {
             numberOfBorrowReceipts: 0,
             maxBorrowingsPerMonth: 5,
             numberOfBorrowReceipts_Off: 0,
-            numberOfBorrowReceipts_Onl: 0,
 
             borrowedBooks: []
 
@@ -188,29 +187,12 @@ export class Cart extends Component {
         }
     };
 
-    // Hàm lấy số lượng mượn online
-    fetchOnlineBorrowCount = async () => {
-        const token = sessionStorage.getItem('jwttoken');
-        if (token) {
-            const userId = jwtDecode(token).nameid;
-
-            try {
-                const response = await fetch(`https://localhost:44315/api/PhieuMuonOnline/Count/${userId}`);
-                const onlineCount = await response.json();
-                this.setState({ numberOfBorrowReceipts_Onl: onlineCount }); // Cập nhật vào state
-            } catch (error) {
-                console.error('Error fetching online borrow count:', error);
-                this.setState({ numberOfBorrowReceipts_Onl: 0 });
-            }
-        }
-    };
 
     // Hàm gọi cả hai hàm trên và tính tổng
     fetchBorrowCount = async () => {
         await this.fetchOfflineBorrowCount();
-        await this.fetchOnlineBorrowCount();
 
-        const totalBorrowReceipts = this.state.numberOfBorrowReceipts_Off + this.state.numberOfBorrowReceipts_Onl;
+        const totalBorrowReceipts = this.state.numberOfBorrowReceipts_Off;
         this.setState({ numberOfBorrowReceipts: totalBorrowReceipts }); // Cập nhật tổng vào state
     };
 
@@ -229,19 +211,8 @@ export class Cart extends Component {
 
                 if (offlineResponse.ok) {
                     const offlineResult = await offlineResponse.json();
-                    if (offlineResult === 'Chờ xét duyệt' || offlineResult === 'Đang mượn') {
+                    if (offlineResult === "1" || offlineResult === "3") {
                         isBorrowed = true;
-                    }
-                }
-
-                // Online borrow status check
-                if (!isBorrowed) {
-                    const onlineResponse = await fetch(`https://localhost:44315/api/PhieuMuonOnline/CheckMuonOnl/${userId}/${book.s_Id}`);
-                    if (onlineResponse.ok) {
-                        const onlineResult = await onlineResponse.json();
-                        if (onlineResult === 'Chờ xử lý') {
-                            isBorrowed = true;
-                        }
                     }
                 }
 

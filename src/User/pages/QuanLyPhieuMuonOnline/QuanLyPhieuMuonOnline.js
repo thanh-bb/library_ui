@@ -3,24 +3,55 @@ import classNames from 'classnames/bind';
 import styles from './QuanLyPhieuMuonOnline.module.scss';
 import { Link } from "react-router-dom";
 import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
+
+function calculateWorkingHours(ngayMuon, hoursToAdd = 48) {
+    const ngayMuonDate = new Date(ngayMuon);
+    let remainingHours = hoursToAdd;
+    let currentDate = new Date(ngayMuonDate);
+
+    while (remainingHours > 0) {
+        // Chuyển đến giờ tiếp theo
+        currentDate.setHours(currentDate.getHours() + 1);
+
+        // Kiểm tra xem có phải cuối tuần không
+        const day = currentDate.getDay();
+        if (day !== 6 && day !== 0) { // Bỏ qua Thứ 7 (6) và Chủ Nhật (0)
+            remainingHours--;
+        }
+    }
+
+    return currentDate; // Trả về thời gian kết thúc sau khi tính đủ 48 giờ làm việc
+}
+function calculateRemainingTime(ngayMuon) {
+    const hanTraDate = calculateWorkingHours(ngayMuon, 48); // Tính `HanTra` 48 giờ bỏ qua cuối tuần
+    const now = new Date();
+    const distance = hanTraDate - now;
+
+    if (distance <= 0) return "Đã quá hạn";
+
+    const totalHours = Math.floor(distance / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    return `${String(totalHours).padStart(2, '0')}h:${String(minutes).padStart(2, '0')}m:${String(seconds).padStart(2, '0')}s`;
+}
 
 export class QuanLyPhieuMuonOnline extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            chitietpmos: [],
+            chitietpms: [],
             tenSachFilter: '',
             tensachWithoutFilter: [],// Khởi tạo mảng chitietpmsWithoutFilter
-            selectedTag: "Chờ nhận sách",
+            selectedTag: "Đang mượn",
             phieumuonWithoutFilter: [],
-            phieumuononls: [],
-            PmoLoaiGiaoHang: "",
-            PmoPhuongThucThanhToan: "",
-            PmoTrangThai: "",
-            countdowns: {}
+            phieumuons: [],
+            TrangThaiMuon: "",
+            TrangThaiXetDuyet: ""
         }
     }
 
@@ -38,11 +69,7 @@ export class QuanLyPhieuMuonOnline extends Component {
             }
         });
 
-        this.setState({ chitietpmos: sortedData });
-    }
-
-    componentWillUnmount() {
-        Object.values(this.state.countdowns).forEach(intervalId => clearInterval(intervalId));
+        this.setState({ chitietpms: sortedData });
     }
 
     refreshList() {
@@ -51,17 +78,20 @@ export class QuanLyPhieuMuonOnline extends Component {
             const decodedToken = jwtDecode(token);
             const nd_id = decodedToken.nameid;
 
-            fetch(`https://localhost:44315/api/PhieuMuonOnline/${nd_id}`)
+            fetch(`https://localhost:44315/api/QuanLyPhieuMuon/${nd_id}`)
                 .then(response => response.json())
                 .then(data => {
+
                     this.setState({
-                        chitietpmos: data.filter(pm => pm.PmoTrangThai === this.state.selectedTag || pm.PmoLoaiGiaoHang === this.state.selectedTag || pm.PmoPhuongThucThanhToan === this.state.selectedTag),
-                        tensachWithoutFilter: data,
+                        chitietpms: data.filter(pm => pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag),
+                        tensachWithoutFilter: data // Lưu toàn bộ dữ liệu phiếu mượn
                     }, () => {
                         // Lọc danh sách dựa trên trạng thái đã chọn
+
+
                         this.FilterFn();
-                        this.startCountdowns(data);
                     });
+
                 })
                 .catch(error => {
                     console.error('Error fetching data: ', error);
@@ -71,120 +101,55 @@ export class QuanLyPhieuMuonOnline extends Component {
         }
     }
 
-    calculateWorkingHoursLeft = (startDate, endDate) => {
-        let remainingHours = 48;
-        let current = new Date(startDate);
-
-        while (current < endDate && remainingHours > 0) {
-            // Bỏ qua thứ Bảy và Chủ Nhật
-            if (current.getDay() !== 0 && current.getDay() !== 6) {
-                remainingHours -= 1;
-            }
-            current = new Date(current.getTime() + (1000 * 60 * 60)); // Cộng thêm 1 giờ
-        }
-
-        return remainingHours;
-    }
-
-
-    startCountdowns(data) {
-        data.forEach(dep => {
-            const orderDate = new Date(dep.PmoNgayDat);
-            const countdownId = `countdown-${dep.PmoId}`;
-
-            if (this.state.countdowns[countdownId]) {
-                clearInterval(this.state.countdowns[countdownId]);
-            }
-
-            const intervalId = setInterval(() => {
-                const now = new Date();
-                const hoursLeft = this.calculateWorkingHoursLeft(orderDate, now);
-
-                if (hoursLeft > 0) {
-                    const isWeekend = now.getDay() === 0 || now.getDay() === 6;
-                    if (isWeekend) {
-                        this.setState(prevState => ({
-                            countdowns: {
-                                ...prevState.countdowns,
-                                [countdownId]: "Tạm ngưng đếm ngược vào cuối tuần" // Thông báo cho người dùng
-                            }
-                        }));
-                        return; // Ngừng đếm ngược vào cuối tuần
-                    }
-                }
-
-                if (hoursLeft <= 0) {
-                    clearInterval(intervalId);
-
-                    if (dep.PmoTrangThai === "Chờ nhận sách") {
-                        this.updateOrderStatus();
-                    }
-
-                    this.setState(prevState => ({
-                        countdowns: {
-                            ...prevState.countdowns,
-                            [countdownId]: "Expired"
-                        }
-                    }));
-                } else {
-                    const hours = Math.floor(hoursLeft);
-                    const minutes = Math.floor((hoursLeft % 1) * 60);
-
-                    this.setState(prevState => ({
-                        countdowns: {
-                            ...prevState.countdowns,
-                            [countdownId]: `${hours}h ${minutes}m`
-                        }
-                    }));
-                }
-            }, 1000);
-
-            this.setState(prevState => ({
-                countdowns: {
-                    ...prevState.countdowns,
-                    [countdownId]: intervalId
-                }
-            }));
-        });
-    }
-
-    updateOrderStatus() {
-        fetch(`https://localhost:44315/api/CTPMOnline/CapNhatTrangThaiQuaHan`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" }
-        })
-            .then(response => {
-                if (response.ok) {
-                    console.log("Order status updated to 'Quá hạn nhận sách'");
-                    this.refreshList(); // Refresh list to get updated data from backend
-                } else {
-                    return response.text().then(text => { // Lấy chi tiết phản hồi
-                        console.error("Failed to update order status:", text);
-                    });
-                }
-            })
-            .catch(error => console.error("Error updating status:", error));
-    }
-
-
 
     componentDidMount() {
         this.refreshList();
+        this.interval = setInterval(() => {
+            this.forceUpdate(); // Cập nhật lại giao diện mỗi giây để hiển thị đếm ngược
+            this.checkOverdue(); // Gọi hàm checkOverdue định kỳ
+        }, 1000); // Cập nhật mỗi giây
+    }
+
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+
+
+    checkOverdue() {
+        const { phieumuons } = this.state;
+        phieumuons.forEach(order => {
+            if (order.TrangThaiMuon === "Đang giữ sách") {
+                const remainingHours = calculateRemainingTime(order.NgayMuon);
+
+                if (remainingHours <= 0) {
+                    // Trigger backend update
+                    axios.put("https://localhost:44315/api/CTPMOnline/CapNhatTrangThaiQuaHan")
+                        .then(response => {
+                            console.log("Status updated for overdue book.");
+                            this.refreshList();
+                        })
+                        .catch(error => console.error("Failed to update status:", error));
+                }
+            }
+        });
     }
 
     FilterFn() {
         const { selectedTag, tensachWithoutFilter } = this.state;
-
+        console.log(selectedTag)
         // Lọc dựa trên selectedTag
         const filteredData = tensachWithoutFilter.filter(el => {
-            return (
-                el.PmoTrangThai === selectedTag || el.PmoPhuongThucThanhToan === selectedTag || el.PmoLoaiGiaoHang === selectedTag
-            );
+            return (el.TrangThaiMuon === selectedTag || el.TrangThaiXetDuyet === selectedTag) &&
+                el.PmLoaiMuon === "Đặt online"
         });
 
         console.log("Dữ liệu sau khi lọc:", filteredData); // Kiểm tra dữ liệu sau khi lọc
-        this.setState({ phieumuononls: filteredData });
+        this.setState({ phieumuons: filteredData });
     }
+
+
+
 
     // Phân loại trạng thái
     handleTagSelection = (tag) => {
@@ -194,60 +159,30 @@ export class QuanLyPhieuMuonOnline extends Component {
     }
 
 
-
-
     render() {
 
-        const { phieumuononls, tenSachFilter } = this.state;
+        const { phieumuons, tenSachFilter } = this.state;
 
         // const filteredChitietpms = chitietpms.filter(pm =>
         //     pm.TenSach.toLowerCase().includes(tenSachFilter.toLowerCase())
         // );
 
         const { selectedTag } = this.state;
-        const { countdowns } = this.state;
 
-        // Nhóm dữ liệu theo PmoId để tính số lượng hàng cần gộp
-        const groupedData = phieumuononls.reduce((acc, item) => {
-            if (!acc[item.PmoId]) {
-                acc[item.PmoId] = [];
-            }
-            acc[item.PmoId].push(item);
-            return acc;
-        }, {});
 
         return (
             <div className={cx('wrapper')}>
                 <div className="row d-flex justify-content-end mb-3">
-                    <h1 className="fw-bold mt-5 mb-5 ">Phiếu Mượn Sách Online</h1>
+                    <h1 className="fw-bold mt-5 mb-5 ">Phiếu Mượn Tại Thư Viện</h1>
                     <hr></hr>
                     <div className="col-2">
                         <button
                             type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Chờ nhận sách" })}
-                            onClick={() => this.handleTagSelection("Chờ nhận sách")}
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đang giữ sách" })}
+                            onClick={() => this.handleTagSelection("Đang giữ sách")}
 
                         >
-                            Chờ nhận sách
-                        </button>
-                    </div>
-                    <div className="col-2">
-                        <button
-                            type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đã nhận sách" })}
-                            onClick={() => this.handleTagSelection("Đã nhận sách")}
-
-                        >
-                            Đã nhận sách
-                        </button>
-                    </div>
-                    <div className="col-2">
-                        <button
-                            type="button"
-                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đã hoàn thành" })}
-                            onClick={() => this.handleTagSelection("Đã hoàn thành")}
-                        >
-                            Đã hoàn thành
+                            Đang giữ sách
                         </button>
                     </div>
                     <div className="col-2">
@@ -259,9 +194,27 @@ export class QuanLyPhieuMuonOnline extends Component {
                             Quá hạn nhận sách
                         </button>
                     </div>
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Ðang mượn" })}
+                            onClick={() => this.handleTagSelection("Ðang mượn")}
+                        >
+                            Ðang mượn
+                        </button>
+                    </div>
+                    <div className="col-2">
+                        <button
+                            type="button"
+                            className={cx('btn-status', { 'btn-selected': selectedTag === "Đã trả" })}
+                            onClick={() => this.handleTagSelection("Đã trả")}
+                        >
+                            Đã trả
+                        </button>
+                    </div>
                 </div>
 
-                {/* <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+                <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
                     <div className="d-flex flex-row w-100 mb-2">
                         <input className="form-control m-2 fs-3 p-2 w-100"
                             type="text"
@@ -283,57 +236,65 @@ export class QuanLyPhieuMuonOnline extends Component {
                             </svg>
                         </button>
                     </div>
-                </div> */}
-
-
-                <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5 mt-5">
+                </div>
+                <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
                     <thead >
                         <tr>
-                            <th className="text-start">ID PMO</th>
-                            <th className="text-start">Tên sách</th>
-                            <th className="text-center">Số lượng</th>
-                            <th className="text-center">
-                                Ngày đặt
+                            <th className="text-start">ID Phiếu</th>
+                            <th className="text-start w-25">
+
+                                Tên Sách
                             </th>
+                            <th className="text-center">Số lượng</th>
+                            <th className="text-center ">Ngày Mượn</th>
                             <th className="text-center ">Hạn Trả</th>
-                            <th className="text-center ">Phương thức nhận sách</th>
-                            <th className="text-center">Trạng Thái Nhận Sách</th>
-                            <th className="text-center">Thời gian giữ sách còn lại</th>
+                            {(selectedTag === "Đang giữ sách") && (
+                                <th className="text-center">
+                                    Thời gian giữ sách còn lại
+                                </th>)}
+                            <th className="text-center">Trạng Thái</th>
                             <th className="text-center">Options</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {Object.values(groupedData).map((items, index) => {
-                            return items.map((dep, idx) => {
-                                const countdownId = `countdown-${dep.PmoId}`;
-                                return (
-                                    <tr key={`${dep.PmoId}-${idx}`}>
-                                        {/* Gộp ô ID đơn hàng nếu là dòng đầu tiên trong nhóm */}
-                                        {idx === 0 && (
-                                            <td className="text-center fw-bold text-primary" rowSpan={items.length}>
-                                                {dep.PmoId}
-                                            </td>
-                                        )}
-                                        <td className="text-start">{dep.TenSach}</td>
-                                        <td className="text-center">{dep.SoLuongSach}</td>
-                                        <td className="text-center">{new Date(dep.PmoNgayDat).toLocaleDateString('en-GB')}</td>
-                                        <td className="text-center">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
-                                        <td className="text-center">{dep.PmoLoaiGiaoHang}</td>
-                                        <td className="text-center">{dep.PmoTrangThai}</td>
-                                        <td className="text-center fw-bold text-danger">
-                                            {countdowns[countdownId] ? countdowns[countdownId] : "Calculating..."}
-                                        </td>
-                                        <td className="text-center">
-                                            <Link type="button" to={`/chitietphieutra/${dep.Id_PhieuMuon}`} className="btn btn-link fs-4">
-                                                Xem chi tiết
-                                            </Link>
-                                        </td>
-                                    </tr>
-                                );
-                            });
-                        })}
-                    </tbody>
+                        {phieumuons.map(dep =>
+                            <tr key={dep.Id_PhieuMuon}>
+                                <td className="text-start">{dep.Id_PhieuMuon}</td>
+                                <td className="text-start">{dep.TenSach}</td>
+                                <td className="text-center">{dep.SoLuongSach}</td>
+                                <td className="text-center">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
+                                <td className="text-center">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
 
+                                {selectedTag === "Đang giữ sách" && (
+                                    <td>
+                                        {calculateRemainingTime(dep.NgayMuon)}
+                                    </td>
+                                )}
+
+                                <td className="text-center">
+                                    {dep.TrangThaiMuon === "Đã trả" ? (
+                                        (new Date(dep.HanTra) - new Date()) < 0 ?
+                                            `Đã trả - Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày` :
+                                            "Đã trả - Đúng hạn"
+                                    ) : dep.TrangThaiMuon === "Ðang mượn" ? (
+                                        (new Date(dep.HanTra) - new Date()) < 0 ?
+                                            `${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn)` :
+                                            `Đang mượn - Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày đến hạn`
+                                    ) : dep.TrangThaiMuon === "Đang giữ sách" ? (
+                                        "Đang giữ sách"
+                                    ) : dep.TrangThaiMuon === "Quá hạn nhận sách" ? (
+                                        "Quá hạn nhận sách"
+
+                                    ) : ("")}
+                                </td>
+
+
+                                <td className="text-center">
+                                    <Link type="button" to={`/chitietphieutra/${dep.Id_PhieuMuon}`} className={`btn btn-link fs-4`}>Xem chi tiết</Link>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
                 </table>
             </div>
         )

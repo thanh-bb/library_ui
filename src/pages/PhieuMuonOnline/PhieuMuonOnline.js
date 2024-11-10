@@ -151,8 +151,10 @@ export class PhieuMuonOnline extends Component {
         this.refreshList();
         this.interval = setInterval(() => {
             this.forceUpdate(); // Cập nhật lại giao diện mỗi giây để hiển thị đếm ngược
+            this.checkOverdue(); // Gọi hàm checkOverdue định kỳ
         }, 1000); // Cập nhật mỗi giây
     }
+
 
     componentWillUnmount() {
         clearInterval(this.interval);
