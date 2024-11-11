@@ -44,6 +44,7 @@ import VNPay_SU from '~/User/pages/VNPay_SU';
 import PhieuMuonOnline from '~/pages/PhieuMuonOnline';
 import PhieuTraOnline from '~/pages/PhieuTraOnline';
 import ThongKe from '~/pages/ThongKe';
+import DanhKyNhanh from '~/pages/DanhKyNhanh';
 
 
 // Public routes
@@ -75,6 +76,7 @@ const publicRoutes = [
     { path: config.routes.datra, component: DaTra },
     { path: config.routes.nhapkhosach, component: NhapKhoSach },
     { path: config.routes.thongke, component: ThongKe },
+    { path: config.routes.dangkynhanh, component: DanhKyNhanh },
 
     //User
     { path: config.routes.userhome, component: UserHome, layout: UserLayout },

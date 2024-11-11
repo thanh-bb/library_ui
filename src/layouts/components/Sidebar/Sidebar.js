@@ -14,7 +14,9 @@ import {
     CardIcon,
     CardActiveIcon,
     ChartIcon,
-    ChartActiveIcon
+    ChartActiveIcon,
+    FastIcon,
+    FastActiveIcon
 } from '~/components/Icons';
 // import SuggestedAccounts from '~/components/SuggestedAccounts';
 import config from '~/config';
@@ -28,19 +30,48 @@ function Sidebar() {
     const [isUserManagementOpen, setIsUserManagementOpen] = useState(false);
     const [isBorrowReturnOpen, setIsBorrowReturnOpen] = useState(false);
     const [isViolationManagementOpen, setIsViolationManagementOpen] = useState(false);
+    const [isChartInfoOpen, setIsChartInfoOpen] = useState(false);
+    const [isFastInfoOpen, setIsFastInfoOpen] = useState(false);
+
 
     // Hàm toggle để mở hoặc đóng dropdown
     const toggleBookInfo = () => setIsBookInfoOpen(!isBookInfoOpen);
     const toggleUserManagement = () => setIsUserManagementOpen(!isUserManagementOpen);
     const toggleBorrowReturn = () => setIsBorrowReturnOpen(!isBorrowReturnOpen);
     const toggleViolationManagement = () => setIsViolationManagementOpen(!isViolationManagementOpen);
+    const toggleChartInfo = () => setIsChartInfoOpen(!isChartInfoOpen);
+    const toggleFastInfo = () => setIsFastInfoOpen(!isFastInfoOpen);
 
     return (
         <aside className={cx('wrapper')}>
             <div className={cx('side-bar mb-lg-5')}>
                 <Menu>
+
+                    {/* Quản lý mượn nhanh */}
+                    <div className="d-flex flex-column" onClick={toggleFastInfo} style={{ cursor: 'pointer' }}>
+                        <TitleMenu
+                            title="Đăng ký mượn nhanh"
+                            icon={<FastIcon />}
+                            activeIcon={<FastActiveIcon />}
+                            to={config.routes.dangkynhanh}
+                        />
+                        <hr style={{ margin: '0' }}></hr>
+                    </div>
+                    {isFastInfoOpen && (
+                        <div className={cx('dropdown-content')}>
+
+                            <MenuItem
+                                title="Đăng ký mượn nhanh"
+                                to={config.routes.dangkynhanh}
+                                icon=""
+                            />
+
+                        </div>
+                    )}
+
+
                     {/* Quản lý thống kê */}
-                    <div className="d-flex flex-column" onClick={toggleUserManagement} style={{ cursor: 'pointer' }}>
+                    <div className="d-flex flex-column" onClick={toggleChartInfo} style={{ cursor: 'pointer' }}>
                         <TitleMenu
                             title="Thống kê"
                             icon={<ChartIcon />}
@@ -49,7 +80,7 @@ function Sidebar() {
                         />
                         <hr style={{ margin: '0' }}></hr>
                     </div>
-                    {isUserManagementOpen && (
+                    {isChartInfoOpen && (
                         <div className={cx('dropdown-content')}>
 
                             <MenuItem
