@@ -45,7 +45,7 @@
 
 .btn-mail {
     background-image: linear-gradient(to right, #f4608a 0%, #e45796 51%, #f1468d 100%);
-    margin-top: 20px;
+    //  margin-top: 20px;
     text-align: center;
     transition: 0.5s;
     background-size: 200% auto;
@@ -54,7 +54,7 @@
     border-radius: 10px;
     display: block;
     font-weight: bold;
-    height: 40px;
+
     width: 100%;
     border: none;
     box-shadow: 0 0 10px #dedbdb;
@@ -103,7 +103,7 @@
 .pagination-item {
     position: fixed;
     left: 350px;
-    bottom: 110px; /* Adjust this value as needed */
+    bottom: 20px; /* Adjust this value as needed */
     // z-index: 9999;
 }
 
@@ -149,4 +149,100 @@
     color: #6c757d;
     pointer-events: none;
     cursor: default;
+}
+
+.phieu-muon-online {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.order-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.order-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.order-card h4 {
+    margin: 0 0 10px;
+}
+
+.order-card p {
+    margin: 5px 0;
+}
+
+.btn-view-details {
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-view-details:hover {
+    background-color: #e64a19;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h4 {
+    margin: 0 0 15px;
+}
+
+.modal-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.modal-content ul li {
+    margin: 5px 0;
+}
+
+.btn-close-modal {
+    background-color: #ddd;
+    color: #333;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-close-modal:hover {
+    background-color: #bbb;
 }

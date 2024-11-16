@@ -14,26 +14,42 @@ const trangThaiMuonMapping = {
 
 function calculateWorkingHours(ngayMuon, hoursToAdd = 48) {
     const ngayMuonDate = new Date(ngayMuon);
-    let remainingHours = hoursToAdd;
+    let remainingHours = hoursToAdd; // Số giờ còn lại cần thêm
     let currentDate = new Date(ngayMuonDate);
 
     while (remainingHours > 0) {
-        // Chuyển đến giờ tiếp theo
-        currentDate.setHours(currentDate.getHours() + 1);
+        currentDate.setHours(currentDate.getHours() + 1); // Thêm 1 giờ
+        const day = currentDate.getDay(); // Lấy ngày hiện tại
 
-        // Kiểm tra xem có phải cuối tuần không
-        const day = currentDate.getDay();
-        if (day !== 6 && day !== 0) { // Bỏ qua Thứ 7 (6) và Chủ Nhật (0)
-            remainingHours--;
+        // Bỏ qua các giờ rơi vào thứ 7 (6) và chủ nhật (0)
+        if (day !== 0 && day !== 6) {
+            remainingHours--; // Trừ dần số giờ cần thêm
         }
     }
 
-    return currentDate; // Trả về thời gian kết thúc sau khi tính đủ 48 giờ làm việc
+    return currentDate; // Trả về thời gian sau khi cộng đủ 48 giờ làm việc
 }
+
+
+
+// function calculateRemainingTime(ngayMuon) {
+//     const ngayMuonDate = new Date(ngayMuon);
+//     const countdownEndDate = new Date(ngayMuonDate.getTime() + 48 * 60 * 60 * 1000); // Cộng thêm 48 giờ
+//     const now = new Date();
+//     const distance = countdownEndDate - now; // Khoảng cách giữa hiện tại và thời điểm kết thúc
+
+//     if (distance <= 0) return "Đã quá hạn";
+
+//     const totalHours = Math.floor(distance / (1000 * 60 * 60));
+//     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+//     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+//     return `${String(totalHours).padStart(2, '0')}h:${String(minutes).padStart(2, '0')}m:${String(seconds).padStart(2, '0')}s`;
+// }
 function calculateRemainingTime(ngayMuon) {
-    const hanTraDate = calculateWorkingHours(ngayMuon, 48); // Tính `HanTra` 48 giờ bỏ qua cuối tuần
+    const hanTraDate = calculateWorkingHours(ngayMuon, 48); // Tính thời gian kết thúc (48 giờ làm việc)
     const now = new Date();
-    const distance = hanTraDate - now;
+    const distance = hanTraDate - now; // Khoảng cách giữa thời gian hiện tại và thời gian kết thúc
 
     if (distance <= 0) return "Đã quá hạn";
 
@@ -43,6 +59,7 @@ function calculateRemainingTime(ngayMuon) {
 
     return `${String(totalHours).padStart(2, '0')}h:${String(minutes).padStart(2, '0')}m:${String(seconds).padStart(2, '0')}s`;
 }
+
 
 
 
@@ -70,8 +87,10 @@ export class PhieuMuonOnline extends Component {
             TrangThaiXetDuyet: "",
 
             currentPage: 1,
-            itemsPerPage: 5,
-            totalPages: 0
+            itemsPerPage: 7,
+            totalPages: 0,
+
+            selectedPhieuMuon: null,
         }
     }
 
@@ -86,16 +105,15 @@ export class PhieuMuonOnline extends Component {
 
 
     sortResult(prop, asc) {
-        var sortedData = this.state.phieumuonsWithoutFilter.sort(function (a, b) {
+        const sortedData = [...this.state.phieumuons].sort((a, b) => {
             if (asc) {
                 return (a[prop] > b[prop]) ? 1 : ((a[prop] < b[prop]) ? -1 : 0);
-            }
-            else {
+            } else {
                 return (b[prop] > a[prop]) ? 1 : ((b[prop] < a[prop]) ? -1 : 0);
             }
         });
 
-        this.setState({ phieumuons: sortedData });
+        this.setState({ phieumuons: sortedData, currentPage: 1 });
     }
 
 
@@ -112,7 +130,7 @@ export class PhieuMuonOnline extends Component {
     }
 
     refreshList() {
-        fetch("https://localhost:44315/api/QuanLyPhieuMuon")
+        fetch("https://localhost:44315/api/QuanLyPhieuMuon/ListPM")
             .then(response => response.json())
             .then(data => {
                 const totalPages = Math.ceil(data.length / this.state.itemsPerPage);
@@ -146,6 +164,16 @@ export class PhieuMuonOnline extends Component {
                 this.setState({ phieutras: data });
             });
     }
+
+    handleShowDetails = (phieuMuon) => {
+        this.setState({ selectedPhieuMuon: phieuMuon });
+    };
+
+    handleCloseModal = () => {
+        this.setState({ selectedPhieuMuon: null });
+    };
+
+
 
     componentDidMount() {
         this.refreshList();
@@ -322,7 +350,7 @@ export class PhieuMuonOnline extends Component {
     }
 
     sendEmail() {
-        axios.post('https://localhost:44315/api/Mail/SendEmail')
+        axios.post('https://localhost:44315/api/Mail/SendEmailOnline')
             .then(response => {
                 // Xử lý khi gửi email thành công, có thể hiển thị thông báo hoặc thực hiện các hành động khác
                 alert('Email đã được gửi thành công!');
@@ -365,6 +393,94 @@ export class PhieuMuonOnline extends Component {
         this.setState({ currentPage: pageNumber });
     }
 
+    handleUpdateStatus = (status) => {
+        const { selectedPhieuMuon } = this.state;
+
+        if (!selectedPhieuMuon) {
+            alert("Chưa chọn phiếu mượn nào.");
+            return;
+        }
+
+        const pm_Id = selectedPhieuMuon.Id_PhieuMuon;
+
+        if (status === "Đã trả") {
+            // Fetch Chi Tiết Phiếu Mượn
+            fetch(`https://localhost:44315/api/ChiTietPhieuMuon/${pm_Id}`, {
+                method: "GET",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then((res) => res.json())
+                .then((chiTietPhieuMuons) => {
+                    if (!chiTietPhieuMuons || chiTietPhieuMuons.length === 0) {
+                        alert("Không tìm thấy Chi Tiết Phiếu Mượn cho Phiếu Mượn này.");
+                        return;
+                    }
+
+                    // Chuẩn bị dữ liệu Chi Tiết Phiếu Trả
+                    const chiTietPhieuTras = chiTietPhieuMuons.map((chiTiet) => ({
+                        sId: chiTiet.s_Id,
+                        ctptSoLuongSachTra: chiTiet.ctpm_SoLuongSachMuon
+                    }));
+
+                    // Tạo Phiếu Trả
+                    const phieuTraPayload = {
+                        ptNgayTra: new Date().toISOString(),
+                        ndId: selectedPhieuMuon.Id_User,
+                        pmId: pm_Id,
+                        chiTietPhieuTras
+                    };
+
+                    fetch("https://localhost:44315/api/PhieuTra", {
+                        method: "POST",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(phieuTraPayload)
+                    })
+                        .then((res) => res.json())
+                        .then((result) => {
+                            alert("Phiếu Trả được tạo thành công!");
+                            this.refreshList(); // Làm mới danh sách phiếu mượn
+                        })
+                        .catch((error) => {
+                            console.error("Lỗi khi tạo Phiếu Trả:", error);
+                            alert("Tạo Phiếu Trả thất bại.");
+                        });
+                })
+                .catch((error) => {
+                    console.error("Lỗi khi lấy Chi Tiết Phiếu Mượn:", error);
+                    alert("Không thể lấy dữ liệu Chi Tiết Phiếu Mượn.");
+                });
+        }
+
+        // Cập nhật trạng thái phiếu mượn
+        fetch("https://localhost:44315/api/PhieuMuon", {
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                pmId: pm_Id,
+                ttmId: status === "Đã trả" ? 2 : 1 // 2: Đã trả, 1: Đang giữ sách
+            })
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                alert(`Trạng thái cập nhật thành: ${status}`);
+                this.refreshList(); // Làm mới danh sách
+                this.handleCloseModal(); // Đóng modal
+            })
+            .catch((error) => {
+                console.error("Lỗi khi cập nhật trạng thái:", error);
+                alert("Không thể cập nhật trạng thái.");
+            });
+    };
+
 
     render() {
         const {
@@ -376,6 +492,14 @@ export class PhieuMuonOnline extends Component {
             nguoidungs,
             selectedTag
         } = this.state;
+
+        const { selectedPhieuMuon } = this.state;
+
+        // Lọc dữ liệu theo tag
+        const filteredPhieumuons = phieumuons.filter(
+            (pm) =>
+                pm.TrangThaiMuon === selectedTag || pm.TrangThaiXetDuyet === selectedTag
+        );
 
         const { currentPage, itemsPerPage } = this.state;
         const totalPages = Math.ceil(phieumuons.length / itemsPerPage);
@@ -478,7 +602,7 @@ export class PhieuMuonOnline extends Component {
 
                     <div className="col-2 ">
                         {/* Phần bên phải: Nút Gửi mail */}
-                        {selectedTag === "Đang mượn" && (
+                        {selectedTag === "Ðang mượn" && (
                             <div className="col-auto">
                                 <button type="button" className={cx('btn-mail')} onClick={() => this.sendEmail()}>
                                     Gửi mail
@@ -497,9 +621,6 @@ export class PhieuMuonOnline extends Component {
                             <th className="text-start">
                                 Người mượn
                             </th>
-                            <th className="text-start">
-                                Sách mượn
-                            </th>
                             <th className="text-start ">
                                 Ngày Mượn
                             </th>
@@ -515,23 +636,23 @@ export class PhieuMuonOnline extends Component {
                                 </th>)}
 
                             {(selectedTag === "Đang giữ sách") && (
-                                <th className="text-start">
+                                <th >
                                     Thời gian giữ sách còn lại
                                 </th>)}
 
-                            <th className="text-start">
+                            <th >
                                 Options
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.map((dep, index) =>
-                            <tr key={`${dep.Id_PhieuMuon}-${index}`}>
+                        {currentItems.map((dep, index) => (
+                            <tr key={`${dep.Id_PhieuMuon}-${dep.Id_User}-${index}`}>
                                 <td className="text-start">{dep.Id_PhieuMuon}</td>
                                 <td className="text-start">
                                     {nguoidungs.find(ng => ng.nd_Id === dep.Id_User)?.nd_Username} - {nguoidungs.find(ng => ng.nd_Id === dep.Id_User)?.nd_HoTen}
                                 </td>
-                                <td className="text-start">{dep.TenSach}</td>
+
                                 <td className="text-start">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
                                 <td className="text-start">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
                                 <td className="text-start">{dep.TrangThaiMuon}</td>
@@ -572,34 +693,91 @@ export class PhieuMuonOnline extends Component {
                                 )}
 
 
-                                <td className="position-relative">
-                                    {(dep.TrangThaiMuon !== "Đã trả") && (dep.TrangThaiMuon !== "Quá hạn nhận sách") ? ( // Add condition to enable/disable button
-                                        <button type="button"
-                                            className="btn btn-light mr-1 "
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#exampleModal"
-                                            onClick={() => this.editClick(dep)}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                                <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
-                                            </svg>
-                                        </button>
-                                    ) : (
-                                        <button type="button"
-                                            className="btn btn-light mr-1"
-                                            disabled={true}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                                <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
-                                            </svg>
-                                        </button>
-                                    )}
+                                <td >
+                                    <button
+                                        className="btn btn-outline-primary fs-4"
+                                        onClick={() => this.handleShowDetails(dep)}
+                                    >
+                                        Xem chi tiết
+                                    </button>
+
                                 </td>
 
 
-                            </tr>)}
+                            </tr>))}
                     </tbody>
                 </table>
+
+                {/* Modal hiển thị chi tiết */}
+                {selectedPhieuMuon && (
+                    <div className={cx("modal-overlay")}>
+                        <div className={cx("modal-content", "text-start")}>
+                            <h4>Chi Tiết Phiếu Mượn #{selectedPhieuMuon.Id_PhieuMuon}</h4>
+                            <p>
+                                <strong>Người Mượn:</strong>{" "}
+                                {nguoidungs.find((nd) => nd.nd_Id === selectedPhieuMuon.Id_User)?.nd_HoTen ||
+                                    "Không rõ"}
+                            </p>
+                            <p>
+                                <strong>Ngày Mượn:</strong>{" "}
+                                {new Date(selectedPhieuMuon.NgayMuon).toLocaleDateString("vi-VN")}
+                            </p>
+                            <p>
+                                <strong>Hạn Trả:</strong>{" "}
+                                {new Date(selectedPhieuMuon.HanTra).toLocaleDateString("vi-VN")}
+                            </p>
+                            <p>
+                                <strong>Trạng Thái:</strong> {selectedPhieuMuon.TrangThaiMuon}
+                            </p>
+
+                            {/* Danh sách sách */}
+                            <div className="mt-5">
+                                <strong>Bao gồm:</strong>
+                                {selectedPhieuMuon.ChiTiet && selectedPhieuMuon.ChiTiet.length > 0 ? (
+                                    <ul className="list-group">
+                                        {selectedPhieuMuon.ChiTiet.map((sach, index) => (
+                                            <li
+                                                key={index}
+                                                className="list-group-item d-flex justify-content-between align-items-center"
+                                            >
+                                                <span>{sach.TenSach}</span>
+                                                <span className="badge bg-secondary">{sach.SoLuongSach}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>Không có thông tin sách.</p>
+                                )}
+                            </div>
+
+                            {/* Nút cập nhật trạng thái */}
+
+                            <div className="d-flex gap-2 mt-3">
+                                {selectedTag === "Ðang mượn" && (
+                                    <button
+                                        className="btn btn-outline-success fs-3"
+                                        onClick={() => this.handleUpdateStatus("Đã trả")}
+                                    >
+                                        Đánh dấu là Đã trả
+                                    </button>
+                                )}
+
+                                {selectedTag === "Đang giữ sách" && (
+                                    <button
+                                        className="btn btn-outline-warning fs-3"
+                                        onClick={() => this.handleUpdateStatus("Đã nhận sách")}
+                                    >
+                                        Đánh dấu là đã nhận sách
+                                    </button>)}
+
+                                <button className="btn btn-outline-danger fs-3" onClick={this.handleCloseModal}>
+                                    Đóng
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                )}
 
                 {/* Điều hướng phân trang */}
                 <div className={cx('pagination-item')}>

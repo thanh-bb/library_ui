@@ -66,7 +66,7 @@ function HeaderAdmin() {
             to: '/thongtintaikhoan',
         },
 
-        ...MENU_ITEMS,
+        // ...MENU_ITEMS,
         {
             icon: <FontAwesomeIcon icon={faSignOut} />,
             title: 'Log out',

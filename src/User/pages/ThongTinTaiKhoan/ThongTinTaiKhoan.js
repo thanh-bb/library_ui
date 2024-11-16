@@ -156,7 +156,7 @@ export class ThongTinTaiKhoan extends Component {
                                     <div className="row flex">
                                         <div className="col-5">
                                             <Link to="/userhome" type="submit" className={cx('btn-return')}>
-                                                <p className="pt-2">Quay lại</p>
+                                                <p className="pt-3">Quay lại</p>
                                             </Link>
                                         </div>
                                         <div className="col-7 ">

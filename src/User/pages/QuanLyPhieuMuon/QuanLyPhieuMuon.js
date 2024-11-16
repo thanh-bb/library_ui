@@ -18,12 +18,13 @@ export class QuanLyPhieuMuon extends Component {
             phieumuonWithoutFilter: [],
             phieumuons: [],
             TrangThaiMuon: "",
-            TrangThaiXetDuyet: ""
+            TrangThaiXetDuyet: "",
+            idPhieuMuonFilter: '',
         }
     }
 
-    handleTenSachFilterChange = (e) => {
-        this.setState({ tenSachFilter: e.target.value });
+    handleIdPhieuMuonFilterChange = (e) => {
+        this.setState({ idPhieuMuonFilter: e.target.value });
     }
 
     sortResult(prop, asc) {
@@ -51,7 +52,8 @@ export class QuanLyPhieuMuon extends Component {
 
                     this.setState({
                         chitietpms: data.filter(pm => (pm.TrangThaiMuon === this.state.selectedTag || pm.TrangThaiXetDuyet === this.state.selectedTag) && pm.PmLoaiMuon === "Mượn trực tiếp"),
-                        tensachWithoutFilter: data // Lưu toàn bộ dữ liệu phiếu mượn
+                        tensachWithoutFilter: data, // Lưu toàn bộ dữ liệu phiếu mượn
+                        phieumuons: data
                     }, () => {
                         // Lọc danh sách dựa trên trạng thái đã chọn
 
@@ -101,10 +103,11 @@ export class QuanLyPhieuMuon extends Component {
 
     render() {
 
-        const { phieumuons, tenSachFilter } = this.state;
+        const { phieumuons, tenSachFilter, idPhieuMuonFilter } = this.state;
 
+        // Lọc dữ liệu dựa trên ID phiếu mượn
         const filteredPhieumuons = phieumuons.filter(pm =>
-            pm.TenSach.toLowerCase().includes(tenSachFilter.toLowerCase())
+            pm.Id_PhieuMuon.toString().includes(idPhieuMuonFilter)
         );
 
         const { selectedTag } = this.state;
@@ -156,21 +159,22 @@ export class QuanLyPhieuMuon extends Component {
 
                 <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
                     <div className="d-flex flex-row w-100 mb-2">
-                        <input className="form-control m-2 fs-3 p-2 w-100"
+                        <input
+                            className="form-control m-2 fs-3 p-2 w-100"
                             type="text"
-                            placeholder="Tìm kiếm theo tên sách"
-                            value={tenSachFilter}
-                            onChange={this.handleTenSachFilterChange}
+                            placeholder="Tìm kiếm theo ID phiếu mượn"
+                            value={idPhieuMuonFilter}
+                            onChange={this.handleIdPhieuMuonFilterChange}
                         />
                         <button type="button" className="btn btn-light"
-                            onClick={() => this.sortResult('TenSach', true)}>
+                            onClick={() => this.sortResult('Id_PhieuMuon', true)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
                                 <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
                             </svg>
                         </button>
 
                         <button type="button" className="btn btn-light"
-                            onClick={() => this.sortResult('TenSach', false)}>
+                            onClick={() => this.sortResult('Id_PhieuMuon', false)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
                                 <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
                             </svg>
@@ -182,11 +186,6 @@ export class QuanLyPhieuMuon extends Component {
                     <thead >
                         <tr>
                             <th className="text-start">ID Phiếu</th>
-                            <th className="text-start w-25">
-
-                                Tên Sách
-                            </th>
-                            <th className="text-center">Số lượng</th>
                             <th className="text-center ">Ngày Mượn</th>
                             <th className="text-center ">Hạn Trả</th>
                             <th className="text-center">Trạng Thái</th>
@@ -197,8 +196,7 @@ export class QuanLyPhieuMuon extends Component {
                         {filteredPhieumuons.map(dep =>
                             <tr key={dep.Id_PhieuMuon}>
                                 <td className="text-start">{dep.Id_PhieuMuon}</td>
-                                <td className="text-start">{dep.TenSach}</td>
-                                <td className="text-center">{dep.SoLuongSach}</td>
+
                                 <td className="text-center">{new Date(dep.NgayMuon).toLocaleDateString('en-GB')}</td>
                                 <td className="text-center">{new Date(dep.HanTra).toLocaleDateString('en-GB')}</td>
 

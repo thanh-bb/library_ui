@@ -72,7 +72,7 @@ export class DanhKyNhanh extends Component {
             const response = await axios.get('https://localhost:44315/api/NguoiDung/search-borrower', {
                 params: { cccd: cccd || null, username: username || null }
             });
-            if (response.data !== "Borrower not found") {
+            if (response.data !== "Không tìm thấy người mượn") {
                 const borrower = response.data[0];
                 this.setState({ borrower, errorMessage: '' });
                 // Kiểm tra số lượng phiếu mượn khi tìm thấy người mượn

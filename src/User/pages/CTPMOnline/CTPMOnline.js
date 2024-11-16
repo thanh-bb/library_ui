@@ -411,12 +411,12 @@ export class CTPMOnline extends Component {
                         <div className={cx("row d-flex justify-content-end mt-2 mb-5 w-50 me-5 m-auto")}>
                             <div className="col-4 ">
                                 <Link to="/giosach" type="submit" className={cx('btn-return')}>
-                                    <p className="pt-2">Quay lại</p>
+                                    <p className="pt-3">Quay lại</p>
                                 </Link>
                             </div>
                             <div className="col-4">
                                 <button type="button" className={cx('btn-continue')} onClick={this.handleOrderSubmit}>
-                                    <p className="pt-2">Xác nhận đặt sách</p>
+                                    <p className="fs-3">Xác nhận đặt sách</p>
                                 </button>
                             </div>
 

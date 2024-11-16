@@ -70,7 +70,7 @@ function Header() {
 
     const userMenu = [
         { icon: <FontAwesomeIcon icon={faUser} />, title: 'View profile', to: '/thongtintaikhoan' },
-        ...MENU_ITEMS,
+        // ...MENU_ITEMS,
         { icon: <FontAwesomeIcon icon={faSignOut} />, title: 'Log out', to: '/login', separate: true },
     ];
 

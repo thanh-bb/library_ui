@@ -211,7 +211,7 @@ export class Cart extends Component {
 
                 if (offlineResponse.ok) {
                     const offlineResult = await offlineResponse.json();
-                    if (offlineResult === "1" || offlineResult === "3") {
+                    if (offlineResult === "1" || offlineResult === "2" || offlineResult === "3" || offlineResult === "4") {
                         isBorrowed = true;
                     }
                 }
@@ -290,9 +290,9 @@ export class Cart extends Component {
             return;
         }
 
-        const { numberOfBorrowReceipts, maxBorrowingsPerMonth } = this.state;
+        const { numberOfBorrowReceipts_Off, maxBorrowingsPerMonth } = this.state;
         // Check if user has reached the borrow limit
-        if (numberOfBorrowReceipts >= maxBorrowingsPerMonth) {
+        if (numberOfBorrowReceipts_Off >= maxBorrowingsPerMonth) {
             alert("Bạn đã mượn đủ số lần cho phép của tháng này!");
         } else {
             sessionStorage.setItem('selectedBooks', JSON.stringify(selectedBooks));
@@ -406,12 +406,12 @@ export class Cart extends Component {
                             <div className={cx("row d-flex justify-content-end mt-2 mb-5 w-50 me-5")}>
                                 <div className="col-4 ">
                                     <Link to="/userhome" type="submit" className={cx('btn-return')}>
-                                        <p className="pt-2">Quay lại</p>
+                                        <p className="pt-3">Quay lại</p>
                                     </Link>
                                 </div>
                                 <div className="col-4">
                                     <button type="button" onClick={this.handleContinue} className={cx('btn-continue')}>
-                                        <p className="pt-2">TIếp tục</p>
+                                        <p className="fs-3">Tiếp tục</p>
                                     </button>
 
                                 </div>
