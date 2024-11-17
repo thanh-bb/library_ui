@@ -37,7 +37,7 @@ export class PhieuMuon extends Component {
             TrangThaiXetDuyet: "",
 
             currentPage: 1,
-            itemsPerPage: 7,
+            itemsPerPage: 8,
             totalPages: 0,
 
             selectedPhieuMuon: null,
@@ -632,8 +632,15 @@ export class PhieuMuon extends Component {
                                 {(selectedTag === "Ðang mượn" || selectedTag === "Đã trả") && (
                                     <td className="text-start">
                                         {(() => {
-                                            const currentDate = new Date();
-                                            const dueDate = new Date(dep.HanTra);
+                                            // Reset time to 00:00:00 for accurate day calculations
+                                            const resetTime = (date) => {
+                                                const newDate = new Date(date);
+                                                newDate.setHours(0, 0, 0, 0);
+                                                return newDate;
+                                            };
+
+                                            const currentDate = resetTime(new Date());
+                                            const dueDate = resetTime(dep.HanTra);
                                             const dueDays = Math.floor((dueDate - currentDate) / (1000 * 60 * 60 * 24));
 
                                             if (dep.TrangThaiMuon === "Đã trả") {
@@ -659,22 +666,35 @@ export class PhieuMuon extends Component {
                                             }
                                         })()}
                                     </td>
+
                                 )}
 
 
 
                                 {(selectedTag === "Chờ xét duyệt") && (
                                     <td className="text-start">
-                                        {dep.HanTra ?
-                                            ((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)) >= 0 ?
-                                                `Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày (Chưa đến hạn)`
-                                                :
-                                                "Còn hạn"
+                                        {dep.HanTra ? (() => {
+                                            // Reset time to 00:00:00 for accurate day calculations
+                                            const resetTime = (date) => {
+                                                const newDate = new Date(date);
+                                                newDate.setHours(0, 0, 0, 0);
+                                                return newDate;
+                                            };
+
+                                            const currentDate = resetTime(new Date());
+                                            const dueDate = resetTime(dep.HanTra);
+                                            const daysRemaining = Math.floor((dueDate - currentDate) / (1000 * 60 * 60 * 24));
+
+                                            return daysRemaining >= 0
+                                                ? `Còn ${daysRemaining} ngày (Chưa đến hạn)`
+                                                : "Còn hạn";
+                                        })()
                                             :
                                             "Chưa cập nhật hạn trả"
                                         }
                                     </td>
                                 )}
+
 
 
                                 <td >
@@ -710,6 +730,12 @@ export class PhieuMuon extends Component {
                                 <strong>Hạn Trả:</strong>{" "}
                                 {new Date(selectedPhieuMuon.HanTra).toLocaleDateString("vi-VN")}
                             </p>
+                            {selectedTag === "Đã trả" && (
+                                <p>
+                                    <strong>Ngày trả:</strong>{" "}
+                                    {new Date(selectedPhieuMuon.NgayTra).toLocaleDateString("vi-VN")}
+                                </p>
+                            )}
                             <p>
                                 <strong>Trạng Thái:</strong> {selectedPhieuMuon.TrangThaiMuon}
                             </p>

@@ -87,7 +87,7 @@ export class PhieuMuonOnline extends Component {
             TrangThaiXetDuyet: "",
 
             currentPage: 1,
-            itemsPerPage: 7,
+            itemsPerPage: 8,
             totalPages: 0,
 
             selectedPhieuMuon: null,

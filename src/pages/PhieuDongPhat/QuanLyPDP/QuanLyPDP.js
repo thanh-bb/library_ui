@@ -12,7 +12,11 @@ export class QuanLyPDP extends Component {
             phieudongphats: [],
             nguoiDongPhatMap: {}, // to store user information associated with pm_Id
             pm_IdFilter: "",
-            phieudongphatsWithoutFilter: []
+            phieudongphatsWithoutFilter: [],
+
+            currentPage: 1,
+            itemsPerPage: 10,
+            totalPages: 0
         };
     }
 
@@ -66,6 +70,7 @@ export class QuanLyPDP extends Component {
             this.FilterFn();
         });
     }
+
     sortResult(prop, asc) {
         var sortedData = this.state.phieudongphatsWithoutFilter.sort(function (a, b) {
             if (asc) {
@@ -78,42 +83,64 @@ export class QuanLyPDP extends Component {
 
         this.setState({ phieudongphats: sortedData });
     }
+
+
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage } = this.state;
+        const totalPages = Math.ceil(this.state.phieudongphats.length / this.state.itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
     render() {
         const { phieudongphats, nguoiDongPhatMap } = this.state;
 
+
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(phieudongphats.length / itemsPerPage);
+
+        // Lọc dữ liệu theo trang hiện tại
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = phieudongphats.slice(indexOfFirstItem, indexOfLastItem);
+
+
         return (
             <div className={cx('wrapper')}>
-                <table className="table table-hover">
-                    <thead className="table-danger">
+                <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+                    <div className="d-flex justify-content-center align-items-center">
+                        <input
+                            className="form-control m-2 fs-4"
+                            onChange={this.changepm_IdFilter}
+                            placeholder="Tìm theo ID phiếu mượn"
+                        />
+                    </div>
+                </div>
+                <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
+                    <thead >
                         <tr>
                             <th className="text-start">ID Phiếu Phạt</th>
                             <th className="text-start">Tổng Tiền Phạt</th>
                             <th className="text-start">
-                                <div className="d-flex flex-row">
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('pdp_NgayDong', true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0z" />
-                                        </svg>
-                                    </button>
 
-                                    <button type="button" className="btn btn-light"
-                                        onClick={() => this.sortResult('pdp_NgayDong', false)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                                            <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0z" />
-                                        </svg>
-                                    </button>
-                                </div >
-                                Ngày Đóng
+                                Ngày Xuất PDP
                             </th>
                             <th className="text-center" style={{ width: "20%" }}>
-                                <div className="d-flex justify-content-center align-items-center">
-                                    <input
-                                        className="form-control m-2 fs-4"
-                                        onChange={this.changepm_IdFilter}
-                                        placeholder="Tìm theo ID phiếu mượn"
-                                    />
-                                </div>
+
                                 Số phiếu mượn
                             </th>
                             <th className="text-center">Trạng Thái Đóng</th>
@@ -121,7 +148,7 @@ export class QuanLyPDP extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {phieudongphats.map(dep => (
+                        {currentItems.map(dep => (
                             <tr key={dep.pdp_Id}>
                                 <td className="text-start">{dep.pdp_Id}</td>
                                 <td className="text-start">{dep.pdp_TongTienPhat} VND</td>
@@ -133,7 +160,43 @@ export class QuanLyPDP extends Component {
                         ))}
                     </tbody>
                 </table>
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
             </div>
+
+
         );
 
 

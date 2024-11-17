@@ -43,6 +43,7 @@ function PhieuDongPhat() {
         fetchUsers();
     }, []);
 
+
     useEffect(() => {
         const fetchOverdueLoans = async () => {
             try {
@@ -50,11 +51,14 @@ function PhieuDongPhat() {
                 if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu phiếu mượn.");
                 const data = await response.json();
 
+                // Filter only overdue records
                 const overdueLoans = data.filter(
                     (pm) =>
-                        pm.TrangThaiMuon === "Ðang mượn" &&
-                        new Date(pm.HanTra) < new Date()
+                        pm.NgayTra && // Ensure Ngày trả is not null
+                        new Date(pm.NgayTra) > new Date(pm.HanTra) && // Ngày trả is after Hạn trả
+                        pm.TrangThaiMuon === "Đã trả" // Ensure the loan is marked as "Đã trả"
                 );
+
                 setPhieuQuaHan(overdueLoans);
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu:", error);
@@ -63,6 +67,7 @@ function PhieuDongPhat() {
 
         fetchOverdueLoans();
     }, []);
+
 
     const handleCreateFine = async (pmId) => {
         try {
@@ -142,6 +147,7 @@ function PhieuDongPhat() {
                             <th>Mã phiếu</th>
                             <th>Người mượn</th>
                             <th>Hạn trả</th>
+                            <th>Ngày trả</th>
                             <th>Số ngày quá hạn</th>
                             <th>Options</th>
                         </tr>
@@ -155,12 +161,22 @@ function PhieuDongPhat() {
                                     <td>{phieu.Id_PhieuMuon}</td>
                                     <td>{user ? user.nd_HoTen : "Không rõ"}</td>
                                     <td>{new Date(phieu.HanTra).toLocaleDateString("vi-VN")}</td>
+                                    <td>{new Date(phieu.NgayTra).toLocaleDateString("vi-VN")}</td>
                                     <td>
-                                        {Math.abs(
-                                            Math.floor((new Date() - new Date(phieu.HanTra)) / (1000 * 60 * 60 * 24))
-                                        )}{" "}
-                                        ngày
+                                        {(() => {
+                                            const hanTra = new Date(phieu.HanTra);
+                                            const ngayTra = new Date(phieu.NgayTra);
+
+                                            // Set time components to midnight to ignore hours, minutes, and seconds
+                                            hanTra.setHours(0, 0, 0, 0);
+                                            ngayTra.setHours(0, 0, 0, 0);
+
+                                            // Calculate overdue days
+                                            const overdueDays = Math.floor((ngayTra - hanTra) / (1000 * 60 * 60 * 24));
+                                            return `${overdueDays} ngày`;
+                                        })()}
                                     </td>
+
                                     <td>
                                         {phieu.PmDaXuatPhat === false ? (
                                             <>
@@ -240,6 +256,7 @@ function PhieuDongPhat() {
                         <p>Người mượn: {selectedPhieu.Id_User}</p>
                         <p>Ngày mượn: {new Date(selectedPhieu.NgayMuon).toLocaleDateString("vi-VN")}</p>
                         <p>Hạn trả: {new Date(selectedPhieu.HanTra).toLocaleDateString("vi-VN")}</p>
+                        <p>Ngày trả:   {new Date(selectedPhieu.NgayTra).toLocaleDateString("vi-VN")}</p>
                         <p>Số lượng sách: {selectedPhieu.ChiTiet.length}</p>
                         <ul>
                             <h3>Bao gồm sách:</h3>
