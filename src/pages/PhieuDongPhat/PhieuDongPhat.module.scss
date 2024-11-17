@@ -19,13 +19,276 @@
     border-radius: 10px;
     display: block;
     float: right;
-    margin-left: 0px;
-    font-weight: bold;
-    font-size: 15px;
 }
 
 .btn-grad:hover {
     background-position: right center; /* change the direction of the change here */
     color: #fff;
     text-decoration: none;
+}
+
+.btn-status {
+    background-color: #1253e094;
+    margin-top: 20px;
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: rgba(0, 0, 0, 0.321);
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+    font-weight: bold;
+    height: 40px;
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.321);
+}
+
+.btn-mail {
+    background-image: linear-gradient(to right, #f4608a 0%, #e45796 51%, #f1468d 100%);
+    //  margin-top: 20px;
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: rgb(255, 255, 255);
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+    font-weight: bold;
+
+    width: 100%;
+    border: none;
+    box-shadow: 0 0 10px #dedbdb;
+    transform: scale(1.05);
+}
+
+/* Khi nút được chọn */
+.btn-selected {
+    background-color: #11009e;
+    margin-top: 20px;
+    text-align: center;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: rgb(255, 255, 255);
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+    font-weight: bold;
+    height: 40px;
+    width: 100%;
+    border: none;
+    box-shadow: 0 0 10px #dedbdb;
+    transform: scale(1.05);
+}
+
+// phân trang
+
+.pagination button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background-color: #435ebe;
+    color: white;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-item {
+    position: fixed;
+    left: 350px;
+    bottom: 20px; /* Adjust this value as needed */
+    // z-index: 9999;
+}
+
+.pagination {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.page-item {
+    margin: 0 0.2rem;
+    padding: 5px;
+}
+
+.page-link {
+    display: block;
+    padding: 0.5rem 0.8rem;
+    color: #030d34;
+    text-decoration: none;
+    //    font-size: 1.25rem;
+    border-radius: 0.3rem;
+    transition: background-color 0.2s, color 0.2s;
+
+    width: 30px;
+}
+
+.page-link:hover {
+    background-color: #435ebe;
+    color: white;
+}
+
+.page-item.active .page-link {
+    background-color: #435ebe;
+    color: white;
+    font-weight: bold;
+}
+
+.page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: default;
+}
+
+.phieu-muon-online {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.order-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.order-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.order-card h4 {
+    margin: 0 0 10px;
+}
+
+.order-card p {
+    margin: 5px 0;
+}
+
+.btn-view-details {
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-view-details:hover {
+    background-color: #e64a19;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h4 {
+    margin: 0 0 15px;
+}
+
+.modal-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.modal-content ul li {
+    margin: 5px 0;
+}
+
+.btn-close-modal {
+    background-color: #ddd;
+    color: #333;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-close-modal:hover {
+    background-color: #bbb;
+}
+
+.pagination-container {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    // padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    // bottom: 30px;
+}
+
+.pagination-btn {
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    background-color: transparent;
+    color: #333;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s;
+
+    &:hover {
+        background-color: #f0f0f0;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+}
+
+.active-btn {
+    background-color: #3f51b5;
+    color: white;
+    border-radius: 4px;
+}
+
+.prev-btn,
+.next-btn {
+    font-size: 14px;
 }

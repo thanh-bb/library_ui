@@ -218,8 +218,13 @@ function Sidebar() {
                     {isViolationManagementOpen && (
                         <div className={cx('dropdown-content')}>
                             <MenuItem
-                                title="Phiếu Đóng Phạt"
+                                title="Xuất phiếu Đóng Phạt"
                                 to={config.routes.phieudongphat}
+                                icon=""
+                            />
+                            <MenuItem
+                                title="Xem phiếu Đóng Phạt"
+                                to={config.routes.quanlypdp}
                                 icon=""
                             />
                         </div>

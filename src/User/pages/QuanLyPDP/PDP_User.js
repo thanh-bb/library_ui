@@ -12,8 +12,10 @@ export class PDP_User extends Component {
         this.state = {
             phieudongphats: [],
             pm_IdFilter: "",
-            phieudongphatsWithoutFilter: []
-        }
+            phieudongphatsWithoutFilter: [],
+            thongtins: "",
+
+        };
     }
 
     FilterFn = () => {
@@ -35,8 +37,7 @@ export class PDP_User extends Component {
         var sortedData = this.state.phieudongphatsWithoutFilter.sort(function (a, b) {
             if (asc) {
                 return (a[prop] > b[prop]) ? 1 : ((a[prop] < b[prop]) ? -1 : 0);
-            }
-            else {
+            } else {
                 return (b[prop] > a[prop]) ? 1 : ((b[prop] < a[prop]) ? -1 : 0);
             }
         });
@@ -45,33 +46,53 @@ export class PDP_User extends Component {
     }
 
     refreshList() {
-        // Lấy token từ sessionStorage
         const token = sessionStorage.getItem('jwttoken');
-
-        // Kiểm tra nếu token tồn tại
         if (token) {
-            // Giải mã token để lấy nd_id
             const decodedToken = jwtDecode(token);
             const nd_id = decodedToken.nameid;
 
-            // Gọi API để lấy danh sách phiếu mượn của người dùng với nd_id này
             fetch(`https://localhost:44315/api/PhieuDongPhat/FindByNdId/${nd_id}`)
                 .then(response => response.json())
                 .then(data => {
                     this.setState({
                         phieudongphats: data,
-                        phieudongphatsWithoutFilter: data // Cập nhật chitietpmsWithoutFilter với dữ liệu mới
+                        phieudongphatsWithoutFilter: data
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching data: ', error);
+                });
+
+            // Gọi API để lấy danh sách phiếu mượn của người dùng với nd_id này
+            fetch(`https://localhost:44315/api/NguoiDung/${nd_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({
+                        thongtins: data[0].nd_HoTen,
                     });
                 })
                 .catch(error => {
                     console.error('Error fetching data: ', error);
                 });
         } else {
-            // Xử lý khi không có token
             console.error('Access token not found');
         }
     }
 
+    handlePayment = (fine) => {
+        const { thongtins } = this.state; // Access user's name from state
+        const amount = fine.pdp_TongTienPhat;
+        const orderDescription = `Thanh toán phiếu đóng phạt #${fine.pdp_Id}`;
+        const orderId = fine.pdp_Id;
+
+        // Save the pdp_Id to localStorage for future reference
+        localStorage.setItem("pdp_Id", fine.pdp_Id);
+
+        const paymentUrl = `https://localhost:44393/Home/Index/?customerName=${encodeURIComponent(thongtins)}&amount=${encodeURIComponent(amount)}&description=${encodeURIComponent(orderDescription)}&orderId=${orderId}`;
+
+        // Redirect to VNPAY
+        window.location.href = paymentUrl;
+    }
 
     componentDidMount() {
         this.refreshList();
@@ -79,6 +100,7 @@ export class PDP_User extends Component {
 
     render() {
         const { phieudongphats } = this.state;
+
 
         return (
             <div className={cx('wrapper')}>
@@ -113,35 +135,39 @@ export class PDP_User extends Component {
                     </div >
                 </div>
                 <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
-                    <thead >
+                    <thead>
                         <tr>
-                            <th className="text-start ">ID Phiếu Phạt</th>
-                            <th className="text-center " style={{ width: "18%" }}>
-
-                                Số phiếu mượn
-                            </th>
-                            <th className="text-center" style={{ paddingLeft: '60px' }}>Tổng Tiền Phạt</th>
-                            <th className="text-center w-25">
-
-                                Ngày đóng
-                            </th>
-                            <th className="text-start w-25">Trạng Thái</th>
+                            <th className="text-start">ID Phiếu Phạt</th>
+                            <th className="text-center" >Số phiếu mượn</th>
+                            <th className="text-center" >Tổng Tiền Phạt</th>
+                            <th className="text-center ">Ngày đóng</th>
+                            <th className="text-start">Trạng Thái</th>
+                            <th className="text-start">Thanh toán</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {phieudongphats.map(dep =>
-                            <tr key={dep.pdp_Id}>
-                                <td className="text-start">{dep.pdp_Id}</td>
-                                <td className="text-center">{dep.pm_Id}</td>
-                                <td className="text-start " style={{ paddingLeft: '100px' }}>{dep.pdp_TongTienPhat} VND</td>
-                                <td className="text-center">{new Date(dep.pdp_NgayDong).toLocaleDateString('en-GB')}</td>
-                                <td className="text-start">{dep.pdp_TrangThaiDong ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
-
+                        {phieudongphats.map(fine => (
+                            <tr key={fine.pdp_Id}>
+                                <td className="text-start">{fine.pdp_Id}</td>
+                                <td className="text-center">{fine.pm_Id}</td>
+                                <td className="text-center">{fine.pdp_TongTienPhat} VND</td>
+                                <td className="text-center">{new Date(fine.pdp_NgayDong).toLocaleDateString('en-GB')}</td>
+                                <td className="text-start">{fine.pdp_TrangThaiDong ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
+                                <td>
+                                    {!fine.pdp_TrangThaiDong && (
+                                        <button
+                                            className="btn btn-primary fs-3"
+                                            onClick={() => this.handlePayment(fine)}
+                                        >
+                                            Thanh toán qua VNPAY
+                                        </button>
+                                    )}
+                                </td>
                             </tr>
-                        )}
+                        ))}
                     </tbody>
                 </table>
             </div>
-        )
+        );
     }
 }
