@@ -48,6 +48,9 @@
     font-size: 15px;
     border: 2px solid #435ebe;
     float: right;
+    width: 20%;
+    margin: auto;
+    margin-bottom: 20px;
 }
 
 .btn-create:hover {
@@ -126,4 +129,15 @@
     color: #6c757d;
     pointer-events: none;
     cursor: default;
+}
+
+.custom-add-button {
+    margin-top: 50px; /* Điều chỉnh khoảng cách */
+    padding: 20px; /* Tăng kích thước nút */
+}
+.plus-custom {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }

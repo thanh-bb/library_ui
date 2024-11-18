@@ -285,39 +285,39 @@ export class Sach extends Component {
         });
     }
 
-    handleFileChange = async (e, fieldName, index) => {
-        const file = e.target.files[0];
+    // handleFileChange = async (e, fieldName, index) => {
+    //     const file = e.target.files[0];
 
-        if (file) {
-            const formData = new FormData();
-            formData.append("file", file);
+    //     if (file) {
+    //         const formData = new FormData();
+    //         formData.append("file", file);
 
-            try {
-                const response = await fetch("https://localhost:44315/api/HinhMinhHoa/SaveFile", {
-                    method: "POST",
-                    body: formData,
-                });
-                const data = await response.json();
+    //         try {
+    //             const response = await fetch("https://localhost:44315/api/HinhMinhHoa/SaveFile", {
+    //                 method: "POST",
+    //                 body: formData,
+    //             });
+    //             const data = await response.json();
 
-                if (data) {
-                    // Cập nhật ảnh đã tải lên trong mảng `images`
-                    const updatedImages = [...this.state.images];
-                    updatedImages[index] = data; // Cập nhật hình ảnh mới ở vị trí `index`
+    //             if (data) {
+    //                 // Cập nhật ảnh đã tải lên trong mảng `images`
+    //                 const updatedImages = [...this.state.images];
+    //                 updatedImages[index] = data; // Cập nhật hình ảnh mới ở vị trí `index`
 
-                    // Nếu chưa đủ 5 ảnh và người dùng vừa tải lên một ảnh mới, thêm một trường trống
-                    if (updatedImages.length < 5 && !updatedImages.includes('')) {
-                        updatedImages.push('');
-                    }
+    //                 // Nếu chưa đủ 5 ảnh và người dùng vừa tải lên một ảnh mới, thêm một trường trống
+    //                 if (updatedImages.length < 5 && !updatedImages.includes('')) {
+    //                     updatedImages.push('');
+    //                 }
 
-                    this.setState({ images: updatedImages });
-                } else {
-                    alert("Failed to upload the file.");
-                }
-            } catch (error) {
-                console.error("Error uploading file:", error);
-            }
-        }
-    };
+    //                 this.setState({ images: updatedImages });
+    //             } else {
+    //                 alert("Failed to upload the file.");
+    //             }
+    //         } catch (error) {
+    //             console.error("Error uploading file:", error);
+    //         }
+    //     }
+    // };
 
     createClick = () => {
         const isValid = this.validateFields();
@@ -395,10 +395,13 @@ export class Sach extends Component {
     addNewImageField = () => {
         if (this.state.images.length < 5) {
             this.setState(prevState => ({
-                images: [...prevState.images, null]
+                images: [...prevState.images, null],
             }));
+        } else {
+            alert("Không thể thêm quá 5 hình ảnh.");
         }
     };
+
 
 
     updateTrangThaiClick() {
@@ -508,40 +511,70 @@ export class Sach extends Component {
         this.setState({ s_ChiDoc: e.target.value });
     }
 
-    updateClick() {
+    updateClick = () => {
+        const {
+            s_Id,
+            s_TenSach,
+            s_SoLuong,
+            s_MoTa,
+            s_TrongLuong,
+            s_NamXuatBan,
+            s_ChiDoc,
+            tg_Id,
+            nxb_Id,
+            tl_Id,
+            ls_Id,
+            ks_Id,
+            os_Id,
+            images,
+            bookImages,
+        } = this.state;
+
+        // Chuẩn bị danh sách hình minh họa (kết hợp hình mới và cũ)
+        const hinhMinhHoas = images.map((image, index) => ({
+            hmhId: bookImages[s_Id]?.[index]?.hmh_Id || 0, // Nếu hình mới, không có ID
+            hmhHinhAnhMaHoa: image,
+        }));
+
+        // Chuẩn bị dữ liệu cập nhật sách
+        const requestData = {
+            sId: s_Id,
+            sTenSach: s_TenSach,
+            sSoLuong: s_SoLuong,
+            sMoTa: s_MoTa,
+            sTrongLuong: s_TrongLuong,
+            sNamXuatBan: s_NamXuatBan,
+            sChiDoc: s_ChiDoc,
+            tgId: tg_Id,
+            nxbId: nxb_Id,
+            tlId: tl_Id,
+            lsId: ls_Id,
+            ksId: ks_Id,
+            osId: os_Id,
+            hinhMinhHoas: hinhMinhHoas,
+        };
+
+        // Gửi API cập nhật
         fetch("https://localhost:44315/api/Sach", {
             method: "PUT",
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                Accept: "application/json",
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                sId: this.state.s_Id,
-                sTenSach: this.state.s_TenSach,
-                sSoLuong: this.state.s_SoLuong,
-                sMoTa: this.state.s_MoTa,
-                sTrongLuong: this.state.s_TrongLuong,
-                sNamXuatBan: this.state.s_NamXuatBan,
-                //    sTrangThaiMuon: this.state.s_TrangThaiMuon,
-                sChiDoc: this.state.s_ChiDoc,
-                tgId: this.state.tg_Id,
-                nxbId: this.state.nxb_Id,
-                tlId: this.state.tl_Id,
-                lsId: this.state.ls_Id,
-                ksId: this.state.ks_Id,
-                osId: this.state.os_Id,
-                hinhMinhHoas: this.state.bookImages[this.state.s_Id] // List of images for this book including hmh_Id and hmh_HinhAnhMaHoa
-            })
+            body: JSON.stringify(requestData),
         })
-            .then(res => res.json())
-            .then((result) => {
-                alert(result);
-                //  this.updateImages();
-                this.refreshList();
-            }, (error) => {
-                alert('Failed');
-            });
-    }
+            .then((res) => res.json())
+            .then(
+                (result) => {
+                    alert("Cập nhật thành công!");
+                    this.refreshList(); // Làm mới danh sách sau khi cập nhật
+                },
+                (error) => {
+                    alert("Cập nhật thất bại.");
+                }
+            );
+    };
+
 
 
     deleteClick(id) {
@@ -625,6 +658,71 @@ export class Sach extends Component {
             s_SoLuong: dep.s_SoLuong
         });
     }
+
+    handleFileChange = async (e, index) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch("https://localhost:44315/api/HinhMinhHoa/SaveFile", {
+                    method: "POST",
+                    body: formData,
+                });
+                const uploadedFileName = await response.json();
+
+                if (uploadedFileName) {
+                    const updatedImages = [...this.state.images];
+                    updatedImages[index] = uploadedFileName;
+
+                    // Nếu chưa đủ 5 ảnh và người dùng vừa tải lên một ảnh mới, thêm một trường trống
+
+                    if (updatedImages.length < 5 && !updatedImages.includes('') && this.state.s_Id === 0) {
+                        updatedImages.push('');
+                    }
+
+                    this.setState({ images: updatedImages });
+                    //alert("Hình ảnh đã được thay đổi thành công!");
+                } else {
+                    alert("Lỗi khi tải lên hình ảnh.");
+                }
+            } catch (error) {
+                console.error("Error uploading file:", error);
+            }
+        }
+    };
+
+    handleDeleteImage = async (index, hmh_Id) => {
+        const { s_Id, images } = this.state;
+
+        // Gọi API để xóa hình từ cơ sở dữ liệu
+        try {
+            const response = await fetch(`https://localhost:44315/api/HinhMinhHoa/DeleteImage`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ hmhId: hmh_Id, sId: s_Id }),
+            });
+
+            if (response.ok) {
+                //  alert("Hình đã được xóa khỏi cơ sở dữ liệu.");
+            } else {
+                alert("Xóa hình thất bại.");
+                return;
+            }
+        } catch (error) {
+            console.error("Error deleting image:", error);
+            alert("Lỗi khi xóa hình ảnh.");
+            return;
+        }
+
+        // Xóa hình khỏi state
+        const updatedImages = [...images];
+        updatedImages.splice(index, 1); // Xóa hình tại vị trí index
+        this.setState({ images: updatedImages });
+    };
+
 
     render() {
         const {
@@ -854,15 +952,15 @@ export class Sach extends Component {
                 <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
                     <div className="modal-dialog modal-lg modal-dialog-centered ">
                         <div className="modal-content">
-                            <div className="card p-5 ">
+                            <div className="card p-2 ">
                                 <div className="modal-header">
-                                    <h2 className={cx('card-header')}>Thông tin sách </h2>
+                                    <h2 className={cx('mb-0')}>Thông tin sách </h2>
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                     ></button>
                                 </div>
 
-                                <div className="row d-flex justify-content-around">
-                                    <div className="col-5 ">
+                                <div className="row d-flex justify-content-around p-3">
+                                    <div className="col-10 ">
                                         <div className="form-group mb-3 text-start">
                                             <label className="fw-medium">Tên sách<span className="text-danger">*</span></label>
                                             {errors.s_TenSach && (
@@ -905,7 +1003,7 @@ export class Sach extends Component {
                                             </select>
                                         </div>
 
-                                        <div className="form-group mb-3 text-start">
+                                        <div className="form-group mb-3 text-start w-100">
                                             <label className="fw-medium">Năm xuất bản<span className="text-danger">*</span></label>
                                             {errors.s_NamXuatBan && (
                                                 <span className="text-danger fs-4 float-end">{errors.s_NamXuatBan}</span>
@@ -918,7 +1016,7 @@ export class Sach extends Component {
                                             />
                                         </div>
 
-                                        <div className="form-group mb-3 text-start">
+                                        <div className="form-group mb-3 text-start w-100">
                                             <label className="fw-medium ">Thể loại<span className="text-danger">*</span></label>
                                             {errors.tl_Id && (
                                                 <span className="text-danger fs-4 float-end">{errors.tl_Id}</span>
@@ -936,13 +1034,13 @@ export class Sach extends Component {
 
                                     </div>
 
-                                    <div className="col-7 ">
-                                        <div className="form-group mb-3 text-start w-75">
+                                    <div className="col-10 ">
+                                        <div className="form-group mb-3 text-start w-100">
                                             <label className="fw-medium ">Loại sách<span className="text-danger">*</span></label>
                                             {errors.ls_Id && (
                                                 <span className="text-danger fs-4 float-end">{errors.ls_Id}</span>
                                             )}
-                                            <select className={cx('form-control  form-select p-2  fs-3 bg-body-secondary border-0 aria-label="Default select example"')}
+                                            <select className={cx('form-control  form-select p-2  m-0 fs-3 bg-body-secondary border-0 aria-label="Default select example"')}
                                                 onChange={this.changes_LoaiSach}
                                                 value={ls_Id}>
                                                 <option value="">Chọn loại sách</option>
@@ -951,22 +1049,9 @@ export class Sach extends Component {
                                                 </option>)}
                                             </select>
                                         </div>
-                                        {/* <div className="form-group mb-3 text-start w-75">
-                                            <label className="fw-medium ">Trạng thái trong kho<span className="text-danger">*</span></label>
-                                            {errors.s_TrangThaiMuon && (
-                                                <span className="text-danger fs-4 float-end">{errors.s_TrangThaiMuon}</span>
-                                            )}
-                                            <select className={cx('form-control  form-select p-2  fs-3 bg-body-secondary border-0 aria-label="Default select example"')}
-                                                onChange={this.changes_TrangThaiMuon}
-                                                value={s_TrangThaiMuon}>
-                                                <option value="">Chọn trạng thái</option>
-                                                <option value={true}>Trong kho sẵn sàng</option>
-                                                <option value={false}>Chưa sẵn sàng</option>
-                                            </select>
-                                        </div> */}
 
 
-                                        <div className="form-group mb-3 text-start w-75">
+                                        <div className="form-group mb-3 text-start w-100">
                                             <label className="fw-medium ">Cho phép mượn về nhà<span className="text-danger">*</span></label>
                                             {errors.s_ChiDoc && (
                                                 <span className="text-danger fs-4 float-end">{errors.s_ChiDoc}</span>
@@ -1024,7 +1109,7 @@ export class Sach extends Component {
                                                 <textarea
                                                     type="text"
                                                     className="form-control p-2  fs-5 bg-body-secondary border-0"
-                                                    style={{ height: "37px" }}
+                                                    style={{ height: "100px" }}
                                                     value={s_MoTa}
                                                     onChange={this.changes_MoTa}
                                                     maxLength={2000} // Giới hạn độ dài tại đây
@@ -1035,17 +1120,17 @@ export class Sach extends Component {
 
                                     </div>
 
-                                    <div className="row mt-3 text-center">
+                                    <div className="row mt-3 text-center mb-5">
                                         {this.state.images.map((image, index) => (
                                             <div className="col" key={index}>
-                                                <p className="mb-0 fw-medium fs-4 text-start">Ảnh minh họa {index + 1}</p>
-                                                <div className="bd-highlight rounded-2">
+                                                <p className="mt-4 mb-0 fw-medium fs-3 text-start">Ảnh minh họa {index + 1}</p>
+                                                <div className="bd-highlight rounded-2 mt-5">
                                                     <label style={{ cursor: "pointer" }}>
                                                         <img
                                                             width="65px"
                                                             height="77px"
                                                             style={{ borderRadius: "10%" }}
-                                                            alt=""
+                                                            alt={`Hình minh họa ${index + 1}`}
                                                             src={
                                                                 image
                                                                     ? `https://localhost:44315/Photos/${image}`
@@ -1055,38 +1140,43 @@ export class Sach extends Component {
                                                         <input
                                                             type="file"
                                                             style={{ display: "none" }}
-                                                            onChange={(e) => this.handleFileChange(e, `hmh_HinhAnhMaHoa${index + 1}`, index)}
+                                                            onChange={(e) => this.handleFileChange(e, index)}
                                                         />
                                                     </label>
+
                                                 </div>
+                                                {image && image !== "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg" && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-danger mt-3 fs-5"
+                                                        onClick={() => this.handleDeleteImage(index, image.hmh_Id)}
+                                                    >
+                                                        Xóa
+                                                    </button>
+                                                )}
                                             </div>
                                         ))}
-                                        {this.state.errors.images && (
-                                            <span className="text-danger fs-4">{this.state.errors.images}</span>
+
+                                        {/* Nút thêm hình mới */}
+                                        {this.state.images.length < 5 && s_Id !== 0 && (
+                                            <div className="col d-flex justify-content-center">
+                                                <div className={cx('"bd-highlight rounded-2', 'custom-add-button')}>
+                                                    <button
+                                                        type="button"
+                                                        className={cx('btn btn-outline-secondary fs-1', 'plus-custom')}
+                                                        onClick={this.addNewImageField}
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+
+                                            </div>
                                         )}
                                     </div>
 
-                                    {/* <div className="image-container">
-                                        {this.state.images.map((image, index) => (
-                                            <img
-                                                key={index}
-                                                src={`https://localhost:44315/Photos/${image}`}
-                                                alt={`Hình minh họa ${index + 1}`}
-                                                className="img-thumbnail"
-                                                style={{ width: '100px', height: '100px', marginRight: '10px' }}
-                                            />
-                                        ))}
-                                    </div> */}
-
-
-                                    {/* <div className="p-2 w-50 bd-highlight">
-                                        <img width="250px" height="250px"
-                                            alt=""
-                                            src={PhotoPath + PhotoFileName} />
-                                        <input className="m-2" type="file" onChange={this.imageUpload} />
-                                    </div> */}
-
                                 </div>
+
+
 
                                 {s_Id === 0 ?
                                     <button type="button"
