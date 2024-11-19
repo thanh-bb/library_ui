@@ -23,7 +23,14 @@ export class NguoiDung extends Component {
 
             currentPage: 1,
             itemsPerPage: 8,
-            totalPages: 0
+            totalPages: 0,
+
+            userDetails: null,
+            userViolations: [],
+
+
+            nd_Active: null, // Giá trị trạng thái tài khoản
+            isOptionSelected: false, // Theo dõi việc chọn option
         }
     }
 
@@ -100,9 +107,18 @@ export class NguoiDung extends Component {
     changend_HoTen = (e) => {
         this.setState({ nd_HoTen: e.target.value });
     }
+
+
     changend_Active = (e) => {
-        this.setState({ nd_Active: e.target.value });
-    }
+        const selectedValue = e.target.value;
+
+        // Kiểm tra nếu giá trị được chọn khác giá trị hiện tại
+        this.setState({
+            nd_Active: selectedValue,
+            isOptionSelected: selectedValue !== "" && selectedValue !== this.state.nd_active,
+        });
+    };
+
 
     addClick() {
         this.setState({
@@ -158,7 +174,7 @@ export class NguoiDung extends Component {
         })
             .then(res => res.json())
             .then((result) => {
-                alert(result);
+                alert("Cập nhật trạng thái tài khoản thành công");
                 this.refreshList();
             }, (error) => {
                 alert('Failed');
@@ -205,6 +221,42 @@ export class NguoiDung extends Component {
     goToPage = (pageNumber) => {
         this.setState({ currentPage: pageNumber });
     }
+
+    fetchUserDetails = (id) => {
+        fetch(`https://localhost:44315/api/NguoiDung/${id}`)
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    userDetails: data[0], // Lưu thông tin người dùng vào state
+                });
+            })
+            .catch((error) => {
+                console.error("Error fetching user details: ", error);
+            });
+    };
+
+    handleEditUser = (dep) => {
+        this.fetchUserDetails(dep.nd_Id); // Lấy thông tin cá nhân
+        this.fetchUserViolations(dep.nd_Id); // Lấy thông tin vi phạm
+        this.setState({
+            modalTitle: "Thông tin chi tiết người dùng",
+            nd_Id: dep.nd_Id,
+            nd_Active: dep.nd_Active
+        });
+    };
+
+
+    fetchUserViolations = (id) => {
+        fetch(`https://localhost:44315/api/NguoiDung/GetViolations/${id}`)
+            .then((response) => response.json())
+            .then((data) => {
+                this.setState({
+                    userViolations: data, // Lưu danh sách vi phạm vào state
+                });
+            })
+            .catch((error) => console.error("Error fetching user violations:", error));
+    };
+
 
 
     render() {
@@ -323,7 +375,7 @@ export class NguoiDung extends Component {
                                         className="btn btn-light mr-1 "
                                         data-bs-toggle="modal"
                                         data-bs-target="#exampleModal"
-                                        onClick={() => this.editClick(dep)}>
+                                        onClick={() => this.handleEditUser(dep)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
                                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                                             <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
@@ -371,46 +423,145 @@ export class NguoiDung extends Component {
                     </nav>
                 </div>
 
-                <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
-                    <div className="modal-dialog modal-lg modal-dialog-centered ">
-                        <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">
-                            <div className="modal-header">
-                                <h5 className="modal-title fs-2">{modalTitle}</h5>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                <div className="modal fade" id="exampleModal" tabIndex="-1" aria-hidden="true">
+                    <div className="modal-dialog modal-lg modal-dialog-centered">
+                        <div className="modal-content border-0 shadow">
+                            {/* Header */}
+                            <div className="modal-header bg-primary text-white">
+                                <h5 className="modal-title fs-3">{this.state.modalTitle}</h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
                                 ></button>
                             </div>
 
+                            {/* Body */}
                             <div className="modal-body">
-                                <div className="input-group mb-3 input-group-lg">
-                                    <span className="input-group-text fw-bold">Trạng thái tài khoản</span>
-                                    <select className="form-select form-control fs-2"
-                                        onChange={this.changend_Active}
-                                        value={nd_active}>
-                                        <option value="">Chọn trạng thái</option>
-                                        <option value={true}>Kích hoạt lại</option>
-                                        <option value={false}>Khóa tài khoản</option>
-                                    </select>
+                                {/* Card Hiển thị Thông tin Người Dùng */}
+                                <div className="card mb-4 border-0 shadow-sm">
+                                    <div className="card-body d-flex align-items-center">
+                                        <div className="me-5">
+                                            <img
+                                                src={
+                                                    this.state.userDetails?.nd_HinhThe
+                                                        ? `https://localhost:44315/Photos/${this.state.userDetails.nd_HinhThe}`
+                                                        : 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg'
+                                                }
+                                                alt="Hình thẻ"
+                                                className="rounded-circle"
+                                                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                                            />
+                                        </div>
+                                        <div className="text-start fs-4 mx-5">
+                                            <p><strong>Username:</strong> {this.state.userDetails?.nd_Username}</p>
+                                            <p><strong>Họ tên:</strong> {this.state.userDetails?.nd_HoTen}</p>
+                                            <p><strong>Ngày sinh:</strong> {new Date(this.state.userDetails?.nd_NgaySinh).toLocaleDateString('en-GB')}</p>
+                                            <p><strong>Giới tính:</strong> {this.state.userDetails?.nd_GioiTinh}</p>
+                                            <p><strong>Số CCCD:</strong> {this.state.userDetails?.nd_CCCD}</p>
+                                            <p><strong>Số điện thoại:</strong> {this.state.userDetails?.nd_SoDienThoai}</p>
+
+                                        </div>
+                                        <div className="text-start fs-4 mx-5">
+                                            <p><strong>Email:</strong> {this.state.userDetails?.nd_Email}</p>
+                                            <p><strong>Địa chỉ:</strong> {this.state.userDetails?.nd_DiaChi}</p>
+                                            <p><strong>Ngày đăng ký:</strong> {new Date(this.state.userDetails?.nd_NgayDangKy).toLocaleDateString('en-GB')}</p>
+                                            <p><strong>Thời gian sử dụng:</strong> {this.state.userDetails?.nd_ThoiGianSuDung}</p>
+                                            <p>
+                                                <strong>Đối tượng:</strong>{" "}
+                                                {this.state.userDetails?.lnd_LoaiNguoiDung === 1 ? "Sinh viên của trường" : "Bạn đọc ngoài nhà trường"}
+                                            </p>
+                                            <p>
+                                                <strong>Trạng thái tài khoản:</strong>{" "}
+                                                {this.state.userDetails?.nd_active
+                                                    ? "Đang hoạt động"
+                                                    : this.state.userDetails?.nd_active === false
+                                                        ? "Đã bị khóa"
+                                                        : "Không xác định"}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
 
+                                {/* Selection Trạng Thái Tài Khoản */}
+                                <div className="card mb-4 border-0 shadow-sm">
+                                    <div className="card-body text-start">
+                                        <label className="fw-bold mb-2 text-start">Chỉnh sửa trạng thái tài khoản</label>
+                                        <select
+                                            className="form-select fs-4 w-50"
+                                            onChange={this.changend_Active}
+                                            value={this.state.nd_active}
+                                        >
+                                            <option value={null}>Chọn trạng thái</option>
+                                            <option value={true}>Kích hoạt tài khoản</option>
+                                            <option value={false}>Khóa tài khoản</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-                                {nd_Id === 0 ?
-                                    <button type="button"
-                                        className={cx('btn-create')}
-                                        onClick={() => this.createClick()}>
-                                        Create
-                                    </button> : null}
+                                {/* Bảng Chi tiết Vi phạm */}
+                                <div className="card border-0 shadow-sm">
+                                    <div className="card-header bg-primary-subtle  fw-bold">
+                                        Chi tiết vi phạm
+                                    </div>
+                                    <div className="card-body">
+                                        {this.state.userViolations.length > 0 ? (
+                                            <table className="table table-hover">
+                                                <thead className="table-light">
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Mã phiếu mượn</th>
+                                                        <th>Ngày mượn</th>
+                                                        <th>Hạn trả</th>
+                                                        <th>Ngày trả</th>
+                                                        <th>Số ngày trễ</th>
+                                                        <th>Loại vi phạm</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {this.state.userViolations.map((violation, index) => (
+                                                        <tr key={index}>
+                                                            <td>{index + 1}</td>
+                                                            <td>{violation.pm_Id}</td>
+                                                            <td>{new Date(violation.pm_NgayMuon).toLocaleDateString('en-GB')}</td>
+                                                            <td>{new Date(violation.pm_HanTra).toLocaleDateString('en-GB')}</td>
+                                                            <td>{new Date(violation.pt_NgayTra).toLocaleDateString('en-GB')}</td>
+                                                            <td>{violation.SoNgayTre}</td>
+                                                            <td className="text-danger">{violation.LoaiViPham}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        ) : (
+                                            <p className="text-center text-muted">Người dùng không có vi phạm.</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
 
-                                {nd_Id !== 0 ?
-                                    <button type="button"
-                                        className={cx('btn-create')}
-                                        onClick={() => this.updateClick()}>
-                                        Update
-                                    </button> : null}
+                            {/* Footer */}
+                            <div className="modal-footer bg-light">
+                                {this.state.isOptionSelected && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary fs-3 fw-bold"
+                                        onClick={() => this.updateClick()}
+                                    >
+                                        Cập nhật
+                                    </button>)}
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary fs-3 fw-bold"
+                                    data-bs-dismiss="modal"
+                                >
+                                    Đóng
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         )
     }
 }

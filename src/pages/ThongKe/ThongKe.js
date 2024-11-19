@@ -226,7 +226,7 @@ const ThongKe = () => {
                                     id="year"
                                     value={year}
                                     onChange={(e) => setYear(e.target.value)}
-                                    className={cx('select')}
+                                    className={cx('select w-100')}
                                 >
                                     {Array.from({ length: 5 }, (_, i) => {
                                         const currentYear = new Date().getFullYear();
@@ -243,7 +243,7 @@ const ThongKe = () => {
                                     id="month"
                                     value={month}
                                     onChange={(e) => setMonth(e.target.value)}
-                                    className={cx('select')}
+                                    className={cx('select w-100')}
                                 >
                                     {Array.from({ length: 12 }, (_, i) => (
                                         <option key={i + 1} value={i + 1}>{`Tháng ${i + 1}`}</option>
@@ -271,7 +271,7 @@ const ThongKe = () => {
                                     id="year"
                                     value={year}
                                     onChange={handleYearChange}
-                                    className={cx('select')}
+                                    className={cx('select w-100')}
                                 >
                                     {Array.from({ length: 5 }, (_, i) => {
                                         const currentYear = new Date().getFullYear();
