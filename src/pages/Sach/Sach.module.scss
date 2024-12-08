@@ -48,9 +48,10 @@
     font-size: 15px;
     border: 2px solid #435ebe;
     float: right;
-    width: 20%;
+    //  width: 50%;
     margin: auto;
     margin-bottom: 20px;
+    padding: auto;
 }
 
 .btn-create:hover {
@@ -81,9 +82,9 @@
 }
 
 .pagination-item {
-    position: fixed;
+    //position: fixed;
     left: 350px;
-    bottom: 70px; /* Adjust this value as needed */
+    bottom: 10px; /* Adjust this value as needed */
     // z-index: 9999;
 }
 

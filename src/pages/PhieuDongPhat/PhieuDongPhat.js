@@ -138,7 +138,7 @@ function PhieuDongPhat() {
 
     return (
         <div className={cx("wrapper")}>
-            <h1 className={cx("text-center fw-bold mb-5")}>Quản lý phiếu mượn quá hạn</h1>
+            <h1 className={cx("text-center fw-bold mb-5")}>Quản lý phiếu mượn quá hạn- Xuất Phiếu Đóng Phạt</h1>
             <ToastContainer />
             <div className={cx("table-responsive")}>
                 <table className={cx("table", "table-bordered")}>

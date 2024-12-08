@@ -59,20 +59,20 @@ const Login = () => {
                         const decodedToken = jwtDecode(token, 'this is my custom Secret key for authentication');
                         console.log(decodedToken); // Log the decoded token
                         if (decodedToken.role === '1') {
-                            usernavigate('/admin/danhmuc');
+                            usernavigate('/admin/dangkynhanh');
                         } else {
                             usernavigate('/userhome');
                         }
-                        toast.success('Success');
+                        toast.success('Đăng nhập thành công');
                         sessionStorage.setItem('username', username);
                         sessionStorage.setItem('jwttoken', token);
                     } catch (error) {
                         console.error(error); // Log any decoding errors
-                        toast.error('Login Failed due to :' + error.message);
+                        toast.error('Đăng nhập không thành công. Vui lòng nhập lại Username hoặc Password');
                     }
                 } else {
                     console.error('Invalid response from server'); // Log if the response or token is missing
-                    toast.error('Login Failed due to :Invalid response from server');
+                    toast.error('Đăng nhập không thành công. Vui lòng nhập lại Username hoặc Password');
                 }
             });
 
@@ -84,11 +84,11 @@ const Login = () => {
         let result = true;
         if (username === '' || username === null) {
             result = false;
-            toast.warning('Pls enter Username');
+            toast.warning('Vui lòng nhập Username');
         }
-        if (password === '' || password === null) {
+        else if ((username !== '' || username !== null) && (password === '' || password === null)) {
             result = false;
-            toast.warning('Pls enter Password');
+            toast.warning('Vui lòng nhập Password');
         }
 
         return result;

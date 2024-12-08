@@ -23,7 +23,7 @@ export class TacGia extends Component {
 
 
             currentPage: 1,
-            itemsPerPage: 7,
+            itemsPerPage: 10,
             totalPages: 0
         }
     }
@@ -334,8 +334,8 @@ export class TacGia extends Component {
 
                             </tr>)}
                     </tbody>
-                </table>
 
+                </table>
                 {/* Điều hướng phân trang */}
                 <div className={cx('pagination-item')}>
                     <nav aria-label="Page navigation example">
@@ -369,6 +369,7 @@ export class TacGia extends Component {
                         </ul>
                     </nav>
                 </div>
+
 
                 <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
                     <div className="modal-dialog modal-lg modal-dialog-centered ">

@@ -233,7 +233,7 @@ export class CTPMOnline extends Component {
                 <div className={cx("container")}>
                     <div className="row justify-content-center mt-5 ">
                         {/* notification & news */}
-                        <h1 className="text-center"> Phiếu Mượn Online</h1>
+                        <h1 className="text-center"> Chi Tiết Phiếu Mượn Online</h1>
                         <hr></hr>
 
                         <div className={cx("row d-flex justify-content-center mt-5 mb-5")} >

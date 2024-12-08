@@ -101,7 +101,7 @@
 }
 
 .pagination-item {
-    position: fixed;
+    //  position: fixed;
     left: 350px;
     bottom: 20px; /* Adjust this value as needed */
     // z-index: 9999;
@@ -115,11 +115,13 @@
     background-color: #f8f9fa;
     border-radius: 0.5rem;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    width: fit-content;
 }
 
 .page-item {
     margin: 0 0.2rem;
     padding: 5px;
+    //  width: fit-content;
 }
 
 .page-link {

@@ -159,40 +159,41 @@ export class QuanLyPDP extends Component {
                             </tr>
                         ))}
                     </tbody>
-                </table>
-                {/* Điều hướng phân trang */}
-                <div className={cx('pagination-item')}>
-                    <nav aria-label="Page navigation example">
-                        <ul className={cx('pagination')}>
-                            {/* Previous Button */}
-                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
-                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-
-                            {/* Page Numbers */}
-                            {[...Array(totalPages)].map((_, i) => (
-                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
-                                    <a
-                                        className={cx('page-link')}
-                                        href="#"
-                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
-                                    >
-                                        {i + 1}
+                    {/* Điều hướng phân trang */}
+                    <div className={cx('pagination-item')}>
+                        <nav aria-label="Page navigation example">
+                            <ul className={cx('pagination')}>
+                                {/* Previous Button */}
+                                <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                    <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                        <span aria-hidden="true">&laquo;</span>
                                     </a>
                                 </li>
-                            ))}
 
-                            {/* Next Button */}
-                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
-                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
+                                {/* Page Numbers */}
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                        <a
+                                            className={cx('page-link')}
+                                            href="#"
+                                            onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                        >
+                                            {i + 1}
+                                        </a>
+                                    </li>
+                                ))}
+
+                                {/* Next Button */}
+                                <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                    <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </table>
+
 
             </div>
 

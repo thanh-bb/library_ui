@@ -36,6 +36,32 @@ function ChiTietSach() {
 
     const [selectedImage, setSelectedImage] = useState(hmhList.length > 0 ? hmhList[0].hmh_HinhAnhMaHoa : null);
 
+    const [canBorrow, setCanBorrow] = useState(true); // Trạng thái có thể mượn sách hay không
+    const [borrowMessage, setBorrowMessage] = useState(""); // Thông báo lỗi
+
+    // Hàm kiểm tra vi phạm (sách quá hạn chưa trả)
+    const checkCanBorrow = async () => {
+        try {
+            const response = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckIfCanBorrow/${userId}`);
+            const data = await response.json();
+
+            if (data === "Không thể mượn thêm sách vì bạn có sách quá hạn chưa trả.") {
+                setCanBorrow(false); // Disable nút mượn sách
+                setBorrowMessage(data); // Hiển thị thông báo vi phạm
+            } else {
+                setCanBorrow(true); // Cho phép mượn sách
+                setBorrowMessage(""); // Không có thông báo lỗi
+            }
+        } catch (error) {
+            console.error("Lỗi khi kiểm tra vi phạm:", error);
+            setBorrowMessage("Có lỗi khi kiểm tra tình trạng mượn sách.");
+        }
+    };
+
+    useEffect(() => {
+        checkCanBorrow(); // Kiểm tra vi phạm (sách quá hạn chưa trả)
+    }, []); // Chạy 1 lần khi component được mount
+
     // Fetch dữ liệu sách và người dùng
     useEffect(() => {
         const fetchData = async () => {
@@ -464,9 +490,11 @@ function ChiTietSach() {
                                                                 }
 
                                                                 {/* Nút "Mượn sách ngay" chỉ hiển thị khi chưa mượn sách */}
-                                                                {!isBookBorrowed && (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) < maxBorrowingsPerMonth ? (
-                                                                    <Link to={`/chitietsach/formphieumuon/${sach?.s_Id}`}
-                                                                        className={cx('col', 'btn-return')}
+                                                                {/* Nút "Mượn sách ngay" */}
+                                                                {!isBookBorrowed && canBorrow && (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) < maxBorrowingsPerMonth ? (
+                                                                    <Link
+                                                                        to={`/chitietsach/formphieumuon/${sach?.s_Id}`}
+                                                                        className="col btn-return"
                                                                     >
                                                                         Mượn sách ngay
                                                                     </Link>
@@ -476,9 +504,10 @@ function ChiTietSach() {
                                                                         className={cx('col', 'btn-disable')}
                                                                         disabled
                                                                     >
-                                                                        Bạn đã mượn sách này
+                                                                        {isBookBorrowed ? "Bạn đã mượn sách này" : borrowMessage || "Bạn không thể mượn sách về nhà"}
                                                                     </button>
                                                                 )}
+
                                                             </div>
                                                         ) : (
                                                             <div className='row d-flex justify-content-between mt-5'>

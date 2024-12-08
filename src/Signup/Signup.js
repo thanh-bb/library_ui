@@ -507,7 +507,7 @@ export class Signup extends Component {
                                                         <div className="row">
                                                             <div className="col-4">
                                                                 <button type="button" className={cx('btn-return')} onClick={this.prevStep}>
-                                                                    <p className="pt-2">Quay lại</p>
+                                                                    <p className="pt-2 ">Quay lại</p>
                                                                 </button>
                                                             </div>
                                                             <div className="col-8">

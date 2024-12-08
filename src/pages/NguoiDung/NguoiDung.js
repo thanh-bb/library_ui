@@ -22,7 +22,7 @@ export class NguoiDung extends Component {
 
 
             currentPage: 1,
-            itemsPerPage: 8,
+            itemsPerPage: 15,
             totalPages: 0,
 
             userDetails: null,
@@ -329,7 +329,7 @@ export class NguoiDung extends Component {
                 <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
                     <thead >
                         <tr >
-                            <th>
+                            <th className="text-start ">
                                 ID
                             </th>
                             <th className="text-start w-25">
@@ -387,6 +387,7 @@ export class NguoiDung extends Component {
 
                             </tr>)}
                     </tbody>
+
                 </table>
 
                 {/* Điều hướng phân trang */}

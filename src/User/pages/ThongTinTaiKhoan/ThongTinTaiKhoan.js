@@ -154,12 +154,12 @@ export class ThongTinTaiKhoan extends Component {
                             <div className="row d-flex justify-content-end mt-3">
                                 <div className='col-4 '>
                                     <div className="row flex">
-                                        <div className="col-5">
+                                        <div className="">
                                             <Link to="/userhome" type="submit" className={cx('btn-return')}>
                                                 <p className="pt-3">Quay lại</p>
                                             </Link>
                                         </div>
-                                        <div className="col-7 ">
+                                        {/* <div className="col-7 ">
                                             <button
                                                 type="button"
                                                 className={cx('btn-continue')}
@@ -169,7 +169,7 @@ export class ThongTinTaiKhoan extends Component {
                                             </button>
 
 
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>

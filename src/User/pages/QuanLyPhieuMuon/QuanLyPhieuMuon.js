@@ -20,6 +20,10 @@ export class QuanLyPhieuMuon extends Component {
             TrangThaiMuon: "",
             TrangThaiXetDuyet: "",
             idPhieuMuonFilter: '',
+
+            currentPage: 1,
+            itemsPerPage: 5,
+            totalPages: 0,
         }
     }
 
@@ -100,6 +104,28 @@ export class QuanLyPhieuMuon extends Component {
         });
     }
 
+    // Chuyển trang trước
+    prevPage = () => {
+        this.setState((prevState) => ({
+            currentPage: prevState.currentPage > 1 ? prevState.currentPage - 1 : 1
+        }));
+    }
+
+    // Chuyển sang trang kế tiếp
+    nextPage = () => {
+        const { currentPage, phieumuons, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(phieumuons.length / itemsPerPage);
+        this.setState({
+            currentPage: currentPage < totalPages ? currentPage + 1 : currentPage
+        });
+    }
+
+
+    // Chuyển đến trang cụ thể
+    goToPage = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
+
 
     render() {
 
@@ -112,11 +138,17 @@ export class QuanLyPhieuMuon extends Component {
 
         const { selectedTag } = this.state;
 
+        const { currentPage, itemsPerPage } = this.state;
+        const totalPages = Math.ceil(phieumuons.length / itemsPerPage);
+        const indexOfLastItem = currentPage * itemsPerPage;
+        const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+        const currentItems = phieumuons.slice(indexOfFirstItem, indexOfLastItem);
+
 
         return (
             <div className={cx('wrapper')}>
                 <div className="row d-flex justify-content-end mb-3">
-                    <h1 className="fw-bold mt-5 mb-5 ">Phiếu Mượn Tại Thư Viện</h1>
+                    <h1 className="fw-bold ">Phiếu Mượn Trực Tiếp Tại Thư Viện</h1>
                     <hr></hr>
                     <div className="col-2">
                         <button
@@ -193,7 +225,7 @@ export class QuanLyPhieuMuon extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredPhieumuons.map(dep =>
+                        {currentItems.map(dep =>
                             <tr key={dep.Id_PhieuMuon}>
                                 <td className="text-start">{dep.Id_PhieuMuon}</td>
 
@@ -202,13 +234,15 @@ export class QuanLyPhieuMuon extends Component {
 
                                 <td className="text-center">
                                     {dep.TrangThaiMuon === "Đã trả" ? (
-                                        (new Date(dep.HanTra) - new Date()) < 0 ?
-                                            `Đã trả - Trễ hạn ${Math.abs(Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24)))} ngày` :
-                                            "Đã trả - Đúng hạn"
+                                        "Đã trả"
+                                        // (new Date(dep.HanTra) - new Date(dep.NgayTra)) < 0 ?
+                                        //     `Đã trả - Trễ hạn ${Math.abs(Math.floor((new Date(dep.NgayTra) - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24)))} ngày` :
+                                        //     "Đã trả - Đúng hạn"
                                     ) : dep.TrangThaiMuon === "Ðang mượn" ? (
-                                        (new Date(dep.HanTra) - new Date()) < 0 ?
-                                            `${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn)` :
-                                            `Đang mượn - Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày đến hạn`
+                                        "Đang mượn"
+                                        // (new Date(dep.HanTra) - new Date()) < 0 ?
+                                        //     `${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn)` :
+                                        //     `Đang mượn - Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày đến hạn`
                                     ) : dep.TrangThaiXetDuyet === "Chờ xét duyệt" ? (
                                         "Chờ xét duyệt"
                                     ) : dep.TrangThaiXetDuyet === "Từ chối xét duyệt" ? (
@@ -225,7 +259,45 @@ export class QuanLyPhieuMuon extends Component {
                         )}
                     </tbody>
                 </table>
+
+                {/* Điều hướng phân trang */}
+                <div className={cx('pagination-item')}>
+                    <nav aria-label="Page navigation example">
+                        <ul className={cx('pagination')}>
+                            {/* Previous Button */}
+                            <li className={cx('page-item', { disabled: currentPage === 1 })}>
+                                <a className={cx('page-link')} href="#" aria-label="Previous" onClick={(e) => { e.preventDefault(); this.prevPage(); }}>
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {[...Array(totalPages)].map((_, i) => (
+                                <li key={i + 1} className={cx('page-item', { active: currentPage === i + 1 })}>
+                                    <a
+                                        className={cx('page-link')}
+                                        href="#"
+                                        onClick={(e) => { e.preventDefault(); this.goToPage(i + 1); }}
+                                    >
+                                        {i + 1}
+                                    </a>
+                                </li>
+                            ))}
+
+                            {/* Next Button */}
+                            <li className={cx('page-item', { disabled: currentPage === totalPages })}>
+                                <a className={cx('page-link')} href="#" aria-label="Next" onClick={(e) => { e.preventDefault(); this.nextPage(); }}>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+
             </div>
+
         )
+
     }
 }

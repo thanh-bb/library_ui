@@ -38,7 +38,9 @@ const ThongKe = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const [mode, setMode] = useState('ngay'); // 'ngay', '7ngay', 'thang'
     const [year, setYear] = useState(new Date().getFullYear());
-    const [month, setMonth] = useState(new Date().getMonth() + 1); // Tháng hiện tại
+    const [month, setMonth] = useState(new Date().getMonth() + 1);
+    const [maxBook, setMaxBook] = useState(null);
+    const [minBook, setMinBook] = useState(null); // Tháng hiện tại
 
     const formatDate = (date) => {
         const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -104,6 +106,34 @@ const ThongKe = () => {
             .catch(error => {
                 console.error('Error fetching book statistics data:', error);
                 setErrorMessage('Có lỗi xảy ra khi tải dữ liệu.');
+            });
+
+        axios.get(`https://localhost:44315/api/ThongKe/SachMuonNhieuNhatTheoThang?month=${month}&year=${year}`)
+            .then(response => {
+                const maxBookData = response.data[0];  // Sách mượn nhiều nhất
+                setMaxBook(maxBookData);
+
+                // Thiết lập mô tả thời gian cho sách mượn nhiều nhất
+                if (maxBookData) {
+                    setMoTaThoiGian(`Tháng ${month}/${year} - Sách mượn nhiều nhất: ${maxBookData.STenSach} với ${maxBookData.TongSoLanMuon} lần mượn`);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching most borrowed book:', error);
+            });
+
+        axios.get(`https://localhost:44315/api/ThongKe/SachMuonItNhatTheoThang?month=${month}&year=${year}`)
+            .then(response => {
+                const minBookData = response.data[0];  // Sách mượn ít nhất
+                setMinBook(minBookData);
+
+                // Thiết lập mô tả thời gian cho sách mượn ít nhất
+                if (minBookData) {
+                    setMoTaThoiGian((prevMoTa) => `${prevMoTa} | Sách mượn ít nhất: ${minBookData.STenSach} với ${minBookData.TongSoLanMuon} lần mượn`);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching least borrowed book:', error);
             });
     };
 
@@ -187,6 +217,9 @@ const ThongKe = () => {
         setMoTaThoiGian("");
     };
 
+
+
+
     return (
         <div className={cx('wrapper')}>
             <h2 className={cx('header')}>Thống Kê Mượn Sách</h2>
@@ -217,6 +250,8 @@ const ThongKe = () => {
                         <p>{moTaThoiGian}</p>
                     </div>
                 )}
+
+
                 {mode === 'thang' && (
                     <div className={cx('filters', 'inline-filters', 'month-filter-container')}>
                         <div className={cx('navigation')}>
@@ -259,9 +294,13 @@ const ThongKe = () => {
                         <p className={cx('description')}>{moTaThoiGian}</p>
                     </div>
                 )}
+
+
                 {mode === '7ngay' && (
                     <p>{moTaThoiGian}</p>
                 )}
+
+
                 {mode === 'quy' && (
                     <div className={cx('filters', 'inline-filters', 'month-filter-container')}>
                         <div className={cx('navigation')}>
@@ -303,6 +342,31 @@ const ThongKe = () => {
                             )}
                         </div>
 
+                        {mode === 'thang' && (
+                            <div className="row">
+                                <div className="col-6">
+                                    {/* Hiển thị sách mượn nhiều nhất */}
+                                    {maxBook && (
+                                        <div className={cx('summary')}>
+                                            <h3>Sách mượn nhiều nhất:</h3>
+                                            <p>{maxBook.STenSach} - {maxBook.TongSoLanMuon} lần mượn</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="col-6">
+                                    {/* Hiển thị sách mượn ít nhất */}
+                                    {minBook && (
+                                        <div className={cx('summary')}>
+                                            <h3>Sách mượn ít nhất:</h3>
+                                            <p>{minBook.STenSach} - {minBook.TongSoLanMuon} lần mượn</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                        )}
+
                         <div className={cx('summary')}>
                             <h3>Thông tin chi tiết</h3>
                             {sachNoiBat.map(book => (
@@ -324,6 +388,8 @@ const ThongKe = () => {
                                 <p>Không có dữ liệu</p>
                             )}
                         </div>
+
+
 
                         {/* Thêm thông tin tóm tắt chỉ cho 4 quý */}
                         <div className={cx('summary')}>

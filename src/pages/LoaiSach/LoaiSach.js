@@ -22,7 +22,7 @@ export class LoaiSach extends Component {
             validationError: "",
 
             currentPage: 1,
-            itemsPerPage: 7,
+            itemsPerPage: 10,
             totalPages: 0
         }
     }
@@ -325,6 +325,8 @@ export class LoaiSach extends Component {
 
                             </tr>)}
                     </tbody>
+
+
                 </table>
 
                 {/* Điều hướng phân trang */}
@@ -360,7 +362,6 @@ export class LoaiSach extends Component {
                         </ul>
                     </nav>
                 </div>
-
 
 
                 <button type="button"

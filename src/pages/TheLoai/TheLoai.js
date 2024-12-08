@@ -23,7 +23,7 @@ export class TheLoai extends Component {
 
 
             currentPage: 1,
-            itemsPerPage: 7,
+            itemsPerPage: 10,
             totalPages: 0
         };
 
@@ -367,7 +367,9 @@ export class TheLoai extends Component {
 
                             </tr>)}
                     </tbody>
+
                 </table>
+
 
                 {/* Điều hướng phân trang */}
                 <div className={cx('pagination-item')}>
@@ -402,7 +404,6 @@ export class TheLoai extends Component {
                         </ul>
                     </nav>
                 </div>
-
                 <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
                     <div className="modal-dialog modal-lg modal-dialog-centered ">
                         <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">

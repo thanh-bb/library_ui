@@ -56,7 +56,8 @@ export class Cart extends Component {
             maxBorrowingsPerMonth: 5,
             numberOfBorrowReceipts_Off: 0,
 
-            borrowedBooks: []
+            borrowedBooks: [],
+            borrowMessage: "",
 
         };
     }
@@ -233,6 +234,7 @@ export class Cart extends Component {
         this.fetchRankingData();
         this.fetchBorrowCount();
         this.checkBookBorrowedStatus();
+        this.checkCanBorrow();
     }
 
 
@@ -268,19 +270,48 @@ export class Cart extends Component {
     }
 
     handleCheckboxChange = (bookId, isChecked) => {
+        // Kiểm tra nếu đang tích chọn và đã chọn đủ 3 cuốn sách
+        if (isChecked && this.state.selectedBooks.length >= 3) {
+            // Nếu đã chọn 3 cuốn, hiển thị thông báo cảnh báo và không cho chọn thêm
+            alert("Bạn chỉ có thể chọn tối đa 3 cuốn sách.");
+            return; // Dừng lại, không cập nhật state
+        }
+
+        // Cập nhật state với các thay đổi của checkbox (tích chọn hoặc bỏ chọn)
         this.setState(prevState => {
             if (isChecked) {
-                // Nếu được chọn, thêm vào danh sách sách đã chọn
+                // Nếu tích chọn, thêm sách vào danh sách selectedBooks
                 return { selectedBooks: [...prevState.selectedBooks, bookId] };
             } else {
-                // Nếu bỏ chọn, xóa khỏi danh sách sách đã chọn
+                // Nếu bỏ chọn, loại bỏ sách khỏi danh sách selectedBooks
                 return { selectedBooks: prevState.selectedBooks.filter(id => id !== bookId) };
             }
         });
     };
 
+    // Kiểm tra sách quá hạn chưa trả
+    checkCanBorrow = async () => {
+        const token = sessionStorage.getItem('jwttoken');
+        const userId = jwtDecode(token).nameid;
 
-    handleContinue = () => {
+        try {
+            const response = await fetch(`https://localhost:44315/api/QuanLyPhieuMuon/CheckIfCanBorrow/${userId}`);
+            const data = await response.json();
+
+            if (data === "Không thể mượn thêm sách vì bạn có sách quá hạn chưa trả.") {
+                this.setState({ borrowMessage: "Không thể mượn thêm sách vì bạn có sách quá hạn chưa trả. Bạn cần trả sách trước khi mượn thêm" }); // Hiển thị thông báo
+                return false; // Không cho phép mượn sách
+            }
+            this.setState({ borrowMessage: "" }); // Xóa thông báo nếu không có vi phạm
+            return true; // Cho phép mượn sách nếu không có vi phạm
+        } catch (error) {
+            console.error("Lỗi khi kiểm tra vi phạm:", error);
+            this.setState({ borrowMessage: "Có lỗi khi kiểm tra tình trạng mượn sách." });
+            return false;
+        }
+    };
+
+    handleContinue = async () => {
         const selectedBooks = this.state.listcarts.filter(book =>
             this.state.selectedBooks.includes(book.s_Id)
         );
@@ -288,6 +319,12 @@ export class Cart extends Component {
         if (selectedBooks.length === 0) {
             alert("Vui lòng chọn ít nhất 1 cuốn sách để có thể tiếp tục!");
             return;
+        }
+
+        const canBorrow = await this.checkCanBorrow(); // Kiểm tra vi phạm
+        if (!canBorrow) {
+            alert(this.state.borrowMessage);
+            return; // Nếu có vi phạm, dừng tiến trình
         }
 
         const { numberOfBorrowReceipts_Off, maxBorrowingsPerMonth } = this.state;
@@ -299,6 +336,7 @@ export class Cart extends Component {
             window.location.href = "/chi_tiet_phieu_muon_online";
         }
     };
+
 
 
     render() {
@@ -336,21 +374,22 @@ export class Cart extends Component {
                                 {listcarts.map(dep => (
 
                                     <div className="row d-flex justify-content-center" key={dep.s_Id}>
-                                        <div className="col-1 m-auto ">
+                                        <div className="col-1 m-auto">
                                             <div className="form-check">
                                                 <input
-                                                    className={cx(' fs-1 form-check-input', {
-                                                        'disabled-checkbox': this.state.borrowedBooks.includes(dep.s_Id)  // Áp dụng lớp khi bị vô hiệu hóa
+                                                    className={cx('fs-1 form-check-input', {
+                                                        'disabled-checkbox ': this.state.borrowedBooks.includes(dep.s_Id)  // Áp dụng lớp khi bị vô hiệu hóa
                                                     })}
                                                     type="checkbox"
                                                     onChange={(e) => this.handleCheckboxChange(dep.s_Id, e.target.checked)}
-                                                    disabled={this.state.borrowedBooks.includes(dep.s_Id)}
+                                                    checked={this.state.selectedBooks.includes(dep.s_Id)} // Đảm bảo rằng checkbox được đánh dấu nếu sách đã được chọn
+                                                    disabled={this.state.selectedBooks.length >= 3 && !this.state.selectedBooks.includes(dep.s_Id) || this.state.borrowedBooks.includes(dep.s_Id)} // Vô hiệu hóa chỉ khi chưa chọn đủ 3 cuốn
                                                 />
-
-
-
                                             </div>
                                         </div>
+
+
+
 
                                         <div className="col">
                                             <div className={cx("board-item")} >
@@ -417,7 +456,6 @@ export class Cart extends Component {
                                 </div>
                             </div>
                         </div>
-
 
                     </div>
                 </div>

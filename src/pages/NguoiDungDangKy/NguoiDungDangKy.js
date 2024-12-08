@@ -28,7 +28,7 @@ export class NguoiDungDangKy extends Component {
 
 
             currentPage: 1,
-            itemsPerPage: 5,
+            itemsPerPage: 10,
             totalPages: 0
         }
     }
@@ -257,6 +257,7 @@ export class NguoiDungDangKy extends Component {
                                 ) : null}
                             </tr>)}
                     </tbody>
+
                 </table>
 
                 {/* Điều hướng phân trang */}

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import classNames from 'classnames/bind';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import {
     faEarthAsia,
     faEllipsisVertical,
@@ -20,6 +21,8 @@ import Menu from '~/components/Popper/Menu';
 import { CartIcon } from '~/components/Icons';
 import Image from '~/components/Image';
 import Search from '../Search';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const cx = classNames.bind(styles);
 
@@ -43,6 +46,30 @@ function Header() {
     const [showMenu, setShowMenu] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const [itemCount, setItemCount] = useState(0);
+    const token = sessionStorage.getItem('jwttoken');
+
+    let userId = null;
+    if (token) {
+        const decodedToken = jwtDecode(token);
+        userId = decodedToken.nameid;
+    }
+
+    useEffect(() => {
+        if (userId) {
+            // Fetch số lượng sách trong giỏ
+            const fetchCartItemCount = async () => {
+                try {
+                    const response = await axios.get(`https://localhost:44315/api/Cart/GetCartItemCount/${userId}`);
+                    setItemCount(response.data);  // Cập nhật số lượng sách
+                } catch (error) {
+                    console.error("Lỗi khi lấy số sách trong giỏ:", error);
+                }
+            };
+            fetchCartItemCount();
+        }
+    }, [userId]);
+
 
     useEffect(() => {
         if (location.pathname === '/login' || location.pathname === '/register') {
@@ -104,15 +131,32 @@ function Header() {
                                 <p className='fw-bold p-5 fs-3'>Vi phạm</p>
                             </Link>
 
-                            <Link to={config.routes.quanlypdp_user}>
+                            {/* <Link to={config.routes.quanlypdp_user}>
                                 <p className='fw-bold p-5 fs-3'>Quy định</p>
-                            </Link>
+                            </Link> */}
                         </div>
 
                         <Search />
 
                         <div className={cx('actions')}>
-                            <CartIcon link="/giosach" />
+                            <div>
+                                {/* Button với badge hiển thị số lượng */}
+                                <span className="badge text-bg-info bg-transparent position-relative fs-4 ">
+                                    <a href="/giosach">
+                                        <FontAwesomeIcon icon={faShoppingCart} className="fs-1" />
+                                        {/* Hiển thị số lượng sách nếu có */}
+                                        {itemCount > 0 && (
+                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                {itemCount}
+                                                <span className="visually-hidden">unread messages</span>
+                                            </span>
+                                        )}
+                                    </a>
+                                </span>
+
+                                {/* Cart Icon */}
+
+                            </div>
 
                             {currentUser ? (
                                 <>

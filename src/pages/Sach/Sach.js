@@ -28,10 +28,10 @@ export class Sach extends Component {
             dm_Id: 0,
             s_IdFilter: "",
             s_TenSachFilter: "",
-            s_SoLuong: 1,
+            s_SoLuong: 0,
             s_MoTa: "",
             s_TrongLuong: "",
-            s_NamXuatBan: 0,
+            s_NamXuatBan: "",
             //   s_TrangThaiMuon: true,
             s_ChiDoc: true,
             tg_Id: 0,
@@ -43,14 +43,16 @@ export class Sach extends Component {
             // s_HinhAnh: "",
             PhotoFileName: "hello.png",
             PhotoPath: "https://localhost:44315/Photos/",
-            errors: {},
+            errors: {
+                nhapKhoQuantity: ""
+            },
             hinhAnhList: [],
             images: [''],
             bookImages: {},
             hmh_Id: 0,
 
             currentPage: 1,
-            itemsPerPage: 5,
+            itemsPerPage: 10,
             totalPages: 0,
 
             nhapKhoQuantity: 0, // To store quantity for Nhập Kho
@@ -66,7 +68,7 @@ export class Sach extends Component {
         if (!this.state.tg_Id) errors.tg_Id = "Vui lòng chọn chọn tác giả";
         if (!this.state.s_NamXuatBan) errors.s_NamXuatBan = "Vui lòng chọn năm xuất bản";
         if (!this.state.nxb_Id) errors.nxb_Id = "Vui lòng chọn nhà xuất bản";
-        if (!this.state.s_SoLuong || this.state.s_SoLuong <= 0) errors.nddk_DiaChi = "Số lượng phải là một số dương lớn hơn 0";
+
         if (!this.state.tl_Id) errors.tl_Id = "Vui lòng chọn thể loại";
         if (!this.state.ks_Id) errors.ks_Id = "Vui lòng chọn kệ sách";
         if (!this.state.os_Id) errors.os_Id = "Vui lòng chọn ô sách";
@@ -84,6 +86,12 @@ export class Sach extends Component {
         return Object.keys(errors).length === 0; // Trả về true nếu không có lỗi
     };
 
+    validateFieldNhapKhos = () => {
+        const errors = {};
+        if (!this.state.nhapKhoQuantity || this.state.nhapKhoQuantity <= 0) errors.nhapKhoQuantity = "Số lượng phải là một số dương lớn hơn 0";
+        this.setState({ errors });
+        return Object.keys(errors).length === 0; // Trả về true nếu không có lỗi
+    };
 
     FilterFn() {
         var s_IdFilter = this.state.s_IdFilter;
@@ -231,7 +239,7 @@ export class Sach extends Component {
             s_SoLuong: 1,
             s_MoTa: "",
             s_TrongLuong: "",
-            s_NamXuatBan: 0,
+            s_NamXuatBan: "",
             // s_TrangThaiMuon: true,
             s_ChiDoc: true,
             tg_Id: 0,
@@ -285,8 +293,6 @@ export class Sach extends Component {
         });
     }
 
-    // handleFileChange = async (e, fieldName, index) => {
-    //     const file = e.target.files[0];
 
     //     if (file) {
     //         const formData = new FormData();
@@ -352,7 +358,7 @@ export class Sach extends Component {
 
                     // Upload từng ảnh một sau khi sách được tạo
                     this.uploadAllHinhMinhHoa(sId);
-
+                    this.clearForm();
                     this.refreshList(); // Làm mới danh sách sau khi tạo thành công
 
                 }, (error) => {
@@ -360,6 +366,26 @@ export class Sach extends Component {
                 });
         }
     };
+
+    clearForm() {
+        this.setState({
+            s_Id: 0,
+            s_TenSach: "",
+            s_SoLuong: 1,
+            s_MoTa: "",
+            s_TrongLuong: "",
+            s_NamXuatBan: "",
+            // s_TrangThaiMuon: true,
+            s_ChiDoc: true,
+            tg_Id: 0,
+            nxb_Id: 0,
+            tl_Id: 0,
+            ls_Id: 0,
+            ks_Id: 0,
+            os_Id: 0,
+            images: ['']
+        });
+    }
 
     uploadAllHinhMinhHoa = (sId) => {
         const fileNames = this.state.images;  // You are storing filenames in the `images` state
@@ -618,20 +644,48 @@ export class Sach extends Component {
     }
 
     openNhapKhoModal = (id) => {
-        this.setState({ s_Id: id, showNhapKhoModal: true });
+        this.setState({ s_Id: id, showNhapKhoModal: true, nhapKhoQuantity: 0 });
         console.log(id);
     }
 
     closeNhapKhoModal = () => {
         this.setState({ s_Id: 0, nhapKhoQuantity: 0, showNhapKhoModal: false });
     }
+    resetModal = () => {
+        this.setState({
+            nhapKhoQuantity: 0,  // Reset lại số lượng nhập kho
+            errors: {}            // Xóa lỗi nếu có
+        });
+    };
 
-    handleNhapKhoChange = (e) => {
-        this.setState({ nhapKhoQuantity: e.target.value });
-    }
+    handleNhapKhoChange = (event) => {
+        const { value } = event.target;
+        const nhapKhoQuantity = value;
+
+        // Kiểm tra nếu số lượng là số âm
+        if (nhapKhoQuantity < 0) {
+            this.setState({
+                nhapKhoQuantity,
+                errors: { nhapKhoQuantity: "Số lượng không thể là số âm!" }
+            });
+        } else {
+            this.setState({
+                nhapKhoQuantity,
+                errors: {} // Xóa thông báo lỗi khi nhập hợp lệ
+            });
+        }
+    };
 
     submitNhapKho = () => {
         const { s_Id, nhapKhoQuantity } = this.state;
+        // Kiểm tra nếu có lỗi trước khi thực hiện nhập kho
+        if (nhapKhoQuantity < 0) {
+            this.setState({
+                errors: { nhapKhoQuantity: "Số lượng không thể là số âm!" } // Cập nhật thông báo lỗi
+            });
+            return; // Dừng lại nếu có lỗi
+        }
+
 
         fetch(`https://localhost:44315/api/Sach/NhapKho/${s_Id}?soLuongNhap=${nhapKhoQuantity}`, {
             method: "PUT",
@@ -650,12 +704,13 @@ export class Sach extends Component {
                 console.error("Error during Nhập Kho:", error);
                 alert('Failed to update inventory');
             });
-    }
+
+    };
 
     editSLClick(dep) {
         this.setState({
             s_Id: dep.s_Id,
-            s_SoLuong: dep.s_SoLuong
+            s_SoLuong: 0
         });
     }
 
@@ -764,17 +819,10 @@ export class Sach extends Component {
 
         const { showNhapKhoModal, nhapKhoQuantity } = this.state;
 
-        const formattedDate = new Date(s_NamXuatBan).toISOString().split("T")[0];
+        //  const formattedDate = new Date(s_NamXuatBan).toISOString().split("T")[0];
 
         return (
             <div className={cx('wrapper')}>
-                <button type="button"
-                    className={cx('btn-grad')}
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                    onClick={() => this.addClick()}>
-                    +
-                </button>
 
                 <div className="row mb-4 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
                     <div className="col-6">
@@ -826,7 +874,7 @@ export class Sach extends Component {
                 <table className="table table-hover shadow p-3 mb-5 bg-body-tertiary rounded w-5">
                     <thead >
                         <tr >
-                            <th className="text-start ">
+                            <th className="text-start w-25">
                                 ID Sách
                             </th>
                             <th className="text-start">Hình Ảnh</th>
@@ -874,8 +922,7 @@ export class Sach extends Component {
                                     <button type="button"
                                         className="btn btn-outline-secondary fs-4 fw-bold"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#nhapKhoModal"
-                                        onClick={() => this.editSLClick(dep)}>
+                                        data-bs-target="#nhapKhoModal" onClick={() => this.editSLClick(dep)}>
 
                                         Nhập kho sách
                                     </button>
@@ -911,6 +958,8 @@ export class Sach extends Component {
                             </tr>
                         ))}
                     </tbody>
+
+
                 </table>
 
 
@@ -947,6 +996,14 @@ export class Sach extends Component {
                         </ul>
                     </nav>
                 </div>
+
+                <button type="button"
+                    className={cx('btn-grad')}
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal"
+                    onClick={() => this.addClick()}>
+                    +
+                </button>
 
 
                 <div className="modal fade " id="exampleModal" tabIndex="-1" aria-hidden="true">
@@ -1010,7 +1067,7 @@ export class Sach extends Component {
                                             )}
                                             <input
                                                 type="date"
-                                                value={formattedDate}
+                                                value={s_NamXuatBan}
                                                 onChange={this.changes_NamXuatBan}
                                                 className={cx('form-control p-2  fs-3 bg-body-secondary border-0')}
                                             />
@@ -1201,7 +1258,7 @@ export class Sach extends Component {
                         <div className="modal-content  w-75 position-absolute top-50 start-50 translate-middle">
                             <div className="modal-header">
                                 <h5 className="modal-title fs-2">Nhập kho sách</h5>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={this.resetModal}
                                 ></button>
                             </div>
 
@@ -1214,16 +1271,16 @@ export class Sach extends Component {
                                         value={nhapKhoQuantity}
                                         onChange={this.handleNhapKhoChange}
                                     />
+
                                 </div>
 
-                                {this.state.validationError && (
-                                    <p className="fw-bold text-danger float-start fs-4" role="alert">
-                                        Lưu ý: {this.state.validationError}
-                                    </p>
+                                {errors.nhapKhoQuantity && (
+                                    <span className="text-danger fs-4 float-start mb-3">{errors.nhapKhoQuantity}</span>
                                 )}
                                 <button type="button" className={cx('btn-create')} onClick={this.submitNhapKho}>
                                     Xác nhận Nhập Kho
                                 </button>
+
 
                             </div>
                         </div>

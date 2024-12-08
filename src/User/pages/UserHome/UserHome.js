@@ -310,12 +310,11 @@ export class UserHome extends Component {
         return (
             <div className={cx('wrapper')}>
                 <div className={cx("container")}>
-                    <div className="row justify-content-center mt-5 ">
+                    <div className="row justify-content-center">
                         {/* notification & news */}
                         <div className="row">
-                            <div className="col-12">
+                            {/* <div className="col-12">
                                 <div className={cx('board-item')}>
-                                    {/* <p className="fw-bold p-3 mx-2">Thông báo - Tin tức</p> */}
                                     <img
                                         className="rounded mx-auto d-block"
                                         width="800x"
@@ -324,7 +323,8 @@ export class UserHome extends Component {
                                         src={`https://localhost:44315/Photos/banner.png`}
                                     />
                                 </div>
-                            </div>
+                            </div> */}
+
                             {/* <div className="col-4">
                                 <div className={cx('board-item')}>
                                     <p className="fw-bold p-3 mx-2">Bảng xếp hạng bạn đọc (hình thức mượn trực tiếp):</p>
