@@ -337,7 +337,7 @@ export class Sach extends Component {
                 },
                 body: JSON.stringify({
                     sTenSach: this.state.s_TenSach,
-                    sSoLuong: this.state.s_SoLuong,
+                    sSoLuong: 0,
                     sMoTa: this.state.s_MoTa,
                     sTrongLuong: this.state.s_TrongLuong,
                     sNamXuatBan: this.state.s_NamXuatBan,

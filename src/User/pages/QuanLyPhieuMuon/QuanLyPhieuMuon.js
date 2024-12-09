@@ -239,10 +239,21 @@ export class QuanLyPhieuMuon extends Component {
                                         //     `Đã trả - Trễ hạn ${Math.abs(Math.floor((new Date(dep.NgayTra) - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24)))} ngày` :
                                         //     "Đã trả - Đúng hạn"
                                     ) : dep.TrangThaiMuon === "Ðang mượn" ? (
-                                        "Đang mượn"
-                                        // (new Date(dep.HanTra) - new Date()) < 0 ?
-                                        //     `${Math.floor((new Date() - new Date(dep.HanTra)) / (1000 * 60 * 60 * 24))} ngày (Quá hạn)` :
-                                        //     `Đang mượn - Còn ${Math.floor((new Date(dep.HanTra) - new Date()) / (1000 * 60 * 60 * 24))} ngày đến hạn`
+                                        // Kiểm tra xem sách có quá hạn hay không
+                                        (() => {
+                                            const currentDate = new Date();
+                                            const dueDate = new Date(dep.HanTra);
+                                            const diffTime = currentDate - dueDate;
+                                            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Tính số ngày chênh lệch
+
+                                            if (diffDays > 0) {
+                                                return `Chưa trả sách - quá hạn ${diffDays} ngày`;
+                                            } else if (diffDays < 0) {
+                                                return `Còn hạn - ${Math.abs(diffDays)} ngày còn lại`;
+                                            } else {
+                                                return "Đúng hạn";
+                                            }
+                                        })()
                                     ) : dep.TrangThaiXetDuyet === "Chờ xét duyệt" ? (
                                         "Chờ xét duyệt"
                                     ) : dep.TrangThaiXetDuyet === "Từ chối xét duyệt" ? (

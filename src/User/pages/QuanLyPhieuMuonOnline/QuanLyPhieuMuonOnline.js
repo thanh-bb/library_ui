@@ -30,7 +30,7 @@ function calculateRemainingTime(ngayMuon) {
     const now = new Date();
     const distance = hanTraDate - now;
 
-    if (distance <= 0) return "Đã quá hạn";
+    if (distance <= 0) return 0;
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24)); // Tính số ngày còn lại
     const totalHours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); // Tính số giờ còn lại
@@ -136,17 +136,20 @@ export class QuanLyPhieuMuonOnline extends Component {
                 const remainingHours = calculateRemainingTime(order.NgayMuon);
 
                 if (remainingHours <= 0) {
-                    // Trigger backend update
-                    axios.put("https://localhost:44315/api/CTPMOnline/CapNhatTrangThaiQuaHan")
+                    // Cập nhật trạng thái phiếu mượn khi quá hạn
+                    axios.put(`https://localhost:44315/api/CTPMOnline/CapNhatTrangThaiQuaHan`)
                         .then(response => {
-                            console.log("Status updated for overdue book.");
-                            this.refreshList();
+                            console.log(`Trạng thái phiếu mượn ID ${order.Id_PhieuMuon} đã được cập nhật.`);
+                            this.refreshList(); // Làm mới danh sách để hiển thị trạng thái cập nhật
                         })
-                        .catch(error => console.error("Failed to update status:", error));
+                        .catch(error => {
+                            console.error("Không thể cập nhật trạng thái phiếu mượn:", error);
+                        });
                 }
             }
         });
     }
+
 
     FilterFn() {
         const { selectedTag, tensachWithoutFilter } = this.state;

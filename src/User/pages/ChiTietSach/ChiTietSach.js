@@ -419,115 +419,118 @@ function ChiTietSach() {
 
                                                 <br />
 
-                                                <div className={cx("btn rounded-pill bg-primary-subtle text-primary fw-bold mt-5 me-3")}>
-                                                    <p className='mb-0 fw-bold fs-4'>
-                                                        {sach?.s_SoLuong > 1
-                                                            ? "Trong kho sẵn sàng"
-                                                            : "Chưa sẵn sàng"}
-                                                    </p>
-
-                                                </div>
-
-                                                <span className={cx("btn rounded-pill bg-primary-subtle text-primary fw-bold mt-5")}>
-                                                    <p className='mb-0 fw-bold fs-4'>{sach?.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach?.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</p>
-                                                </span>
-
-                                                <div className={cx("btn rounded-pill bg-primary-subtle text-primary-emphasis fw-bold mt-4 mb-3")}>
-                                                    <p className='mb-0 fw-bold fs-4'>Số lượng thực tế sách có thể mượn: {sach?.s_SoLuong - 1}</p>
-                                                </div>
-
-                                                <br />
-
-                                                <div className="d-flex align-items-center mt-5">
-                                                    <p className="text-danger fw-bold mb-0 me-2">Lưu ý:</p>
-                                                    <span className={cx("btn rounded-pill bg-danger-subtle text-danger fw-bold")}>
-                                                        {!userActive.nd_active && (
-                                                            <p className="mb-0 fw-bold fs-3">
-                                                                Tài khoản của bạn đã bị khóa do vi phạm quy định của thư viện nên tạm thời bạn không thể mượn sách
+                                                {sach?.s_TrangThaiMuon && (
+                                                    <div>
+                                                        <div className={cx("btn rounded-pill bg-primary-subtle text-primary fw-bold mt-5 me-3")}>
+                                                            <p className='mb-0 fw-bold fs-4'>
+                                                                {sach?.s_SoLuong > 1
+                                                                    ? "Trong kho sẵn sàng"
+                                                                    : "Chưa sẵn sàng"}
                                                             </p>
-                                                        )}
-                                                        {userActive.nd_active && (
-                                                            (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) >= maxBorrowingsPerMonth ? (
-                                                                <p className="mb-0 fw-bold fs-3 pe-auto">Bạn đã mượn đủ số lần cho phép của tháng này</p>
-                                                            ) : (
-                                                                <p className="mb-0 fw-bold fs-3">Bạn còn {maxBorrowingsPerMonth - (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl)} lần mượn sách trong tháng này</p>
-                                                            )
-                                                        )}
-                                                    </span>
-                                                </div>
 
-                                                {/* Hiển thị nút "Tiến hành mượn sách" nếu sách có sẵn để mượn */}
-                                                {userActive.nd_active && sach?.s_TrangThaiMuon && (
-                                                    <>
-                                                        <div className='d-flex justify-content-end me-4'>
-                                                            <span className={cx("btn rounded-pill bg-danger-subtle text-danger fw-bold mt-3 ")}>
-                                                                {(numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) >= maxBorrowingsPerMonth && (
-                                                                    <p className="mb-0 fw-bold fs-3 pe-auto">Bạn không thể mượn sách về nhà</p>
+                                                        </div>
+
+                                                        <span className={cx("btn rounded-pill bg-primary-subtle text-primary fw-bold mt-5")}>
+                                                            <p className='mb-0 fw-bold fs-4'>{sach?.s_ChiDoc === true ? "Chỉ được đọc tại thư viện" : sach?.s_ChiDoc === false ? "Được mượn về nhà" : "Trạng thái không xác định"}</p>
+                                                        </span>
+
+                                                        <div className={cx("btn rounded-pill bg-primary-subtle text-primary-emphasis fw-bold mt-4 mb-3")}>
+                                                            <p className='mb-0 fw-bold fs-4'>Số lượng thực tế sách có thể mượn: {sach?.s_SoLuong - 1}</p>
+                                                        </div>
+
+                                                        <br />
+
+                                                        <div className="d-flex align-items-center mt-5">
+                                                            <p className="text-danger fw-bold mb-0 me-2">Lưu ý:</p>
+                                                            <span className={cx("btn rounded-pill bg-danger-subtle text-danger fw-bold")}>
+                                                                {!userActive.nd_active && (
+                                                                    <p className="mb-0 fw-bold fs-3">
+                                                                        Tài khoản của bạn đã bị khóa do vi phạm quy định của thư viện nên tạm thời bạn không thể mượn sách
+                                                                    </p>
+                                                                )}
+                                                                {userActive.nd_active && (
+                                                                    (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) >= maxBorrowingsPerMonth ? (
+                                                                        <p className="mb-0 fw-bold fs-3 pe-auto">Bạn đã mượn đủ số lần cho phép của tháng này</p>
+                                                                    ) : (
+                                                                        <p className="mb-0 fw-bold fs-3">Bạn còn {maxBorrowingsPerMonth - (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl)} lần mượn sách trong tháng này</p>
+                                                                    )
                                                                 )}
                                                             </span>
                                                         </div>
 
-                                                        {(sach?.s_ChiDoc === false && sach?.s_SoLuong > 1) ? (
-                                                            <div className="row d-flex justify-content-between mt-5">
-                                                                {/* Nút "Thêm vào giỏ sách" */}
-                                                                {!isBookAvailable ? (
-                                                                    <button
-                                                                        type="button"
-                                                                        className={cx('col', 'btn-existed', 'me-5')}
-                                                                        disabled
-                                                                    >
-                                                                        Sách đã có trong giỏ sách
-                                                                    </button>
-                                                                ) : (
-                                                                    <button
-                                                                        type="button"
-                                                                        className={cx('col', 'btn-continue', 'me-5')}
-                                                                        onClick={handleAddToCart}
-                                                                    >
-                                                                        Thêm vào giỏ sách
-                                                                    </button>
-                                                                )
-                                                                }
+                                                        {/* Hiển thị nút "Tiến hành mượn sách" nếu sách có sẵn để mượn */}
+                                                        {userActive.nd_active && sach?.s_TrangThaiMuon && (
+                                                            <>
+                                                                <div className='d-flex justify-content-end me-4'>
+                                                                    <span className={cx("btn rounded-pill bg-danger-subtle text-danger fw-bold mt-3 ")}>
+                                                                        {(numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) >= maxBorrowingsPerMonth && (
+                                                                            <p className="mb-0 fw-bold fs-3 pe-auto">Bạn không thể mượn sách về nhà</p>
+                                                                        )}
+                                                                    </span>
+                                                                </div>
 
-                                                                {/* Nút "Mượn sách ngay" chỉ hiển thị khi chưa mượn sách */}
-                                                                {/* Nút "Mượn sách ngay" */}
-                                                                {!isBookBorrowed && canBorrow && (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) < maxBorrowingsPerMonth ? (
-                                                                    <Link
-                                                                        to={`/chitietsach/formphieumuon/${sach?.s_Id}`}
-                                                                        className="col btn-return"
-                                                                    >
-                                                                        Mượn sách ngay
-                                                                    </Link>
+                                                                {(sach?.s_ChiDoc === false && sach?.s_SoLuong > 1) ? (
+                                                                    <div className="row d-flex justify-content-between mt-5">
+                                                                        {/* Nút "Thêm vào giỏ sách" */}
+                                                                        {!isBookAvailable ? (
+                                                                            <button
+                                                                                type="button"
+                                                                                className={cx('col', 'btn-existed', 'me-5')}
+                                                                                disabled
+                                                                            >
+                                                                                Sách đã có trong giỏ sách
+                                                                            </button>
+                                                                        ) : (
+                                                                            <button
+                                                                                type="button"
+                                                                                className={cx('col', 'btn-continue', 'me-5')}
+                                                                                onClick={handleAddToCart}
+                                                                            >
+                                                                                Thêm vào giỏ sách
+                                                                            </button>
+                                                                        )
+                                                                        }
+
+                                                                        {/* Nút "Mượn sách ngay" chỉ hiển thị khi chưa mượn sách */}
+                                                                        {/* Nút "Mượn sách ngay" */}
+                                                                        {!isBookBorrowed && canBorrow && (numberOfBorrowReceipts_Off + numberOfBorrowReceipts_Onl) < maxBorrowingsPerMonth ? (
+                                                                            <Link
+                                                                                to={`/chitietsach/formphieumuon/${sach?.s_Id}`}
+                                                                                className={cx('col', 'btn-return')}
+
+                                                                            >
+                                                                                Mượn sách ngay
+                                                                            </Link>
+                                                                        ) : (
+                                                                            <button
+                                                                                type="button"
+                                                                                className={cx('col', 'btn-disable')}
+                                                                                disabled
+                                                                            >
+                                                                                {isBookBorrowed ? "Bạn đã mượn sách này" : borrowMessage || "Bạn không thể mượn sách về nhà"}
+                                                                            </button>
+                                                                        )}
+
+                                                                    </div>
                                                                 ) : (
-                                                                    <button
-                                                                        type="button"
-                                                                        className={cx('col', 'btn-disable')}
-                                                                        disabled
-                                                                    >
-                                                                        {isBookBorrowed ? "Bạn đã mượn sách này" : borrowMessage || "Bạn không thể mượn sách về nhà"}
-                                                                    </button>
+                                                                    <div className='row d-flex justify-content-between mt-5'>
+                                                                        <button
+                                                                            type="button"
+                                                                            className={cx('col', 'btn-disable')}
+                                                                            disabled
+                                                                        >
+                                                                            Bạn không thể mượn sách về nhà
+                                                                        </button>
+                                                                    </div>
                                                                 )}
-
-                                                            </div>
-                                                        ) : (
-                                                            <div className='row d-flex justify-content-between mt-5'>
-                                                                <button
-                                                                    type="button"
-                                                                    className={cx('col', 'btn-disable')}
-                                                                    disabled
-                                                                >
-                                                                    Bạn không thể mượn sách về nhà
-                                                                </button>
-                                                            </div>
+                                                            </>
                                                         )}
-                                                    </>
+
+
+
+
+                                                    </div>
                                                 )}
-
-
-
-
-
-
 
                                             </>
                                         )}

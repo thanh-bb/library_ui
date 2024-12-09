@@ -75,6 +75,10 @@ export class Cart extends Component {
                 .then(response => response.json())
                 .then(data => {
                     this.setState({ listcarts: data }, () => {
+                        if (data.length > 0) {
+                            sessionStorage.setItem('cartId', data[0].gh_Id);  // Lưu gh_Id của giỏ hàng đầu tiên
+                        }
+
                         // Gọi checkBookBorrowedStatus sau khi cập nhật listcarts
                         this.checkBookBorrowedStatus();
                     });
@@ -378,7 +382,7 @@ export class Cart extends Component {
                                             <div className="form-check">
                                                 <input
                                                     className={cx('fs-1 form-check-input', {
-                                                        'disabled-checkbox ': this.state.borrowedBooks.includes(dep.s_Id)  // Áp dụng lớp khi bị vô hiệu hóa
+                                                        'disabled-checkbox': this.state.borrowedBooks.includes(dep.s_Id)  // Áp dụng lớp khi bị vô hiệu hóa
                                                     })}
                                                     type="checkbox"
                                                     onChange={(e) => this.handleCheckboxChange(dep.s_Id, e.target.checked)}

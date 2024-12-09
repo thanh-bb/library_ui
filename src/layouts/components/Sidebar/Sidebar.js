@@ -70,27 +70,7 @@ function Sidebar() {
                     )}
 
 
-                    {/* Quản lý thống kê */}
-                    <div className="d-flex flex-column" onClick={toggleChartInfo} style={{ cursor: 'pointer' }}>
-                        <TitleMenu
-                            title="Thống kê"
-                            icon={<ChartIcon />}
-                            activeIcon={<ChartActiveIcon />}
-                            to={config.routes.thongke}
-                        />
-                        <hr style={{ margin: '0' }}></hr>
-                    </div>
-                    {isChartInfoOpen && (
-                        <div className={cx('dropdown-content')}>
 
-                            <MenuItem
-                                title="Thống kê mượn sách"
-                                to={config.routes.thongke}
-                                icon=""
-                            />
-
-                        </div>
-                    )}
 
                     {/* Quản lý thông tin sách */}
                     <div className="d-flex flex-column" onClick={toggleBookInfo} style={{ cursor: 'pointer' }}>
@@ -202,6 +182,27 @@ function Sidebar() {
                                 to={config.routes.phieutraonline}
                                 icon=""
                             />
+                        </div>
+                    )}
+                    {/* Quản lý thống kê */}
+                    <div className="d-flex flex-column" onClick={toggleChartInfo} style={{ cursor: 'pointer' }}>
+                        <TitleMenu
+                            title="Thống kê"
+                            icon={<ChartIcon />}
+                            activeIcon={<ChartActiveIcon />}
+                            to={config.routes.thongke}
+                        />
+                        <hr style={{ margin: '0' }}></hr>
+                    </div>
+                    {isChartInfoOpen && (
+                        <div className={cx('dropdown-content')}>
+
+                            <MenuItem
+                                title="Thống kê mượn sách"
+                                to={config.routes.thongke}
+                                icon=""
+                            />
+
                         </div>
                     )}
 

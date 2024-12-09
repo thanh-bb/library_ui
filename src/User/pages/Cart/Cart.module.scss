@@ -126,13 +126,17 @@
 }
 
 .disabled-checkbox {
-    background-color: #f0f0f0; /* Màu nền xám nhạt */
+    background-color: #646464; /* Màu nền xám nhạt */
     border-color: #ccc; /* Màu viền xám */
     cursor: not-allowed; /* Con trỏ chuột sẽ thay đổi thành dạng không cho phép */
     opacity: 0.6; /* Làm mờ checkbox */
 }
 
 .disabled-checkbox:checked {
-    background-color: #e0e0e0; /* Màu nền khi được chọn */
+    background-color: #555555; /* Màu nền khi được chọn */
     border-color: #bbb;
+}
+
+.form-check-input:disabled {
+    background-color: #555555;
 }

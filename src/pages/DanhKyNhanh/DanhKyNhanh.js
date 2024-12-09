@@ -126,7 +126,7 @@ export class DanhKyNhanh extends Component {
 
         // Kiểm tra nếu đã đạt giới hạn 5 cuốn sách
         if (books.length >= 3) {
-            this.setState({ errorMessage1: "Bạn chỉ có thể mượn tối đa 5 cuốn sách." });
+            this.setState({ errorMessage1: "Bạn chỉ có thể mượn tối đa 3 cuốn sách." });
             return;
         }
 

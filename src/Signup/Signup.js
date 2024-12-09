@@ -154,6 +154,8 @@ export class Signup extends Component {
 
     validateFields = () => {
         const errors = {};
+
+        // Kiểm tra các trường bắt buộc
         if (!this.state.nddk_HoTen) errors.nddk_HoTen = "Trường này bắt buộc nhập";
         if (!this.state.nddk_CCCD) errors.nddk_CCCD = "Trường này bắt buộc nhập";
         if (!this.state.nddk_NgaySinh) errors.nddk_NgaySinh = "Bạn hãy chọn ngày sinh";
@@ -161,16 +163,33 @@ export class Signup extends Component {
         if (!this.state.nddk_SoDienThoai) errors.nddk_SoDienThoai = "Trường này bắt buộc nhập";
         if (!this.state.nddk_DiaChi) errors.nddk_DiaChi = "Trường này bắt buộc nhập";
 
-        // Kiểm tra nếu chưa chọn ảnh 3x4
+        // Kiểm tra định dạng Email
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (this.state.nddk_Email && !emailRegex.test(this.state.nddk_Email)) {
+            errors.nddk_Email = "Email không hợp lệ";
+        }
+
+        // Kiểm tra định dạng số điện thoại
+        const phoneRegex = /^[0-9]{10,11}$/; // Số điện thoại 10-11 chữ số
+        if (this.state.nddk_SoDienThoai && !phoneRegex.test(this.state.nddk_SoDienThoai)) {
+            errors.nddk_SoDienThoai = "Số điện thoại không hợp lệ";
+        }
+
+        // Kiểm tra định dạng số CCCD (12 chữ số)
+        const cccdRegex = /^[0-9]{12}$/;
+        if (this.state.nddk_CCCD && !cccdRegex.test(this.state.nddk_CCCD)) {
+            errors.nddk_CCCD = "Số CCCD phải gồm 12 chữ số";
+        }
+
+        // Kiểm tra nếu chưa chọn ảnh
         if (!this.state.nddk_HinhThe) errors.nddk_HinhThe = "Bạn cần tải lên ảnh 3x4";
-        // Kiểm tra nếu chưa chọn ảnh mặt trước CCCD
         if (!this.state.nddk_CCCD_MatTruoc) errors.nddk_CCCD_MatTruoc = "Bạn cần tải lên ảnh mặt trước CCCD";
-        // Kiểm tra nếu chưa chọn ảnh mặt sau CCCD
         if (!this.state.nddk_CCCD_MatSau) errors.nddk_CCCD_MatSau = "Bạn cần tải lên ảnh mặt sau CCCD";
 
         this.setState({ errors });
         return Object.keys(errors).length === 0; // Trả về true nếu không có lỗi
     };
+
 
 
     nextStep = () => {

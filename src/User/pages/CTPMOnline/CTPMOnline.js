@@ -7,6 +7,7 @@ const cx = classNames.bind(styles);
 
 const token = sessionStorage.getItem('jwttoken');
 const selectedBooks = JSON.parse(sessionStorage.getItem('selectedBooks'));
+const cartId = sessionStorage.getItem('cartId');
 
 function formatDateToString(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
@@ -168,6 +169,7 @@ export class CTPMOnline extends Component {
 
     handleOrderSubmit = () => {
         const token = sessionStorage.getItem('jwttoken');
+        const cartId = sessionStorage.getItem('cartId');
         if (token) {
             const decodedToken = jwtDecode(token);
             const userId = decodedToken.nameid;
@@ -199,6 +201,12 @@ export class CTPMOnline extends Component {
                 .then(response => response.json())
                 .then(result => {
                     if (result) {
+                        // Xóa các sách đã chọn khỏi giỏ
+                        selectedBooks.forEach(book => {
+                            this.deleteBookFromCart(cartId, book.s_Id);  // Gọi hàm xóa từng sách
+                            console.log(cartId, book.s_Id);
+                        });
+
                         alert("Đặt sách thành công! Vui lòng đến thư viện để nhận sách.");
                         window.location.href = '/quanlyphieumuononline';
                     } else {
@@ -213,7 +221,27 @@ export class CTPMOnline extends Component {
     }
 
 
-
+    // Hàm xóa sách khỏi giỏ
+    deleteBookFromCart = (cartId, s_Id) => {
+        fetch(`https://localhost:44315/api/Cart?gh_Id=${cartId}&s_Id=${s_Id}`, {
+            method: "DELETE",  // Sử dụng DELETE thay vì POST
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.includes("Xóa sách thành công")) {
+                    console.log(`Sách ID ${s_Id} đã bị xóa khỏi giỏ.`);
+                } else {
+                    console.error(`Lỗi xóa sách ID ${s_Id}: ${result}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting book from cart:', error);
+            });
+    }
 
 
     render() {
